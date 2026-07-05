@@ -2617,6 +2617,7 @@ function renderInstTeams() {
       <span style="color:var(--muted-light);font-size:.76rem">Kleur is optioneel (bv. #DC2626) — laat leeg om de huidige kleur te behouden.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateTeams()">&#8681; Download huidige teams als CSV</button>
       <input type="file" id="teams-csv-file" accept=".csv,.txt" style="display:none" onchange="teamsCsvLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('teams-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
@@ -2948,6 +2949,7 @@ function renderInstPlanningImport() {
       <span style="color:var(--muted-light);font-size:.76rem">"Type" moet een bestaand label zijn (zie Kampbeheer → Labels). Bij het label "8-Kamp" wordt automatisch een 8-Kamp aangemaakt.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplatePlanning()">&#8681; Download voorbeeld-CSV</button>
       <input type="file" id="plan-csv-file" accept=".csv,.txt" style="display:none" onchange="planningLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('plan-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
@@ -3536,6 +3538,7 @@ function renderInstSpelers() {
         <span style="color:var(--muted-light);font-size:.76rem">Een kopregel (Naam, Name, Speler) wordt automatisch overgeslagen.</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+        <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateSpelers()">&#8681; Download voorbeeld-CSV</button>
         <input type="file" id="inst-csv-file" accept=".csv,.txt" style="display:none" onchange="instLeesBestand(this)">
         <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('inst-csv-file').click()">&#128196; Bestand uploaden</button>
         <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
@@ -3564,6 +3567,73 @@ function instLeesBestand(input) {
     instPreviewCsv();
   };
   reader.readAsText(file, 'UTF-8');
+}
+
+// ── DOWNLOAD-TEMPLATES VOOR IMPORTS ───────────────────────────
+// Elke import-tab in Kampbeheer heeft een knop om een lege/ingevulde voorbeeld-CSV te
+// downloaden (te openen/bewerken in Excel of Google Sheets), zodat je nooit zelf het
+// kolomformaat hoeft uit te zoeken. Gebruikt hetzelfde BOM+Blob-downloadpatroon als
+// exportCsv/archiefDownload.
+function csvVeld(v) {
+  v = v == null ? '' : String(v);
+  return /[",;\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+}
+function csvRegel(velden) { return velden.map(csvVeld).join(','); }
+function downloadTekstBestand(bestandsnaam, inhoud, mimeType) {
+  const BOM = '﻿';
+  const blob = new Blob([BOM + inhoud], {type: mimeType + ';charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = bestandsnaam; a.click();
+  URL.revokeObjectURL(url);
+}
+function downloadCsvTemplate(bestandsnaam, headers, rijen) {
+  const csv = [csvRegel(headers), ...rijen.map(csvRegel)].join('\n') + '\n';
+  downloadTekstBestand(bestandsnaam, csv, 'text/csv');
+  showToast(`&#8681; ${bestandsnaam} gedownload`);
+}
+
+function downloadTemplateSpelers() {
+  downloadCsvTemplate('spelers_template.csv', ['Naam','Leeftijd','HuidigTeam','Kampteam'], [
+    ['Liam Vermeer', 9, 'FC Utrecht', TEAMS[0]?.name || 'Rood Vuur'],
+    ['Noah Dekker', 10, 'Ajax', TEAMS[1]?.name || 'Blauw Staal'],
+  ]);
+}
+
+function downloadTemplateTeams() {
+  downloadCsvTemplate('teams_template.csv', ['Naam','Leider','Kleur'], TEAMS.map(t => [t.name, t.leader, t.color]));
+}
+
+function downloadTemplateKampstaf() {
+  downloadCsvTemplate('kampstaf_template.csv', ['Naam'],
+    EXTRA_STAF.length ? EXTRA_STAF.map(n => [n]) : [['Kok Piet'], ['EHBO Anna']]);
+}
+
+function downloadTemplatePlanning() {
+  const dag = KAMPdagen[1] || KAMPdagen[0] || 'Maandag';
+  const label1 = LABELS.find(l => l.systeem)?.naam || 'Teamklassement';
+  downloadCsvTemplate('planning_template.csv', ['Dag','Tijd','Type','Spelnaam','Leider','Duur'], [
+    [dag, '10:00', '8-Kamp', 'Ochtendspel', LEADERS[0] || 'Thomas', 60],
+    [dag, '15:00', label1, 'Middagspel', LEADERS[1] || 'Sven', 45],
+  ]);
+}
+
+function downloadTemplatePreOntbijt() {
+  const dag = KAMPdagen[1] || KAMPdagen[0] || 'Maandag';
+  const t = TEAMS;
+  downloadCsvTemplate('pre_ontbijt_template.csv', ['Dag','Slot','SpelNaam','Leider1','Leider2','Veld','Team1','Team2'], [
+    [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 1, t[0]?.name||'Rood Vuur', t[1]?.name||'Blauw Staal'],
+    [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 2, t[2]?.name||'Groen Woud', t[3]?.name||'Geel Zand'],
+    [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 3, t[4]?.name||'Oranje Zon', t[5]?.name||'Paars Veld'],
+    [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 4, t[6]?.name||'Zwart Rots', t[7]?.name||'Wit Licht'],
+  ]);
+}
+
+function downloadTemplateAtletiek() {
+  const dag = KAMPdagen[1] || KAMPdagen[0] || 'Maandag';
+  downloadCsvTemplate('atletiek_template.csv', ['Dag','Slot','Spelnaam','Leider1','Leider2','ScoreType'], [
+    [dag, 1, 'Kogelstoten', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 'aantal'],
+    [dag, 2, '60m Sprint', LEADERS[2]||'Rick', LEADERS[3]||'Pieter', 'tijd'],
+  ]);
 }
 
 // Generieke CSV/plak-parser: kolommen is een array van veldnamen, in de volgorde waarin ze
@@ -4168,6 +4238,7 @@ function renderInstKampstaf() {
       <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Naam</code>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateKampstaf()">&#8681; Download voorbeeld-CSV</button>
       <input type="file" id="kampstaf-csv-file" accept=".csv,.txt" style="display:none" onchange="kampstafCsvLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('kampstaf-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
@@ -4219,6 +4290,7 @@ function renderInstAtletiekImport() {
       <span style="color:var(--muted-light);font-size:.76rem">Slot is 1 t/m 4 (het spel-nummer die dag). ScoreType is "aantal" of "tijd".</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateAtletiek()">&#8681; Download voorbeeld-CSV</button>
       <input type="file" id="atletiek-csv-file" accept=".csv,.txt" style="display:none" onchange="atletiekCsvLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('atletiek-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
@@ -4275,6 +4347,7 @@ function renderInstPreImport() {
       <span style="color:var(--muted-light);font-size:.76rem">Slot is 1 of 2 (welk van de 2 pre-ontbijtspellen die dag). Veld is 1 t/m 4.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplatePreOntbijt()">&#8681; Download voorbeeld-CSV</button>
       <input type="file" id="pre-csv-file" accept=".csv,.txt" style="display:none" onchange="preCsvLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('pre-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
