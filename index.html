@@ -3651,19 +3651,30 @@ function instToepassen() {
   const kleurMap = {};
   kampteams.forEach((t,i) => { kleurMap[t] = KAMPTEAM_KLEUREN_PALET[i % KAMPTEAM_KLEUREN_PALET.length]; });
 
-  const nieuweSpelers = SPELERLIJST_IMPORT.map((s, idx) => ({
-    num: idx + 1,
-    name: s.naam,
-    leeftijd: s.leeftijd,
-    huidigTeam: s.huidigTeam,
-    team: s.kampTeam,
-    teamId: kampteams.indexOf(s.kampTeam) + 1,
-    color: kleurMap[s.kampTeam],
-    indPts: 0,
-  }));
+  // Nummer spelers per team (net als de vaste teamlijst: #1, #2, ... binnen elk team),
+  // niet doorlopend over de hele CSV heen.
+  const volgnrPerTeam = {};
+  const nieuweSpelers = SPELERLIJST_IMPORT.map(s => {
+    const teamId = kampteams.indexOf(s.kampTeam) + 1;
+    volgnrPerTeam[teamId] = (volgnrPerTeam[teamId] || 0) + 1;
+    return {
+      num: volgnrPerTeam[teamId],
+      name: s.naam,
+      leeftijd: s.leeftijd,
+      huidigTeam: s.huidigTeam,
+      team: s.kampTeam,
+      teamId,
+      color: kleurMap[s.kampTeam],
+      indPts: 0,
+    };
+  });
 
   // Vervang PLAYERS_ALL in-place
   PLAYERS_ALL.splice(0, PLAYERS_ALL.length, ...nieuweSpelers);
+
+  // Teams bijwerken zodat de Teams-pagina/-modal de geïmporteerde spelers laat zien i.p.v.
+  // de oude voorbeelddata (dit werd eerder gemist — TEAMS[i].players stond los van PLAYERS_ALL).
+  instSyncTeams(kampteams, kleurMap);
 
   // Initialiseer penalty-verdubbelaar voor nieuwe spelers
   nieuweSpelers.forEach(p => { if(!(p.name in penVerdubbelaar)) penVerdubbelaar[p.name] = null; });
@@ -3675,9 +3686,34 @@ function instToepassen() {
     IND_LEEFTIJDEN[cat].spelers.push(p.name);
   });
 
+  logActie('Spelers geïmporteerd', `${nieuweSpelers.length} spelers in ${kampteams.length} kampteams`);
   showToast(`&#10003; ${nieuweSpelers.length} spelers geïmporteerd in ${kampteams.length} kampteams!`);
+  if(kampteams.length !== TEAMS.length) {
+    showToast(`&#9888; CSV heeft ${kampteams.length} kampteams, app heeft er ${TEAMS.length} — controleer Kampbeheer → Teams`);
+  }
   SPELERLIJST_IMPORT = [];
   renderInstellingen();
+  renderTeams(); renderDashboard(); renderTeamKlassement();
+}
+
+// Zet de spelerslijst per kampteam (uit PLAYERS_ALL) terug in TEAMS[i].players, zodat de
+// Teams-pagina/-modal altijd de laatst geïmporteerde spelers tonen. Teamnaam wordt
+// gesynchroniseerd met de "Kampteam"-kolom uit de CSV; leider/kleur van een bestaand team
+// blijven staan (die stel je apart in via Kampbeheer → Teams) — alleen nieuwe teams krijgen
+// een kleur uit het palet en een lege leider.
+function instSyncTeams(kampteams, kleurMap) {
+  kampteams.forEach((naam, i) => {
+    const teamId = i + 1;
+    let team = TEAMS.find(t => t.id === teamId);
+    if(!team) {
+      team = { id: teamId, name: naam, leader: '', color: kleurMap[naam], players: [] };
+      TEAMS.push(team);
+    } else {
+      team.name = naam;
+    }
+    team.players = PLAYERS_ALL.filter(p => p.teamId === teamId).map(p => ({ num: p.num, name: p.name }));
+  });
+  LEADERS.splice(0, LEADERS.length, ...TEAMS.map(t => t.leader));
 }
 
 function instHuidigeSpelersHtml() {
