@@ -242,20 +242,20 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
       <div style="font-size:.83rem;color:#64748B;margin-top:4px">2026 · Inloggen om door te gaan</div>
     </div>
     <div style="margin-bottom:14px">
-      <label style="font-size:.73rem;font-weight:700;color:#64748B;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">E-mailadres</label>
-      <input id="login-email" type="email" class="login-input" placeholder="naam@kamp.nl" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      <label style="font-size:.73rem;font-weight:700;color:#64748B;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Gebruikersnaam</label>
+      <input id="login-email" type="text" autocomplete="username" class="login-input" placeholder="voornaamachternaam" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
     </div>
     <div style="margin-bottom:20px">
       <label style="font-size:.73rem;font-weight:700;color:#64748B;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Wachtwoord</label>
-      <input id="login-pass" type="password" class="login-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <input id="login-pass" type="password" autocomplete="current-password" class="login-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <div id="login-err" style="display:none;margin-bottom:12px;padding:9px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;font-size:.83rem;color:#DC2626;font-weight:600">⚠️ Ongeldig e-mailadres of wachtwoord</div>
+    <div id="login-err" style="display:none;margin-bottom:12px;padding:9px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;font-size:.83rem;color:#DC2626;font-weight:600">⚠️ Ongeldige gebruikersnaam of wachtwoord</div>
     <button onclick="doLogin()" style="width:100%;padding:13px;background:#2563EB;color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 12px rgba(37,99,235,.35)">Inloggen →</button>
     <div style="margin-top:20px;padding:14px;background:#EFF6FF;border-radius:10px;font-size:.75rem;color:#1D4ED8;line-height:2">
       <strong>Demo accounts:</strong><br>
-      admin@kamp.nl / admin2026 · <span style="background:#2563EB;color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">Admin</span><br>
-      thomas@kamp.nl / rood2026 · <span style="background:#059669;color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">Groepsleider</span><br>
-      staf@kamp.nl / kamp2026 · <span style="background:#7C3AED;color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">Kampstaf</span>
+      admin / admin2026 · <span style="background:#2563EB;color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">Admin</span><br>
+      thomas / rood2026 · <span style="background:#059669;color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">Groepsleider</span><br>
+      kampstaf / kamp2026 · <span style="background:#7C3AED;color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">Kampstaf</span>
     </div>
   </div>
 </div>
@@ -277,6 +277,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <button class="nav-btn" onclick="showSection('teams',this)">&#128085; Teams</button>
     <button class="nav-btn" onclick="showSection('achtkamp',this)">&#127919; 8-Kamp</button>
     <button class="nav-btn" onclick="showSection('planning',this)">&#128197; Planning</button>
+    <button class="nav-btn" onclick="showSection('spellen',this)">&#127918; Spellen</button>
     <button class="nav-btn" onclick="showSection('exporteren',this)">&#128229; Exporteren</button>
     <button class="nav-btn" id="nav-instellingen" onclick="showSection('instellingen',this)">&#9881;&#65039; Instellingen</button>
   </nav>
@@ -287,9 +288,9 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <!-- DASHBOARD -->
 <div class="section active" id="section-dashboard">
   <div class="hero">
-    <div class="hero-day">PUPILLENKAMP 2026 — WEEK 1</div>
+    <div class="hero-day" id="hero-day">PUPILLENKAMP 2026 — WEEK 1</div>
     <div class="hero-title">Goedemiddag,<br>Groepsleiders!</div>
-    <div class="hero-sub">Zorg dat alle scores van vandaag zijn ingevoerd ✅</div>
+    <div class="hero-sub" id="hero-sub">Zorg dat alle scores van vandaag zijn ingevoerd ✅</div>
   </div>
   <div class="grid-4" style="margin-bottom:16px">
     <div class="stat-card"><div class="num">8</div><div class="lbl">Teams</div></div>
@@ -388,15 +389,18 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
   <div class="tab-row">
     <button class="tab active" onclick="setTab('teams','overzicht',this)">&#128085; Teams</button>
     <button class="tab" onclick="setTab('teams','staf',this)">&#128101; Kampstaf</button>
+    <button class="tab" onclick="setTab('teams','beheren',this)">&#9881;&#65039; Beheren</button>
   </div>
   <div id="teams-overzicht"></div>
   <div id="teams-staf" style="display:none"></div>
+  <div id="teams-beheren" style="display:none"></div>
 </div>
 
 <!-- 8-KAMP -->
 <div class="section" id="section-achtkamp">
   <div class="page-title">8-Kamp</div>
   <div class="page-sub">8 sub-spellen → totaalscore → eindstand telt mee voor teamklassement</div>
+  <div id="ak-picker"></div>
   <div class="tab-row">
     <button class="tab active" onclick="setTab('ak','invoer',this)">Invoer</button>
     <button class="tab" onclick="setTab('ak','stand',this)">Eindstand</button>
@@ -411,7 +415,15 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-planning">
   <div class="page-title">Weekplanning</div>
   <div class="page-sub" id="planning-sub">Klik op een spel om direct de score in te voeren</div>
+  <div id="planning-import"></div>
   <div id="planning-content"></div>
+</div>
+
+<!-- SPELLEN -->
+<div class="section" id="section-spellen">
+  <div class="page-title">Spellen</div>
+  <div class="page-sub">Alle spellen op een rij, met leider en duur — filter om snel te zien wanneer iemand speelt</div>
+  <div id="spellen-content"></div>
 </div>
 
 <!-- EXPORTEREN -->
@@ -425,7 +437,18 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-instellingen">
   <div class="page-title">Instellingen</div>
   <div class="page-sub">Spelerslijst importeren en kampteams beheren</div>
-  <div id="inst-content"></div>
+  <div class="tab-row">
+    <button class="tab active" onclick="setTab('inst','spelers',this)">&#128085; Spelers</button>
+    <button class="tab" onclick="setTab('inst','labels',this)">&#127991;&#65039; Labels</button>
+    <button class="tab" onclick="setTab('inst','leiders',this)">&#128100; Leiders</button>
+    <button class="tab" onclick="setTab('inst','kamp',this)">&#128190; Kamp &amp; Archief</button>
+    <button class="tab" onclick="setTab('inst','log',this)">&#128220; Log</button>
+  </div>
+  <div id="inst-spelers"></div>
+  <div id="inst-labels" style="display:none"></div>
+  <div id="inst-leiders" style="display:none"></div>
+  <div id="inst-kamp" style="display:none"></div>
+  <div id="inst-log" style="display:none"></div>
 </div>
 
 </main>
@@ -445,30 +468,46 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 
 <script>
 // ── AUTHENTICATIE ────────────────────────────────────────────
-const GEBRUIKERS = [
-  {id:1,naam:'Admin',email:'admin@kamp.nl',pass:'admin2026',rol:'admin',teamId:null},
-  {id:2,naam:'Thomas',email:'thomas@kamp.nl',pass:'rood2026',rol:'groepsleider',teamId:1},
-  {id:3,naam:'Sven',email:'sven@kamp.nl',pass:'blauw2026',rol:'groepsleider',teamId:2},
-  {id:4,naam:'Rick',email:'rick@kamp.nl',pass:'groen2026',rol:'groepsleider',teamId:3},
-  {id:5,naam:'Pieter',email:'pieter@kamp.nl',pass:'geel2026',rol:'groepsleider',teamId:4},
-  {id:6,naam:'Kevin',email:'kevin@kamp.nl',pass:'oranje2026',rol:'groepsleider',teamId:5},
-  {id:7,naam:'Dirk',email:'dirk@kamp.nl',pass:'paars2026',rol:'groepsleider',teamId:6},
-  {id:8,naam:'Michiel',email:'michiel@kamp.nl',pass:'zwart2026',rol:'groepsleider',teamId:7},
-  {id:9,naam:'Jeroen',email:'jeroen@kamp.nl',pass:'wit2026',rol:'groepsleider',teamId:8},
-  {id:10,naam:'Kampstaf',email:'staf@kamp.nl',pass:'kamp2026',rol:'kampstaf',teamId:null},
+// LEIDERS is de door de admin beheerde accountlijst (Instellingen → Leiders, admin-only).
+// Login = voornaam+achternaam aan elkaar (lowercase). Wachtwoorden staan nooit in platte
+// tekst in de data — alleen als SHA-256 hash (zie hashWachtwoord()). Dit is geen
+// productiesterke beveiliging (de Supabase anon-key ligt sowieso open in dit bestand),
+// maar voorkomt dat wachtwoorden zomaar leesbaar in de database staan.
+let LEIDERS = [
+  {id:1, voornaam:'Admin',    achternaam:'', login:'admin',    wachtwoordHash:'6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6', rol:'admin',        teamId:null},
+  {id:2, voornaam:'Thomas',   achternaam:'', login:'thomas',   wachtwoordHash:'678e8bbba37ae3b33d516853cfd5a459475763c5a583f242c28bf9ac52c4038d', rol:'groepsleider', teamId:1},
+  {id:3, voornaam:'Sven',     achternaam:'', login:'sven',     wachtwoordHash:'da8e3dc76ae9ca8aaa95cacd05a0f3c1c24d5539398d56c8e2f009934aebb276', rol:'groepsleider', teamId:2},
+  {id:4, voornaam:'Rick',     achternaam:'', login:'rick',     wachtwoordHash:'0b672eb5cd7f11eda14b6e436219fb06f875715f5e6a24ce9dd398f7e6ad1ba0', rol:'groepsleider', teamId:3},
+  {id:5, voornaam:'Pieter',   achternaam:'', login:'pieter',   wachtwoordHash:'285304ff4af48e62ade0d748b8f45f5c39d4bc3e1f36eb7a0ead0197e15ffde1', rol:'groepsleider', teamId:4},
+  {id:6, voornaam:'Kevin',    achternaam:'', login:'kevin',    wachtwoordHash:'d1162c9fbf909e6cb99c8f20f6734d92fa714684b625de19df804077ca2cfef7', rol:'groepsleider', teamId:5},
+  {id:7, voornaam:'Dirk',     achternaam:'', login:'dirk',     wachtwoordHash:'479d707c57e10ae1a1d9731c57f71cb0165190141f50f765a823ce76b608b107', rol:'groepsleider', teamId:6},
+  {id:8, voornaam:'Michiel',  achternaam:'', login:'michiel',  wachtwoordHash:'3c842947e934b91099019faf2099585fbdd3c624692f48dbf13cbfa7601b4a43', rol:'groepsleider', teamId:7},
+  {id:9, voornaam:'Jeroen',   achternaam:'', login:'jeroen',   wachtwoordHash:'a376134fdb00ea90e88bc41cd29533d4a482036d678509e9e3f5b1c406b74fb6', rol:'groepsleider', teamId:8},
+  {id:10,voornaam:'Kampstaf', achternaam:'', login:'kampstaf', wachtwoordHash:'16550d5b68eaa64b917188cf0ce4e5405294d989e6c1698bbc9e8129bb11cf5b', rol:'kampstaf',     teamId:null},
 ];
+let LEIDERS_NEXT_ID = 11;
+
+function leiderNaam(l) { return [l.voornaam, l.achternaam].filter(Boolean).join(' '); }
+function leiderLogin(voornaam, achternaam) { return ((voornaam||'')+(achternaam||'')).toLowerCase().replace(/[^a-z0-9]/g,''); }
+
+async function hashWachtwoord(tekst) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tekst));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
 
 let huidigeGebruiker = null;
 
-function doLogin() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
+async function doLogin() {
+  const login = document.getElementById('login-email').value.trim().toLowerCase().replace(/[^a-z0-9]/g,'');
   const pass = document.getElementById('login-pass').value;
-  const user = GEBRUIKERS.find(u => u.email === email && u.pass === pass);
+  const hash = await hashWachtwoord(pass);
+  const user = LEIDERS.find(u => u.login === login && u.wachtwoordHash === hash);
   if(!user) { document.getElementById('login-err').style.display = 'block'; return; }
   huidigeGebruiker = user;
   document.getElementById('login-overlay').style.display = 'none';
   document.getElementById('login-err').style.display = 'none';
   updateGebruikerDisplay();
+  logActie('Inloggen', leiderNaam(user));
   renderDashboard();
 }
 
@@ -478,6 +517,7 @@ function doLogout() {
   document.getElementById('login-pass').value = '';
   document.getElementById('login-overlay').style.display = 'flex';
   document.getElementById('gebruiker-info').innerHTML = '';
+  document.title = 'Pupillenkamp';
 }
 
 function updateGebruikerDisplay() {
@@ -486,9 +526,22 @@ function updateGebruikerDisplay() {
   const rol = huidigeGebruiker.rol;
   const teamNaam = rol === 'groepsleider' ? (TEAMS.find(t => t.id === huidigeGebruiker.teamId)?.name || '') : '';
   const rolLabel = rol==='admin' ? 'Admin' : rol==='groepsleider' ? `GL · ${teamNaam}` : 'Kampstaf';
+  const naam = leiderNaam(huidigeGebruiker);
   el.innerHTML = `<span class="rol-badge rol-${rol}">${rolLabel}</span>
-    <span style="font-size:.82rem;font-weight:600;color:var(--text)">${huidigeGebruiker.naam}</span>
+    <span style="font-size:.82rem;font-weight:600;color:var(--text)">${naam}</span>
     <button onclick="doLogout()" style="font-size:.72rem;padding:4px 9px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;cursor:pointer;color:var(--muted)">Uitloggen</button>`;
+  document.title = `Pupillenkamp — ${naam}`;
+}
+
+// ── AUDIT TRAIL ───────────────────────────────────────────────
+// Compacte activiteitenlog: elke belangrijke actie (scores, planning, teams, labels,
+// leiders, archief) wordt hier vastgelegd met tijdstip + wie het deed. Zichtbaar via
+// Instellingen → Log. Blijft gecapped op de laatste 500 acties (oudste eruit).
+let ACTIVITEITEN_LOG = [];
+function logActie(actie, details) {
+  const gebruiker = huidigeGebruiker ? leiderNaam(huidigeGebruiker) : '—';
+  ACTIVITEITEN_LOG.unshift({tijdstip: new Date().toISOString(), gebruiker, actie, details: details || ''});
+  if(ACTIVITEITEN_LOG.length > 500) ACTIVITEITEN_LOG.length = 500;
 }
 
 function isAdmin() { return huidigeGebruiker?.rol === 'admin'; }
@@ -544,6 +597,13 @@ const VK_RONDES = [
 ];
 
 const PLAYERS_ALL = TEAMS.flatMap(t=>t.players.map(p=>({...p,team:t.name,teamId:t.id,color:t.color,indPts:Math.floor(Math.random()*20)})));
+
+// ── KAMP & ARCHIEF ────────────────────────────────────────────
+// Eén actief kamp tegelijk. "Kamp afsluiten" (Instellingen → Kamp & Archief) maakt een
+// snapshot van alle actieve data en zet die in ARCHIEF, waarna de actieve data leeg wordt
+// gemaakt voor een nieuw kamp. Teams/labels/leiders blijven staan (doorlopende configuratie).
+let KAMP_META = { naam: 'Pupillenkamp 2026', jaar: 2026, thema: '', gestartOp: new Date().toISOString() };
+let ARCHIEF = [];
 
 // ── PENALTY DATA ─────────────────────────────────────────────
 const KAMPdagen = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag'];
@@ -887,6 +947,7 @@ function penAdminSave(spelerNaam, dagIdx, shotIdx) {
   }
   closeModal();
   showToast('✓ Penalty aangepast!');
+  logActie('Penalty aangepast', `${spelerNaam} · ${KAMPdagen[dagIdx]}`);
   renderPenalty();
 }
 
@@ -895,6 +956,7 @@ function penSetDag(idx) { penHuidigeDag = idx; renderPenInvoer(); }
 function penOpslaanDag(blijftBewerkbaar) {
   if(!blijftBewerkbaar) penData[penHuidigeDag].opgeslagen = true;
   showToast(`✓ ${KAMPdagen[penHuidigeDag]} opgeslagen!`);
+  logActie('Penalty dag opgeslagen', KAMPdagen[penHuidigeDag]);
   renderPenalty();
 }
 
@@ -1548,6 +1610,7 @@ function preOpslaanSpel(si){
   });
   GAME_HISTORY.push({name:naam,klassement:'Teamklassement',type:'raw',date:KAMPdagen[spel.dag],time:'07:30',scores});
   showToast(`&#10003; ${spel.naam} opgeslagen!`);
+  logActie('Pre-ontbijt opgeslagen', naam);
   renderPreOntbijt();renderTeamKlassement();
 }
 
@@ -1581,7 +1644,7 @@ let planningData = [
   {day:'Dinsdag',icon:'⚽',acts:[
     {time:'07:30',name:'Pre-ontbijtspel',klassement:'Teamklassement',type:'spel',vervallen:false},
     {time:'08:00',name:'Ontbijt',type:'maaltijd',vervallen:false},
-    {time:'10:00',name:'8-Kamp',klassement:'8-Kamp',type:'spel',vervallen:false},
+    {time:'10:00',name:'8-Kamp',klassement:'8-Kamp',type:'spel',vervallen:false,achtkampId:1},
     {time:'12:00',name:'Individueel Klassement',klassement:'Individueel',type:'spel',vervallen:false},
     {time:'13:00',name:'Lunch',type:'maaltijd',vervallen:false},
     {time:'15:00',name:'Penalty Bokaal',klassement:'Penalty',type:'spel',vervallen:false},
@@ -1626,26 +1689,30 @@ function showSection(id,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('section-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
-  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,teams:renderTeams,planning:renderPlanning,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,exporteren:renderExport,instellingen:renderInstellingen})[id]?.();
+  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,teams:renderTeams,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,exporteren:renderExport,instellingen:renderInstellingen})[id]?.();
 }
 
 // ── TAB SWITCHER ─────────────────────────────────────────────
 function setTab(prefix,tab,btn){
-  const sectionMap={tk:'teamklassement',vk:'vierkamp',pen:'penalty',ak:'achtkamp',ind:'individueel',pre:'preontbijt',teams:'teams'};
+  const sectionMap={tk:'teamklassement',vk:'vierkamp',pen:'penalty',ak:'achtkamp',ind:'individueel',pre:'preontbijt',teams:'teams',inst:'instellingen'};
   const section=document.getElementById('section-'+sectionMap[prefix]);
   if(!section) return;
   section.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   // hide all sub-panels
-  ['stand','historie','duels','invoer','detail','spelers','keepers','setup','finale','groepen','spellen','schema','staf','overzicht','leeftijd'].forEach(p=>{const el=document.getElementById(prefix+'-'+p);if(el)el.style.display='none';});
+  ['stand','historie','duels','invoer','detail','spelers','keepers','setup','finale','groepen','spellen','schema','staf','overzicht','leeftijd','beheren','labels','leiders','kamp','log'].forEach(p=>{const el=document.getElementById(prefix+'-'+p);if(el)el.style.display='none';});
   const target=document.getElementById(prefix+'-'+tab);
   if(target)target.style.display='block';
   // re-render
-  ({tk:renderTeamKlassement,vk:renderVierkamp,pen:renderPenalty,ak:renderAchtkamp,ind:renderInd,pre:renderPreOntbijt,teams:renderTeams})[prefix]?.();
+  ({tk:renderTeamKlassement,vk:renderVierkamp,pen:renderPenalty,ak:renderAchtkamp,ind:renderInd,pre:renderPreOntbijt,teams:renderTeams,inst:renderInstellingen})[prefix]?.();
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────
 function renderDashboard(){
+  const heroDay = document.getElementById('hero-day');
+  if(heroDay) heroDay.textContent = KAMP_META.naam.toUpperCase();
+  const heroSub = document.getElementById('hero-sub');
+  if(heroSub) heroSub.textContent = KAMP_META.thema ? `Thema: ${KAMP_META.thema}` : 'Zorg dat alle scores van vandaag zijn ingevoerd ✅';
   const totals=getTeamTotals(),max=totals[0].pts||1;
   const penTop=[...PLAYERS_ALL].map(p=>({...p,pts:penTotaalSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
   const indTop=[...PLAYERS_ALL].filter(p=>isActief(p.name)).map(p=>({...p,pts:indPuntenSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
@@ -1665,10 +1732,8 @@ function renderDashboard(){
   document.getElementById('dash-spellen').textContent=GAME_HISTORY.length;
   const today=planningData[0];
   document.getElementById('dash-today').innerHTML=today.acts.map(a=>{
-    const kl=a.klassement;
-    const tag=kl?`<span class="activity-tag tag-${kl.replace(/ /g,'')}">${kl}</span>`:`<span class="activity-tag tag-${a.type}">${a.type}</span>`;
     return `<div class="activity-row type-${a.type}">
-      <div class="activity-time">${a.time}</div><div class="activity-name">${a.name}</div>${tag}</div>`;
+      <div class="activity-time">${a.time}</div><div class="activity-name">${a.name}</div>${activiteitTagHtml(a)}</div>`;
   }).join('');
 }
 
@@ -1851,6 +1916,7 @@ function vkAfsluitenRonde(rondeId) {
   if(!ronde) return;
   ronde.afgesloten = true;
   showToast('✓ Ronde afgesloten!');
+  logActie('Vierkamp ronde afgesloten', `${ronde.dag} · ronde ${ronde.id}`);
   renderVierkamp();
 }
 
@@ -2150,7 +2216,7 @@ function renderIndInvoer() {
 }
 
 function indSetDag(i) { indHuidigeDag=i; renderIndInvoer(); }
-function indOpslaanSpel(d,s) { indSpellen[d].spellen[s].opgeslagen=true; showToast('&#10003; Spel opgeslagen!'); renderInd(); }
+function indOpslaanSpel(d,s) { indSpellen[d].spellen[s].opgeslagen=true; showToast('&#10003; Spel opgeslagen!'); logActie('Individueel spel opgeslagen', indSpellen[d].spellen[s].naam || `${IND_DAGEN[d]} #${s+1}`); renderInd(); }
 function indSpelHeropen(d,s) { indSpellen[d].spellen[s].opgeslagen=false; renderIndInvoer(); }
 
 function renderIndGroepen() {
@@ -2229,6 +2295,7 @@ function renderIndSpellen() {
 function renderTeams(){
   renderTeamsOverzicht();
   renderTeamsStaf();
+  renderTeamsBeheren();
 }
 
 function renderTeamsOverzicht(){
@@ -2332,8 +2399,55 @@ function showTeamModal(id){
   openModal();
 }
 
+// ── TEAMS BEHEREN (naam/leider/kleur — verandert elk jaar) ────
+function renderTeamsBeheren() {
+  const el = document.getElementById('teams-beheren');
+  if(!el) return;
+  if(!isAdmin()) { el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>'; return; }
+  let html = `<div class="alert alert-info" style="margin-bottom:12px">
+    Pas hier de teamnaam, groepsleider en kleur aan — handig omdat dit elk jaar verandert.
+    Het aantal teams en de spelerslijst wijzig je via CSV-import (Instellingen → Spelers).
+  </div>`;
+  TEAMS.forEach((t,i) => {
+    html += `<div class="card" style="margin-bottom:8px">
+      <div class="grid-2" style="grid-template-columns:auto 1fr 1fr;align-items:end;gap:10px">
+        <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">KLEUR</label>
+          <input type="color" value="${t.color}" onchange="teamSetVeld(${i},'color',this.value)" style="width:40px;height:36px;border:1px solid var(--border-dark);border-radius:6px;padding:0;cursor:pointer"></div>
+        <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TEAMNAAM</label>
+          <input value="${t.name}" onchange="teamSetVeld(${i},'name',this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)"></div>
+        <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">GROEPSLEIDER</label>
+          <input value="${t.leader}" onchange="teamSetVeld(${i},'leader',this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)"></div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function teamSetVeld(i, veld, waarde) {
+  const t = TEAMS[i];
+  const oud = t[veld];
+  if(oud === waarde) return;
+  t[veld] = waarde;
+  if(veld === 'leader') LEADERS[i] = waarde; // LEADERS is afgeleid — in sync houden
+  logActie('Team aangepast', `${veld}: "${oud}" → "${waarde}"`);
+  renderTeams(); renderDashboard(); renderTeamKlassement();
+}
+
 // ── PLANNING ─────────────────────────────────────────────────
-const PLANNING_KLASSEMENTEN = ['Teamklassement','Vierkamp','Individueel','Penalty','8-Kamp','Pre-Ontbijt'];
+// LABELS vervangt de vroeger hardcoded PLANNING_KLASSEMENTEN-lijst. De 6 "systeem"-labels
+// hebben echte scoring-logica erachter (Teamklassement/Vierkamp/etc.) en zijn daarom niet
+// verwijderbaar — alleen hun kleur is aanpasbaar. Custom labels zijn puur organisatorisch
+// (geen scoring) en vrij toe te voegen/verwijderen door de admin (Instellingen → Labels).
+let LABELS = [
+  {id:'Teamklassement', naam:'Teamklassement', kleur:'#2563EB', systeem:true},
+  {id:'Vierkamp',       naam:'Vierkamp',       kleur:'#7C3AED', systeem:true},
+  {id:'Penalty',        naam:'Penalty',        kleur:'#A21CAF', systeem:true},
+  {id:'Individueel',    naam:'Individueel',    kleur:'#059669', systeem:true},
+  {id:'8-Kamp',         naam:'8-Kamp',         kleur:'#E11D48', systeem:true},
+  {id:'Pre-Ontbijt',    naam:'Pre-Ontbijt',    kleur:'#16A34A', systeem:true},
+];
+let LABELS_NEXT_ID = 1;
+const TYPE_KLEUREN = { maaltijd:'#EA580C', vrij:'#64748B', info:'#2563EB', pauze:'#64748B' };
 const PLANNING_TYPES = [
   {val:'spel',    label:'⚽ Spel'},
   {val:'maaltijd',label:'🍽️ Maaltijd'},
@@ -2342,7 +2456,20 @@ const PLANNING_TYPES = [
   {val:'pauze',   label:'⏸️ Pauze'},
 ];
 
+function labelKleur(naam) {
+  return LABELS.find(l => l.naam === naam)?.kleur || '#64748B';
+}
+// Gedeelde tag-rendering voor een planning-activiteit — gebruikt door Planning, Dashboard
+// en de Spellen-pagina zodat labels overal consistent en met de juiste kleur verschijnen.
+function activiteitTagHtml(a) {
+  const kl = a.klassement;
+  const tekst = a.customLabel || kl || a.type;
+  const hex = kl ? labelKleur(kl) : (TYPE_KLEUREN[a.type] || '#64748B');
+  return `<span class="activity-tag" style="background:${hex}1a;color:${hex}">${tekst}</span>`;
+}
+
 function renderPlanning(){
+  renderPlanningImport();
   const el = document.getElementById('planning-content');
   if(!el) return;
   const admin = isAdmin();
@@ -2358,8 +2485,6 @@ function renderPlanning(){
     ${day.acts.map((a, ai) => {
       const kl = a.klassement;
       const is8kamp = kl === '8-Kamp';
-      const tagCls = kl ? `tag-${kl.replace(/ /g,'').replace(/-/g,'')}` : `tag-${a.type}`;
-      const tagLabel = a.customLabel || kl || a.type;
 
       const isInd = kl === 'Individueel';
 
@@ -2368,7 +2493,8 @@ function renderPlanning(){
         statusTag = `<span style="font-size:.7rem;padding:2px 8px;border-radius:20px;background:var(--red-bg);color:var(--red);font-weight:700">Vervallen</span>`;
       } else if(!admin) {
         if(is8kamp) {
-          const inv = ACHTKAMP.subspellen.filter(sp=>sp.scores.every(s=>s!==null)).length;
+          const inst = a.achtkampId ? akInstantie(a.achtkampId) : null;
+          const inv = inst ? inst.subspellen.filter(sp=>sp.scores.every(s=>s!==null)).length : 0;
           statusTag = inv>0 ? `<span class="score-open">${inv}/8 spellen</span>` : `<span class="score-open">&#8594; invoeren</span>`;
         } else if(isInd) {
           const dagIdx = IND_DAGEN.indexOf(day.day);
@@ -2384,7 +2510,7 @@ function renderPlanning(){
       if(admin) {
         click = `onclick="planningEdit(${di},${ai})"`;
       } else if(!a.vervallen && is8kamp) {
-        click = `onclick="openAkVanuitPlanning('${a.name.replace(/'/g,"\\'")}','${a.time}')"`;
+        click = `onclick="openAkVanuitPlanning(${di},${ai})"`;
       } else if(!a.vervallen && isInd) {
         click = `onclick="openIndVanuitPlanning('${day.day}')"`;
       } else if(!a.vervallen && kl) {
@@ -2395,7 +2521,7 @@ function renderPlanning(){
       return `<div class="activity-row type-${a.type}${clickable?' clickable':''}${admin?' admin-editable':''}${a.vervallen?' act-vervallen':''}" ${click}>
         <div class="activity-time" style="${a.vervallen?'text-decoration:line-through;':''}">${a.time}</div>
         <div class="activity-name" style="${a.vervallen?'text-decoration:line-through;color:var(--muted);':''}">${a.name}</div>
-        <span class="activity-tag ${tagCls}">${tagLabel}</span>
+        ${activiteitTagHtml(a)}
         ${statusTag}
         ${admin ? `<span style="font-size:.8rem;opacity:.3;margin-left:auto;flex-shrink:0">&#9998;</span>` : ''}
       </div>`;
@@ -2427,11 +2553,24 @@ function planningEdit(di, ai) {
         </div>
       </div>
       <div id="pe-kl-row" style="display:${a.type==='spel'?'block':'none'}">
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">KOPPELING KLASSEMENT</label>
+        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LABEL</label>
         <select id="pe-kl" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
           <option value="">Geen (los spel)</option>
-          ${PLANNING_KLASSEMENTEN.map(k=>`<option value="${k}" ${a.klassement===k?'selected':''}>${k}</option>`).join('')}
+          ${LABELS.map(l=>`<option value="${l.naam}" ${a.klassement===l.naam?'selected':''}>${l.naam}</option>`).join('')}
         </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LEIDER <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
+          <select id="pe-leider" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
+            <option value="">Geen</option>
+            ${KAMPSTAF.map(l=>`<option value="${l}" ${a.leider===l?'selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">DUUR (MIN)</label>
+          <input id="pe-duur" type="number" min="0" step="5" value="${a.duur||''}" placeholder="bijv. 45" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
+        </div>
       </div>
       <div>
         <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
@@ -2461,11 +2600,16 @@ function planningEditSave(di, ai) {
   a.time       = document.getElementById('pe-time')?.value || a.time;
   a.type       = document.getElementById('pe-type')?.value || a.type;
   a.klassement = a.type==='spel' ? (document.getElementById('pe-kl')?.value||undefined) : undefined;
+  a.leider     = document.getElementById('pe-leider')?.value || undefined;
+  const duurVal = document.getElementById('pe-duur')?.value;
+  a.duur       = duurVal ? parseInt(duurVal) : undefined;
   const lbl    = document.getElementById('pe-label')?.value?.trim();
   a.customLabel = lbl || undefined;
   a.vervallen  = document.getElementById('pe-vervallen')?.checked || false;
+  if(a.klassement === '8-Kamp') akZorgVoorInstantie(a);
   planningData[di].acts.sort((x,y)=>x.time.localeCompare(y.time));
   closeModal(); renderPlanning(); renderDashboard();
+  logActie('Planning bewerkt', `${planningData[di].day} · ${a.name}`);
   showToast('&#10003; Planning bijgewerkt');
 }
 
@@ -2477,8 +2621,10 @@ function planningDeleteConfirm(di, ai) {
 }
 
 function planningDeleteDo(di, ai) {
+  const naam = planningData[di].acts[ai]?.name;
   planningData[di].acts.splice(ai, 1);
   closeModal(); renderPlanning(); renderDashboard();
+  logActie('Planning verwijderd', `${planningData[di].day} · ${naam}`);
   showToast('&#10003; Activiteit verwijderd');
 }
 
@@ -2504,11 +2650,24 @@ function planningAdd(di) {
         </div>
       </div>
       <div id="pa-kl-row">
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">KOPPELING KLASSEMENT</label>
+        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LABEL</label>
         <select id="pa-kl" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
           <option value="">Geen (los spel)</option>
-          ${PLANNING_KLASSEMENTEN.map(k=>`<option value="${k}">${k}</option>`).join('')}
+          ${LABELS.map(l=>`<option value="${l.naam}">${l.naam}</option>`).join('')}
         </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LEIDER <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
+          <select id="pa-leider" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
+            <option value="">Geen</option>
+            ${KAMPSTAF.map(l=>`<option value="${l}">${l}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">DUUR (MIN)</label>
+          <input id="pa-duur" type="number" min="0" step="5" placeholder="bijv. 45" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
+        </div>
       </div>
       <div>
         <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
@@ -2527,11 +2686,179 @@ function planningAddSave(di) {
   const type = document.getElementById('pa-type')?.value || 'spel';
   const time = document.getElementById('pa-time')?.value || '12:00';
   const kl   = type==='spel' ? (document.getElementById('pa-kl')?.value||undefined) : undefined;
+  const leider = document.getElementById('pa-leider')?.value || undefined;
+  const duurVal = document.getElementById('pa-duur')?.value;
+  const duur = duurVal ? parseInt(duurVal) : undefined;
   const lbl  = document.getElementById('pa-label')?.value?.trim();
-  planningData[di].acts.push({name:naam,time,type,klassement:kl||undefined,customLabel:lbl||undefined,vervallen:false});
+  const act = {name:naam,time,type,klassement:kl||undefined,leider,duur,customLabel:lbl||undefined,vervallen:false};
+  planningData[di].acts.push(act);
+  if(kl === '8-Kamp') akZorgVoorInstantie(act);
   planningData[di].acts.sort((a,b)=>a.time.localeCompare(b.time));
   closeModal(); renderPlanning(); renderDashboard();
+  logActie('Planning toegevoegd', `${planningData[di].day} · ${naam}`);
   showToast(`&#10003; "${naam}" toegevoegd`);
+}
+
+// ── PLANNING / SPELLEN IMPORTEREN (admin) ─────────────────────
+let PLANNING_IMPORT = [];
+
+function renderPlanningImport() {
+  const el = document.getElementById('planning-import');
+  if(!el) return;
+  if(!isAdmin()) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="card" style="margin-bottom:12px">
+    <div class="card-title">&#128229; Planning / spellen importeren</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
+      <strong>Formaat</strong> — komma of puntkomma als scheider, één spel per rij, dag moet een bestaande kampdag zijn:<br>
+      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Tijd,Type,Spelnaam,Leider,Duur</code>
+      <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: Maandag,10:00,8-Kamp,Ochtendspel,Thomas,60</span><br>
+      <span style="color:var(--muted-light);font-size:.76rem">"Type" moet een bestaand label zijn (zie Instellingen → Labels). Bij het label "8-Kamp" wordt automatisch een 8-Kamp aangemaakt.</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <input type="file" id="plan-csv-file" accept=".csv,.txt" style="display:none" onchange="planningLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('plan-csv-file').click()">&#128196; Bestand uploaden</button>
+      <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
+    </div>
+    <textarea id="plan-csv-tekst" placeholder="Dag,Tijd,Type,Spelnaam,Leider,Duur&#10;Maandag,10:00,8-Kamp,Ochtendspel,Thomas,60"
+      style="width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"
+      oninput="planningPreviewCsv()"></textarea>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="planningPreviewCsv()">&#128270; Preview</button>
+      <button class="btn btn-primary" style="font-size:.8rem" onclick="planningImportToepassen()">&#10003; Importeren &amp; toevoegen</button>
+    </div>
+    <div id="plan-csv-preview"></div>
+  </div>`;
+}
+
+function planningLeesBestand(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const ta = document.getElementById('plan-csv-tekst');
+    if(ta) { ta.value = e.target.result; planningPreviewCsv(); }
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function planningParseCsv(tekst) {
+  return parseCsvGeneriek(tekst, ['dag','tijd','type','naam','leider','duur']).map(r => ({
+    dag: (r.dag||'').trim(),
+    tijd: (r.tijd||'').trim() || '12:00',
+    typeLabel: (r.type||'').trim(),
+    naam: (r.naam||'').trim(),
+    leider: (r.leider||'').trim() || undefined,
+    duur: r.duur ? (parseInt(r.duur)||undefined) : undefined,
+  })).filter(r => r.dag && r.naam);
+}
+
+function planningPreviewCsv() {
+  const tekst = document.getElementById('plan-csv-tekst')?.value || '';
+  const el = document.getElementById('plan-csv-preview');
+  if(!el) return;
+  if(!tekst.trim()) { el.innerHTML = ''; PLANNING_IMPORT = []; return; }
+  PLANNING_IMPORT = planningParseCsv(tekst);
+  if(PLANNING_IMPORT.length === 0) {
+    el.innerHTML = '<div class="alert alert-warning" style="margin-top:8px">Geen geldige regels gevonden. Controleer het formaat.</div>';
+    return;
+  }
+  el.innerHTML = `<div style="margin-top:10px;overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.79rem">
+      <thead><tr style="background:var(--bg2)">
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Dag</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Tijd</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Type</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Spelnaam</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Leider</th>
+        <th style="padding:6px 8px;text-align:center;font-weight:600;color:var(--muted)">Duur</th>
+      </tr></thead>
+      <tbody>${PLANNING_IMPORT.map((r,i) => {
+        const dagOk = planningData.some(d => d.day.toLowerCase() === r.dag.toLowerCase());
+        const labelOk = !r.typeLabel || LABELS.some(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
+        return `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}">
+          <td style="padding:5px 8px;${dagOk?'':'color:var(--red);font-weight:700'}">${r.dag}${dagOk?'':' ⚠️ onbekende dag'}</td>
+          <td style="padding:5px 8px;font-family:'DM Mono',monospace">${r.tijd}</td>
+          <td style="padding:5px 8px;${labelOk?'':'color:var(--red)'}">${r.typeLabel||'—'}${labelOk?'':' ⚠️'}</td>
+          <td style="padding:5px 8px;font-weight:600">${r.naam}</td>
+          <td style="padding:5px 8px;color:var(--muted)">${r.leider||'—'}</td>
+          <td style="padding:5px 8px;text-align:center;color:var(--muted)">${r.duur||'—'}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+function planningImportToepassen() {
+  if(PLANNING_IMPORT.length === 0) { showToast('&#9888; Eerst een geldige CSV laden.'); return; }
+  let toegevoegd = 0, overgeslagen = 0;
+  PLANNING_IMPORT.forEach(r => {
+    const dag = planningData.find(d => d.day.toLowerCase() === r.dag.toLowerCase());
+    if(!dag) { overgeslagen++; return; }
+    const label = LABELS.find(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
+    const act = {name: r.naam, time: r.tijd, type: 'spel', klassement: label?.naam || undefined, leider: r.leider, duur: r.duur, vervallen: false};
+    dag.acts.push(act);
+    if(label?.naam === '8-Kamp') akZorgVoorInstantie(act);
+    toegevoegd++;
+  });
+  planningData.forEach(d => d.acts.sort((a,b) => a.time.localeCompare(b.time)));
+  PLANNING_IMPORT = [];
+  const ta = document.getElementById('plan-csv-tekst'); if(ta) ta.value = '';
+  const pv = document.getElementById('plan-csv-preview'); if(pv) pv.innerHTML = '';
+  logActie('Planning geïmporteerd', `${toegevoegd} activiteiten${overgeslagen ? `, ${overgeslagen} overgeslagen (onbekende dag)` : ''}`);
+  showToast(`&#10003; ${toegevoegd} activiteiten geïmporteerd`);
+  renderPlanning(); renderDashboard(); renderSpellen();
+}
+
+// ── SPELLEN-PAGINA ─────────────────────────────────────────────
+// Platte lijst van alle spel-activiteiten uit de planning, met leider/duur, filterbaar op
+// leider ("wanneer heeft iemand zijn spellen") en importeerbaar (zie hierboven).
+let spellenLeiderFilter = '';
+
+function renderSpellen() {
+  const el = document.getElementById('spellen-content');
+  if(!el) return;
+
+  const rows = [];
+  planningData.forEach((day, di) => {
+    day.acts.forEach((a, ai) => { if(a.type === 'spel') rows.push({dagNaam: day.day, di, ai, a}); });
+  });
+  const leiders = [...new Set(rows.map(r => r.a.leider).filter(Boolean))].sort();
+
+  let html = `<div class="card" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <label style="font-size:.75rem;font-weight:700;color:var(--muted)">FILTER OP LEIDER</label>
+      <select onchange="spellenLeiderFilter=this.value;renderSpellen()" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
+        <option value="">Alle leiders (${rows.length})</option>
+        ${leiders.map(l => `<option value="${l}" ${spellenLeiderFilter===l?'selected':''}>${l} (${rows.filter(r=>r.a.leider===l).length})</option>`).join('')}
+      </select>
+    </div>
+  </div>`;
+
+  const gefilterd = spellenLeiderFilter ? rows.filter(r => r.a.leider === spellenLeiderFilter) : rows;
+  if(gefilterd.length === 0) { html += '<div class="alert alert-info">Geen spellen gevonden.</div>'; el.innerHTML = html; return; }
+
+  const admin = isAdmin();
+  html += `<div class="gh-wrap"><table class="gh-table"><thead><tr>
+    <th>Label</th><th>Spelnaam</th><th>Leider</th><th>Duur</th><th>Dag</th><th>Tijd</th>
+  </tr></thead><tbody>`;
+  gefilterd.forEach(r => {
+    const a = r.a;
+    let click = '';
+    if(admin) click = `onclick="planningEdit(${r.di},${r.ai})"`;
+    else if(!a.vervallen && a.klassement === '8-Kamp') click = `onclick="openAkVanuitPlanning(${r.di},${r.ai})"`;
+    else if(!a.vervallen && a.klassement === 'Individueel') click = `onclick="openIndVanuitPlanning('${r.dagNaam}')"`;
+    else if(!a.vervallen && a.klassement) click = `onclick="openScoreModal('${a.name.replace(/'/g,"\\'")}','${a.time}','${a.klassement}')"`;
+    html += `<tr style="cursor:${click?'pointer':'default'}" ${click}>
+      <td>${activiteitTagHtml(a)}</td>
+      <td><strong>${a.name}</strong>${a.vervallen?' <span style="color:var(--red);font-size:.72rem">(vervallen)</span>':''}</td>
+      <td>${a.leider || '<span style="color:var(--muted-light)">—</span>'}</td>
+      <td style="color:var(--muted)">${a.duur ? a.duur+' min' : '—'}</td>
+      <td style="color:var(--muted)">${r.dagNaam}</td>
+      <td style="font-family:'DM Mono',monospace;color:var(--muted);font-size:.8rem">${a.time}</td>
+    </tr>`;
+  });
+  html += `</tbody></table></div>`;
+  el.innerHTML = html;
 }
 
 // ── SCORE BEREKENING ─────────────────────────────────────────
@@ -2631,6 +2958,7 @@ function saveScoreModal(spelNaam,tijd,klassement){
   GAME_HISTORY.push({name,klassement,type:'raw',date:'—',time:tijd||'—',scores:kPts,rawScores});
   closeModal();
   showToast(`✓ "${name}" opgeslagen!`);
+  logActie('Score opgeslagen', `${klassement} · ${name}`);
   renderTeamKlassement();
   renderPlanning();
   document.getElementById('dash-spellen').textContent=GAME_HISTORY.length;
@@ -2639,20 +2967,31 @@ function saveScoreModal(spelNaam,tijd,klassement){
 // ── 8-KAMP DATA ──────────────────────────────────────────────
 // 8 sub-spellen, per spel een raw score per team
 // scores: array van 8 waarden (index = team index), null = niet ingevoerd
-const ACHTKAMP = {
-  naam: '8-Kamp',
-  verwerkt: false, // true als eindstand al naar teamklassement is gestuurd
-  subspellen: [
-    {naam:'Spel 1', scores: Array(8).fill(null)},
-    {naam:'Spel 2', scores: Array(8).fill(null)},
-    {naam:'Spel 3', scores: Array(8).fill(null)},
-    {naam:'Spel 4', scores: Array(8).fill(null)},
-    {naam:'Spel 5', scores: Array(8).fill(null)},
-    {naam:'Spel 6', scores: Array(8).fill(null)},
-    {naam:'Spel 7', scores: Array(8).fill(null)},
-    {naam:'Spel 8', scores: Array(8).fill(null)},
-  ]
-};
+// ACHTKAMP_INSTANTIES: vroeger was er precies 1 globaal 8-Kamp-object; nu kan elke
+// planning-activiteit met het label "8-Kamp" zijn eigen instantie krijgen. Instanties
+// worden automatisch aangemaakt zodra zo'n activiteit wordt opgeslagen/geïmporteerd
+// (zie akZorgVoorInstantie). Bij precies 1 instantie (het normale geval) gedraagt de
+// sectie zich zoals voorheen, zonder keuzemenu.
+function akNieuweSubspellen() {
+  return Array.from({length:8}, (_,i) => ({naam:`Spel ${i+1}`, scores: Array(8).fill(null)}));
+}
+let ACHTKAMP_INSTANTIES = [
+  {id:1, naam:'8-Kamp', verwerkt:false, subspellen: akNieuweSubspellen()},
+];
+let AK_NEXT_ID = 2;
+let akHuidigeId = ACHTKAMP_INSTANTIES[0].id;
+
+function akInstantie(id) { return ACHTKAMP_INSTANTIES.find(x => x.id === id) || ACHTKAMP_INSTANTIES[0] || null; }
+
+// Zorgt dat een planning-activiteit met label 8-Kamp een gekoppelde instantie heeft;
+// maakt er zo nodig één aan en koppelt die via activiteit.achtkampId.
+function akZorgVoorInstantie(act) {
+  if(act.achtkampId && akInstantie(act.achtkampId)) return act.achtkampId;
+  const inst = {id: AK_NEXT_ID++, naam: act.name, verwerkt:false, subspellen: akNieuweSubspellen()};
+  ACHTKAMP_INSTANTIES.push(inst);
+  act.achtkampId = inst.id;
+  return inst.id;
+}
 
 // Bereken per subspel de klassementspunten (1e=8, 2e=7, ... gedeeld = max van gedeelde plekken)
 function akSubPunten(rawScores) {
@@ -2663,11 +3002,13 @@ function akSubPunten(rawScores) {
   });
 }
 
-// Totaalpunten per team over alle ingevulde subspellen
-function akTotaalPunten() {
+// Totaalpunten per team over alle ingevulde subspellen van een instantie
+function akTotaalPunten(id) {
+  const inst = akInstantie(id ?? akHuidigeId);
+  if(!inst) return TEAMS.map(()=>0);
   return TEAMS.map((t, i) => {
     let total = 0;
-    ACHTKAMP.subspellen.forEach(sp => {
+    inst.subspellen.forEach(sp => {
       const kPts = akSubPunten(sp.scores);
       if(kPts[i] !== null) total += kPts[i];
     });
@@ -2677,21 +3018,46 @@ function akTotaalPunten() {
 
 // ── RENDER 8-KAMP ─────────────────────────────────────────────
 function renderAchtkamp() {
+  if(!ACHTKAMP_INSTANTIES.find(x => x.id === akHuidigeId)) akHuidigeId = ACHTKAMP_INSTANTIES[0]?.id ?? null;
+  renderAkPicker();
   renderAkInvoer();
   renderAkStand();
+  renderAkDetail();
+}
+
+function renderAkPicker() {
+  const el = document.getElementById('ak-picker');
+  if(!el) return;
+  if(ACHTKAMP_INSTANTIES.length <= 1) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="card" style="margin-bottom:12px">
+    <div class="card-title">8-Kamp kiezen</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${ACHTKAMP_INSTANTIES.map(inst => `<button class="btn ${inst.id===akHuidigeId?'btn-primary':'btn-outline'}" style="font-size:.78rem;padding:6px 12px" onclick="akKiesInstantie(${inst.id})">${inst.naam}${inst.verwerkt?' ✓':''}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function akKiesInstantie(id) { akHuidigeId = id; renderAchtkamp(); }
+
+function akSetSubNaam(si, naam) {
+  const inst = akInstantie(akHuidigeId);
+  if(!inst) return;
+  inst.subspellen[si].naam = naam;
   renderAkDetail();
 }
 
 function renderAkInvoer() {
   const el = document.getElementById('ak-invoer');
   if(!el) return;
+  const inst = akInstantie(akHuidigeId);
+  if(!inst) { el.innerHTML = '<div class="alert alert-info">Nog geen 8-Kamp aangemaakt. Koppel het label "8-Kamp" aan een planning-activiteit (of importeer er één) om een 8-Kamp aan te maken.</div>'; return; }
 
   let html = `<div class="alert alert-info" style="margin-bottom:14px">
     Vul per sub-spel de behaalde punten in per team. Klassementspunten (1e=8 t/m 8e=1) worden live berekend.
     Gedeelde scores → gedeelde positie.
   </div>`;
 
-  ACHTKAMP.subspellen.forEach((sp, si) => {
+  inst.subspellen.forEach((sp, si) => {
     const filled = sp.scores.filter(s => s !== null).length;
     const isDone = filled === 8;
     const badge = isDone
@@ -2705,7 +3071,7 @@ function renderAkInvoer() {
         <div class="ak-subgame-num">${si+1}</div>
         <div class="ak-subgame-name">
           <input type="text" value="${sp.naam}" placeholder="Naam sub-spel ${si+1}"
-            onchange="ACHTKAMP.subspellen[${si}].naam=this.value;renderAkDetail()">
+            onchange="akSetSubNaam(${si},this.value)">
         </div>
         ${badge}
       </div>`;
@@ -2729,8 +3095,8 @@ function renderAkInvoer() {
   });
 
   // Totaalbalk + naar teamklassement knop
-  const totalen = akTotaalPunten();
-  const allDone = ACHTKAMP.subspellen.every(sp => sp.scores.every(s => s !== null));
+  const totalen = akTotaalPunten(inst.id);
+  const allDone = inst.subspellen.every(sp => sp.scores.every(s => s !== null));
   html += `<div class="card" style="margin-top:4px">
     <div class="card-title">Totaalstand (live)</div>`;
   const rows = TEAMS.map((t,i) => ({...t, tot: totalen[i]})).sort((a,b)=>b.tot-a.tot);
@@ -2747,7 +3113,7 @@ function renderAkInvoer() {
     </div>`;
   });
 
-  if(ACHTKAMP.verwerkt) {
+  if(inst.verwerkt) {
     html += `<div class="alert alert-success" style="margin-top:12px">✓ Eindstand al doorgestuurd naar Teamklassement.</div>`;
   } else {
     html += `<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
@@ -2760,10 +3126,12 @@ function renderAkInvoer() {
 }
 
 function akUpdateScore(si, ti, val) {
+  const inst = akInstantie(akHuidigeId);
+  if(!inst) return;
   const v = val === '' ? null : parseFloat(val);
-  ACHTKAMP.subspellen[si].scores[ti] = isNaN(v) ? null : v;
+  inst.subspellen[si].scores[ti] = isNaN(v) ? null : v;
   // Update alleen de preview-punten van dit subspel (zonder volledige re-render)
-  const kPts = akSubPunten(ACHTKAMP.subspellen[si].scores);
+  const kPts = akSubPunten(inst.subspellen[si].scores);
   TEAMS.forEach((t, i) => {
     const el = document.getElementById(`ak-pts-${si}-${i}`);
     if(el) el.textContent = kPts[i] !== null ? kPts[i]+'kp' : '';
@@ -2773,10 +3141,12 @@ function akUpdateScore(si, ti, val) {
 }
 
 function akNaarTeamklassement() {
-  const totalen = akTotaalPunten();
+  const inst = akInstantie(akHuidigeId);
+  if(!inst) return;
+  const totalen = akTotaalPunten(inst.id);
   const kPts = rawScoresToKlassementPunten(totalen);
   GAME_HISTORY.push({
-    name: ACHTKAMP.naam,
+    name: inst.naam,
     klassement: 'Teamklassement',
     type: '8kamp',
     date: '—', time: '—',
@@ -2784,8 +3154,9 @@ function akNaarTeamklassement() {
     rawScores: totalen,
     ak8: true
   });
-  ACHTKAMP.verwerkt = true;
+  inst.verwerkt = true;
   showToast('🏆 8-Kamp eindstand toegevoegd aan Teamklassement!');
+  logActie('8-Kamp doorgestuurd', inst.naam);
   renderAchtkamp();
   renderTeamKlassement();
   document.getElementById('dash-spellen').textContent = GAME_HISTORY.length;
@@ -2794,7 +3165,9 @@ function akNaarTeamklassement() {
 function renderAkStand() {
   const el = document.getElementById('ak-stand');
   if(!el) return;
-  const totalen = akTotaalPunten();
+  const inst = akInstantie(akHuidigeId);
+  if(!inst) { el.innerHTML = '<div class="alert alert-info">Nog geen 8-Kamp aangemaakt.</div>'; return; }
+  const totalen = akTotaalPunten(inst.id);
   const rows = TEAMS.map((t,i)=>({...t,tot:totalen[i]})).sort((a,b)=>b.tot-a.tot);
   const maxTot = rows[0]?.tot || 1;
   let html = '';
@@ -2808,20 +3181,22 @@ function renderAkStand() {
       <div class="rank-pts">${t.tot}kp <span style="font-size:.72rem;color:var(--muted)">totaal</span></div>
     </div>`;
   });
-  if(ACHTKAMP.verwerkt) html += `<div class="alert alert-success" style="margin-top:12px">✓ Verwerkt in Teamklassement.</div>`;
+  if(inst.verwerkt) html += `<div class="alert alert-success" style="margin-top:12px">✓ Verwerkt in Teamklassement.</div>`;
   el.innerHTML = html;
 }
 
 function renderAkDetail() {
   const el = document.getElementById('ak-detail');
   if(!el) return;
+  const inst = akInstantie(akHuidigeId);
+  if(!inst) { el.innerHTML = '<div class="alert alert-info">Nog geen 8-Kamp aangemaakt.</div>'; return; }
 
   // Tabel: rijen = subspellen, kolommen = teams
   let html = `<div class="gh-wrap"><table class="gh-table"><thead><tr><th>Sub-spel</th>`;
   TEAMS.forEach(t => { html += `<th class="pts-th"><span style="color:${t.color}">●</span> ${t.name.split(' ')[0]}</th>`; });
   html += `</tr></thead><tbody>`;
 
-  ACHTKAMP.subspellen.forEach((sp, si) => {
+  inst.subspellen.forEach((sp, si) => {
     const kPts = akSubPunten(sp.scores);
     html += `<tr><td><strong>${si+1}. ${sp.naam}</strong></td>`;
     kPts.forEach((pts, ti) => {
@@ -2838,7 +3213,7 @@ function renderAkDetail() {
   });
 
   // Totaalrij
-  const totalen = akTotaalPunten();
+  const totalen = akTotaalPunten(inst.id);
   html += `<tr class="total-row"><td><strong>Totaal</strong></td>`;
   totalen.forEach(tot => { html += `<td class="pts-cell">${tot}kp</td>`; });
   html += `</tr></tbody></table></div>`;
@@ -2849,10 +3224,12 @@ function closeModal(){document.getElementById('modal-overlay').classList.remove(
 document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-// Vanuit planning naar 8-kamp sectie springen
-function openAkVanuitPlanning(naam, tijd){
-  // Werk de 8-kamp naam bij als die van de planning afwijkt
-  if(naam && naam !== ACHTKAMP.naam) ACHTKAMP.naam = naam;
+// Vanuit planning (of de Spellen-pagina) direct naar de juiste 8-Kamp-instantie springen.
+// Maakt de instantie aan als die er nog niet is (di/ai = index van de planning-activiteit).
+function openAkVanuitPlanning(di, ai){
+  const act = planningData[di]?.acts?.[ai];
+  if(!act) return;
+  akHuidigeId = akZorgVoorInstantie(act);
   // Navigeer naar 8-kamp sectie, open invoer tab
   const btn = document.querySelector('.nav-btn[onclick*="achtkamp"]');
   showSection('achtkamp', btn);
@@ -2860,7 +3237,7 @@ function openAkVanuitPlanning(naam, tijd){
   const akSection = document.getElementById('section-achtkamp');
   akSection.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   akSection.querySelectorAll('.tab')[0].classList.add('active');
-  ['ak-stand','ak-detail'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  ['ak-stand','ak-detail'].forEach(sid=>{const el=document.getElementById(sid);if(el)el.style.display='none';});
   document.getElementById('ak-invoer').style.display='block';
 }
 
@@ -2887,12 +3264,22 @@ const KAMPTEAM_KLEUREN_PALET = [
 ];
 
 function renderInstellingen() {
-  const el = document.getElementById('inst-content');
-  if(!el) return;
   if(!isAdmin()) {
-    el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>';
+    const el = document.getElementById('inst-spelers');
+    if(el) el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>';
+    ['inst-labels','inst-leiders','inst-kamp','inst-log'].forEach(id => { const e = document.getElementById(id); if(e) e.innerHTML = ''; });
     return;
   }
+  renderInstSpelers();
+  renderInstLabels();
+  renderInstLeiders();
+  renderInstKamp();
+  renderInstLog();
+}
+
+function renderInstSpelers() {
+  const el = document.getElementById('inst-spelers');
+  if(!el) return;
   const aantalSpelers = PLAYERS_ALL.length;
   const kampteams = [...new Set(PLAYERS_ALL.map(p => p.team))];
   el.innerHTML = `
@@ -2939,15 +3326,31 @@ function instLeesBestand(input) {
   reader.readAsText(file, 'UTF-8');
 }
 
-function instParseCsv(tekst) {
+// Generieke CSV/plak-parser: kolommen is een array van veldnamen, in de volgorde waarin ze
+// in het bestand voorkomen. Detecteert scheidingsteken (; of ,) en slaat een kopregel over
+// als het eerste veld overeenkomt met een van de kolomnamen (of een gangbaar header-woord).
+// Hergebruikt door zowel de spelers-import (Instellingen) als de planning/spellen-import.
+function parseCsvGeneriek(tekst, kolommen) {
   const regels = tekst.trim().split(/\r?\n/).filter(r => r.trim());
   if(regels.length === 0) return [];
   const scheider = regels[0].includes(';') ? ';' : ',';
-  const start = /naam|name|speler/i.test(regels[0].split(scheider)[0]) ? 1 : 0;
+  const eersteVeld = regels[0].split(scheider)[0].trim().toLowerCase();
+  // Exacte match tegen kolomnamen (of gangbare synoniemen) — een losse substring-check zou
+  // bv. "Maandag" (bevat "dag") onterecht als kopregel aanmerken.
+  const isHeader = kolommen.some(k => k.toLowerCase() === eersteVeld) || ['naam','name','speler'].includes(eersteVeld);
+  const start = isHeader ? 1 : 0;
   return regels.slice(start).map(r => {
     const d = r.split(scheider).map(v => v.trim().replace(/^["']|["']$/g,''));
-    return { naam: d[0]||'', leeftijd: parseInt(d[1])||0, huidigTeam: d[2]||'', kampTeam: d[3]||'' };
-  }).filter(s => s.naam && s.kampTeam);
+    const obj = {};
+    kolommen.forEach((k, i) => { obj[k] = d[i] !== undefined ? d[i] : ''; });
+    return obj;
+  });
+}
+
+function instParseCsv(tekst) {
+  return parseCsvGeneriek(tekst, ['naam','leeftijd','huidigTeam','kampTeam'])
+    .map(r => ({ naam: r.naam||'', leeftijd: parseInt(r.leeftijd)||0, huidigTeam: r.huidigTeam||'', kampTeam: r.kampTeam||'' }))
+    .filter(s => s.naam && s.kampTeam);
 }
 
 function instPreviewCsv() {
@@ -3051,6 +3454,350 @@ function instHuidigeSpelersHtml() {
   });
   html += '</tbody></table></div>';
   return html;
+}
+
+// ── LABELS BEHEER ─────────────────────────────────────────────
+function renderInstLabels() {
+  const el = document.getElementById('inst-labels');
+  if(!el) return;
+  let html = `<div class="alert alert-info" style="margin-bottom:12px">
+    Labels bepalen de gekleurde tag op een activiteit in Planning/Spellen. De 6 systeemlabels
+    (Teamklassement, Vierkamp, Penalty, Individueel, 8-Kamp, Pre-Ontbijt) horen bij een werkend
+    onderdeel van de app en zijn niet verwijderbaar — wel van kleur te wisselen. Eigen labels
+    zijn puur organisatorisch (geen score-logica erachter) en vrij toe te voegen/verwijderen.
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">Labels</div>`;
+  LABELS.forEach((l,i) => {
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">
+      <input type="color" value="${l.kleur}" onchange="labelSetKleur(${i},this.value)" style="width:36px;height:28px;border:1px solid var(--border-dark);border-radius:5px;padding:0;cursor:pointer">
+      <span class="activity-tag" style="background:${l.kleur}1a;color:${l.kleur}">${l.naam}</span>
+      <span style="flex:1;font-size:.8rem;color:var(--muted-light)">${l.systeem?'Systeemlabel':'Eigen label'}</span>
+      ${!l.systeem?`<button onclick="labelVerwijder(${i})" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;font-size:.75rem;color:var(--red);cursor:pointer">Verwijder</button>`:''}
+    </div>`;
+  });
+  html += `</div>
+  <div class="card">
+    <div class="card-title">Nieuw label toevoegen</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input id="nieuw-label-naam" placeholder="Naam label..." style="flex:1;min-width:160px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+      <input id="nieuw-label-kleur" type="color" value="#2563EB" style="width:44px;height:36px;border:1px solid var(--border-dark);border-radius:6px;padding:0;cursor:pointer">
+      <button class="btn btn-primary" onclick="labelToevoegen()">+ Toevoegen</button>
+    </div>
+  </div>`;
+  el.innerHTML = html;
+}
+
+function labelSetKleur(i, kleur) {
+  const l = LABELS[i];
+  l.kleur = kleur;
+  logActie('Label kleur aangepast', l.naam);
+  renderInstLabels(); renderPlanning(); renderDashboard();
+}
+
+function labelToevoegen() {
+  const naam = document.getElementById('nieuw-label-naam')?.value?.trim();
+  if(!naam) { showToast('&#9888; Vul een naam in'); return; }
+  if(LABELS.some(l => l.naam.toLowerCase() === naam.toLowerCase())) { showToast('&#9888; Dit label bestaat al'); return; }
+  const kleur = document.getElementById('nieuw-label-kleur')?.value || '#2563EB';
+  LABELS.push({id:'custom_'+(LABELS_NEXT_ID++), naam, kleur, systeem:false});
+  logActie('Label toegevoegd', naam);
+  showToast(`&#10003; Label "${naam}" toegevoegd`);
+  renderInstLabels();
+}
+
+function labelVerwijder(i) {
+  const l = LABELS[i];
+  if(l.systeem) return;
+  LABELS.splice(i,1);
+  logActie('Label verwijderd', l.naam);
+  renderInstLabels(); renderPlanning(); renderDashboard();
+}
+
+// ── LEIDERS BEHEER (accounts) ─────────────────────────────────
+function renderInstLeiders() {
+  const el = document.getElementById('inst-leiders');
+  if(!el) return;
+  let html = `<div class="alert alert-info" style="margin-bottom:12px">
+    Elke kampleider heeft een eigen account. Gebruikersnaam = voornaam+achternaam aan elkaar
+    (automatisch bepaald). Wachtwoorden worden alleen als hash opgeslagen, nooit in platte tekst.
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">Leiders (${LEIDERS.length})</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.82rem">
+      <thead><tr style="background:var(--bg2)">
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Naam</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Login</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Rol</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Team</th>
+        <th style="padding:6px 8px"></th>
+      </tr></thead><tbody>`;
+  LEIDERS.forEach((l,i) => {
+    const teamNaam = l.teamId ? (TEAMS.find(t=>t.id===l.teamId)?.name || '—') : '—';
+    html += `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}">
+      <td style="padding:6px 8px;font-weight:600">${leiderNaam(l)}</td>
+      <td style="padding:6px 8px;font-family:'DM Mono',monospace;color:var(--muted)">${l.login}</td>
+      <td style="padding:6px 8px"><span class="rol-badge rol-${l.rol}">${l.rol==='admin'?'Admin':l.rol==='groepsleider'?'Groepsleider':'Kampstaf'}</span></td>
+      <td style="padding:6px 8px;color:var(--muted)">${teamNaam}</td>
+      <td style="padding:6px 8px;text-align:right"><button onclick="leiderBewerken(${i})" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;font-size:.75rem;color:var(--muted);cursor:pointer">Bewerken</button></td>
+    </tr>`;
+  });
+  html += `</tbody></table></div>
+    <div style="margin-top:10px"><button class="btn btn-primary" style="font-size:.82rem" onclick="leiderNieuw()">&#43; Nieuwe leider</button></div>
+  </div>`;
+  el.innerHTML = html;
+}
+
+function leiderNieuw() {
+  document.getElementById('modal-title').textContent = 'Nieuwe leider';
+  document.getElementById('modal-sub').textContent = 'Login wordt automatisch voornaam+achternaam';
+  document.getElementById('modal-body').innerHTML = `<div style="display:grid;gap:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">VOORNAAM</label>
+        <input id="ln-voornaam" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">ACHTERNAAM</label>
+        <input id="ln-achternaam" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+    </div>
+    <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">WACHTWOORD</label>
+      <input id="ln-wachtwoord" type="text" placeholder="Kies een wachtwoord" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">ROL</label>
+        <select id="ln-rol" onchange="document.getElementById('ln-team-row').style.display=this.value==='groepsleider'?'block':'none'" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
+          <option value="groepsleider">Groepsleider</option>
+          <option value="kampstaf">Kampstaf</option>
+          <option value="admin">Admin</option>
+        </select></div>
+      <div id="ln-team-row"><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TEAM</label>
+        <select id="ln-team" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
+          ${TEAMS.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}
+        </select></div>
+    </div>
+  </div>`;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">Annuleren</button>
+    <button class="btn btn-primary" onclick="leiderNieuwOpslaan()">&#10003; Aanmaken</button>`;
+  openModal();
+}
+
+async function leiderNieuwOpslaan() {
+  const voornaam = document.getElementById('ln-voornaam')?.value?.trim();
+  const achternaam = document.getElementById('ln-achternaam')?.value?.trim();
+  const wachtwoord = document.getElementById('ln-wachtwoord')?.value;
+  const rol = document.getElementById('ln-rol')?.value || 'groepsleider';
+  const teamId = rol==='groepsleider' ? parseInt(document.getElementById('ln-team')?.value) : null;
+  if(!voornaam || !wachtwoord) { showToast('&#9888; Vul minimaal voornaam en wachtwoord in'); return; }
+  const login = leiderLogin(voornaam, achternaam);
+  if(LEIDERS.some(l => l.login === login)) { showToast('&#9888; Deze gebruikersnaam bestaat al'); return; }
+  const wachtwoordHash = await hashWachtwoord(wachtwoord);
+  LEIDERS.push({id: LEIDERS_NEXT_ID++, voornaam, achternaam, login, wachtwoordHash, rol, teamId});
+  closeModal();
+  logActie('Leider aangemaakt', `${voornaam} ${achternaam}`.trim());
+  showToast(`&#10003; ${voornaam} toegevoegd als leider`);
+  renderInstLeiders();
+}
+
+function leiderBewerken(i) {
+  const l = LEIDERS[i];
+  document.getElementById('modal-title').textContent = 'Leider bewerken';
+  document.getElementById('modal-sub').textContent = `Login: ${l.login}`;
+  document.getElementById('modal-body').innerHTML = `<div style="display:grid;gap:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">VOORNAAM</label>
+        <input id="ln-voornaam" value="${l.voornaam}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">ACHTERNAAM</label>
+        <input id="ln-achternaam" value="${l.achternaam||''}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+    </div>
+    <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">NIEUW WACHTWOORD <span style="font-weight:400;opacity:.7">(leeg laten = ongewijzigd)</span></label>
+      <input id="ln-wachtwoord" type="text" placeholder="••••••••" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">ROL</label>
+        <select id="ln-rol" onchange="document.getElementById('ln-team-row').style.display=this.value==='groepsleider'?'block':'none'" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
+          <option value="groepsleider" ${l.rol==='groepsleider'?'selected':''}>Groepsleider</option>
+          <option value="kampstaf" ${l.rol==='kampstaf'?'selected':''}>Kampstaf</option>
+          <option value="admin" ${l.rol==='admin'?'selected':''}>Admin</option>
+        </select></div>
+      <div id="ln-team-row" style="display:${l.rol==='groepsleider'?'block':'none'}"><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TEAM</label>
+        <select id="ln-team" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
+          ${TEAMS.map(t=>`<option value="${t.id}" ${l.teamId===t.id?'selected':''}>${t.name}</option>`).join('')}
+        </select></div>
+    </div>
+  </div>`;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-outline" style="color:var(--red);border-color:#FECACA;margin-right:auto" onclick="leiderVerwijderen(${i})">&#128465; Verwijderen</button>
+    <button class="btn btn-outline" onclick="closeModal()">Annuleren</button>
+    <button class="btn btn-primary" onclick="leiderBewerkenOpslaan(${i})">&#10003; Opslaan</button>`;
+  openModal();
+}
+
+async function leiderBewerkenOpslaan(i) {
+  const l = LEIDERS[i];
+  l.voornaam = document.getElementById('ln-voornaam')?.value?.trim() || l.voornaam;
+  l.achternaam = document.getElementById('ln-achternaam')?.value?.trim() || '';
+  l.login = leiderLogin(l.voornaam, l.achternaam);
+  l.rol = document.getElementById('ln-rol')?.value || l.rol;
+  l.teamId = l.rol==='groepsleider' ? parseInt(document.getElementById('ln-team')?.value) : null;
+  const nieuwWachtwoord = document.getElementById('ln-wachtwoord')?.value;
+  if(nieuwWachtwoord) l.wachtwoordHash = await hashWachtwoord(nieuwWachtwoord);
+  closeModal();
+  logActie('Leider bewerkt', leiderNaam(l));
+  showToast(`&#10003; ${leiderNaam(l)} bijgewerkt`);
+  renderInstLeiders();
+}
+
+function leiderVerwijderen(i) {
+  if(LEIDERS.length <= 1) { showToast('&#9888; Je kunt niet de laatste leider verwijderen'); return; }
+  const naam = leiderNaam(LEIDERS[i]);
+  LEIDERS.splice(i,1);
+  closeModal();
+  logActie('Leider verwijderd', naam);
+  showToast(`&#10003; ${naam} verwijderd`);
+  renderInstLeiders();
+}
+
+// ── KAMP & ARCHIEF ────────────────────────────────────────────
+function renderInstKamp() {
+  const el = document.getElementById('inst-kamp');
+  if(!el) return;
+  let html = `<div class="card" style="margin-bottom:12px">
+    <div class="card-title">Huidig kamp</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">NAAM</label>
+        <input id="km-naam" value="${KAMP_META.naam}" onchange="KAMP_META.naam=this.value" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">JAAR</label>
+        <input id="km-jaar" type="number" value="${KAMP_META.jaar}" onchange="KAMP_META.jaar=parseInt(this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+    </div>
+    <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">THEMA <span style="font-weight:400;opacity:.7">(bepaald per kamp, zichtbaar op dashboard)</span></label>
+    <input id="km-thema" value="${KAMP_META.thema||''}" placeholder="bijv. Piraten" onchange="kampSetThema(this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">Kamp afsluiten &amp; archiveren</div>
+    <div class="alert alert-warning" style="margin-bottom:10px">
+      Dit maakt een snapshot van alle huidige data (spelers, planning, scores, spellen) en zet
+      die in het archief hieronder. Daarna wordt de actieve data leeggemaakt zodat je met een
+      nieuw kamp kan beginnen. Teams, labels en leiders-accounts blijven staan.
+    </div>
+    <button class="btn btn-outline" style="color:var(--red);border-color:#FECACA" onclick="kampAfsluitenConfirm()">&#128230; Kamp afsluiten &amp; archiveren</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Archief (${ARCHIEF.length})</div>`;
+  if(ARCHIEF.length === 0) {
+    html += `<div style="font-size:.83rem;color:var(--muted-light);font-style:italic">Nog geen gearchiveerde kampen.</div>`;
+  } else {
+    [...ARCHIEF].reverse().forEach(a => {
+      const top3 = (a.data?.game_history||[]).length ? null : null;
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:.9rem">${a.kampNaam} ${a.jaar?`(${a.jaar})`:''}</div>
+          <div style="font-size:.75rem;color:var(--muted)">${a.thema?`Thema: ${a.thema} · `:''}Afgesloten: ${new Date(a.afgeslotenOp).toLocaleDateString('nl-NL')}</div>
+        </div>
+        <button class="btn btn-outline" style="font-size:.75rem" onclick="archiefDownload('${a.id}')">&#8595; JSON</button>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+function kampSetThema(thema) {
+  KAMP_META.thema = thema;
+  logActie('Thema aangepast', thema);
+  renderDashboard();
+}
+
+function kampAfsluitenConfirm() {
+  document.getElementById('modal-title').textContent = 'Kamp afsluiten?';
+  document.getElementById('modal-sub').textContent = KAMP_META.naam;
+  document.getElementById('modal-body').innerHTML = `<div class="alert alert-warning">
+    Weet je het zeker? Alle huidige spelers, planning, scores en spellen worden gearchiveerd
+    en daarna leeggemaakt. Dit kan niet ongedaan gemaakt worden (de data blijft wel bewaard
+    in het archief).
+  </div>`;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">Annuleren</button>
+    <button class="btn" style="background:#DC2626;color:#fff" onclick="kampAfsluitenDoen()">&#10003; Ja, archiveren &amp; resetten</button>`;
+  openModal();
+}
+
+function kampAfsluitenDoen() {
+  const snapshot = {
+    players: PLAYERS_ALL, game_history: GAME_HISTORY, vierkamp: VK_RONDES,
+    pen_keepers: penKeepersPerDag, pen_verdubbelaar: penVerdubbelaar, pen_data: penData, pen_finale: penFinale,
+    ind_groepen: IND_GROEPEN, ind_leeftijden: IND_LEEFTIJDEN, ind_spellen: indSpellen,
+    preontbijt: preSpellenData, achtkamp_instanties: ACHTKAMP_INSTANTIES, planning: planningData,
+    inactief: [...inactiefSpelers], extra_staf: EXTRA_STAF,
+  };
+  ARCHIEF.push({
+    id: 'archief_'+Date.now(), kampNaam: KAMP_META.naam, jaar: KAMP_META.jaar, thema: KAMP_META.thema,
+    afgeslotenOp: new Date().toISOString(), data: JSON.parse(JSON.stringify(snapshot)),
+  });
+
+  // Reset actieve data (teams/labels/leiders blijven staan — dat is doorlopende configuratie)
+  PLAYERS_ALL.length = 0;
+  GAME_HISTORY.length = 0;
+  VK_RONDES.forEach(r => { r.spellen = r.spellen.map(()=>null); r.afgesloten = false; });
+  Object.keys(penKeepersPerDag).forEach(k => penKeepersPerDag[k] = ['','']);
+  Object.keys(penVerdubbelaar).forEach(k => delete penVerdubbelaar[k]);
+  penData.forEach(d => { d.pogingen = []; d.opgeslagen = false; });
+  penFinale.drempel = null; penFinale.rondes = []; penFinale.handmatigDeelnemers = null; penFinale.actieveRonde = null; penFinale.schietBeurt = 0;
+  IND_LEEFTIJDEN.forEach(c => c.spelers = []);
+  indSpellen.forEach(d => { d.spellen.forEach(s => { s.naam=''; s.maker=''; s.leider=''; s.uitleg=''; s.opgeslagen=false; s.scores={}; }); });
+  preSpellenData.forEach(sp => { sp.opgeslagen = false; sp.duels.forEach(d => { d.score1=null; d.score2=null; }); });
+  ACHTKAMP_INSTANTIES.length = 0;
+  ACHTKAMP_INSTANTIES.push({id:1, naam:'8-Kamp', verwerkt:false, subspellen: akNieuweSubspellen()});
+  AK_NEXT_ID = 2; akHuidigeId = 1;
+  planningData.forEach(day => { day.acts.forEach(a => { delete a.achtkampId; }); });
+  inactiefSpelers.clear();
+  KAMP_META.naam = `Pupillenkamp ${KAMP_META.jaar+1}`;
+  KAMP_META.jaar = KAMP_META.jaar+1;
+  KAMP_META.thema = '';
+  KAMP_META.gestartOp = new Date().toISOString();
+
+  closeModal();
+  logActie('Kamp afgesloten & gearchiveerd', ARCHIEF[ARCHIEF.length-1].kampNaam);
+  showToast('&#10003; Kamp gearchiveerd — nieuw kamp gestart');
+  renderInstellingen(); renderDashboard();
+}
+
+function archiefDownload(id) {
+  const a = ARCHIEF.find(x => x.id === id);
+  if(!a) return;
+  const json = JSON.stringify(a, null, 2);
+  const blob = new Blob([json], {type: 'application/json;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = `${(a.kampNaam||'kamp').replace(/[^a-z0-9]/gi,'_')}_${a.jaar||''}.json`; link.click();
+  URL.revokeObjectURL(url);
+  showToast('&#8681; Archief gedownload!');
+}
+
+// ── ACTIVITEITENLOG ───────────────────────────────────────────
+function renderInstLog() {
+  const el = document.getElementById('inst-log');
+  if(!el) return;
+  if(ACTIVITEITEN_LOG.length === 0) {
+    el.innerHTML = '<div class="alert alert-info">Nog geen acties gelogd.</div>';
+    return;
+  }
+  let html = `<div class="card"><div class="card-title">Recente acties (${ACTIVITEITEN_LOG.length})</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
+      <thead><tr style="background:var(--bg2)">
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Tijdstip</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Wie</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Actie</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Details</th>
+      </tr></thead><tbody>`;
+  ACTIVITEITEN_LOG.slice(0,200).forEach((log,i) => {
+    html += `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}">
+      <td style="padding:5px 8px;color:var(--muted-light);font-family:'DM Mono',monospace;white-space:nowrap">${new Date(log.tijdstip).toLocaleString('nl-NL')}</td>
+      <td style="padding:5px 8px;font-weight:600">${log.gebruiker}</td>
+      <td style="padding:5px 8px">${log.actie}</td>
+      <td style="padding:5px 8px;color:var(--muted)">${log.details||''}</td>
+    </tr>`;
+  });
+  html += `</tbody></table></div></div>`;
+  el.innerHTML = html;
 }
 
 function renderExport() {
@@ -3235,7 +3982,7 @@ const SYNC_MODULES = {
   ind_leeftijden:   { get: () => IND_LEEFTIJDEN,     set: v => _vulArray(IND_LEEFTIJDEN, v) },
   ind_spellen:      { get: () => indSpellen,         set: v => _vulArray(indSpellen, v) },
   preontbijt:       { get: () => preSpellenData,     set: v => _vulArray(preSpellenData, v) },
-  achtkamp:         { get: () => ACHTKAMP,           set: v => _vulObject(ACHTKAMP, v) },
+  achtkamp_instanties: { get: () => ACHTKAMP_INSTANTIES, set: v => _vulArray(ACHTKAMP_INSTANTIES, v) },
   planning:         { get: () => planningData,       set: v => _vulArray(planningData, v) },
   inactief:         { get: () => [...inactiefSpelers],
                       set: v => { inactiefSpelers.clear(); (v || []).forEach(n => inactiefSpelers.add(n)); } },
@@ -3245,6 +3992,19 @@ const SYNC_MODULES = {
                         KAMPSTAF.length = 0;
                         LEADERS.forEach(l => KAMPSTAF.push(l));
                         EXTRA_STAF.forEach(l => KAMPSTAF.push(l));
+                      } },
+  labels:           { get: () => LABELS,             set: v => _vulArray(LABELS, v) },
+  leiders:          { get: () => LEIDERS,            set: v => _vulArray(LEIDERS, v) },
+  kamp_meta:        { get: () => KAMP_META,          set: v => _vulObject(KAMP_META, v) },
+  archief:          { get: () => ARCHIEF,            set: v => _vulArray(ARCHIEF, v) },
+  activiteiten_log: { get: () => ACTIVITEITEN_LOG,   set: v => _vulArray(ACTIVITEITEN_LOG, v) },
+  teams_meta:       { get: () => TEAMS.map(t => ({id:t.id, name:t.name, leader:t.leader, color:t.color})),
+                      set: v => {
+                        (v || []).forEach(m => {
+                          const t = TEAMS.find(x => x.id === m.id);
+                          if(t) { t.name = m.name; t.leader = m.leader; t.color = m.color; }
+                        });
+                        TEAMS.forEach((t,i) => { LEADERS[i] = t.leader; });
                       } },
 };
 
@@ -3308,7 +4068,7 @@ setInterval(syncDiffSave, 5000);
 // ── Renderfuncties wrappen: na elke render → opslaan plannen ─
 [
   'renderDashboard','renderTeamKlassement','renderVierkamp','renderPenalty','renderInd',
-  'renderTeams','renderPlanning','renderAchtkamp','renderPreOntbijt','renderExport',
+  'renderTeams','renderPlanning','renderSpellen','renderAchtkamp','renderPreOntbijt','renderExport',
   'renderInstellingen','renderTeamsStaf','renderPenSpelers','renderIndStand'
 ].forEach(fn => {
   const orig = window[fn];
@@ -3328,7 +4088,7 @@ function herRenderActieveSectie() {
   const map = {
     dashboard: renderDashboard, teamklassement: renderTeamKlassement, vierkamp: renderVierkamp,
     penalty: renderPenalty, individueel: renderInd, teams: renderTeams, planning: renderPlanning,
-    achtkamp: renderAchtkamp, preontbijt: renderPreOntbijt, exporteren: renderExport,
+    spellen: renderSpellen, achtkamp: renderAchtkamp, preontbijt: renderPreOntbijt, exporteren: renderExport,
     instellingen: renderInstellingen
   };
   map[id]?.();
