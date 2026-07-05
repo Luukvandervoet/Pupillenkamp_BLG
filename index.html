@@ -2694,6 +2694,23 @@ const PLANNING_TYPES = [
 function labelKleur(naam) {
   return LABELS.find(l => l.naam === naam)?.kleur || '#64748B';
 }
+// Kleurenpalet voor automatisch aangemaakte labels (bijv. bij planning-import met een
+// onbekend label). Pakt de eerste kleur die nog niet in gebruik is; als alle kleuren al
+// gebruikt zijn, wordt een willekeurige maar leesbare HSL-kleur gegenereerd.
+const LABEL_AUTO_PALET = ['#2563EB','#7C3AED','#A21CAF','#059669','#E11D48','#16A34A','#EA580C','#0891B2','#CA8A04','#DB2777','#4F46E5','#0D9488'];
+function labelAutoKleur() {
+  const gebruikt = new Set(LABELS.map(l => l.kleur));
+  const vrij = LABEL_AUTO_PALET.find(k => !gebruikt.has(k));
+  if(vrij) return vrij;
+  return hslNaarHex(Math.floor(Math.random()*360), 65, 42);
+}
+function hslNaarHex(h, s, l) {
+  s/=100; l/=100;
+  const c = (1-Math.abs(2*l-1))*s, x = c*(1-Math.abs((h/60)%2-1)), m = l-c/2;
+  let [r,g,b] = h<60?[c,x,0]: h<120?[x,c,0]: h<180?[0,c,x]: h<240?[0,x,c]: h<300?[x,0,c]:[c,0,x];
+  const naarHex = v => Math.round((v+m)*255).toString(16).padStart(2,'0');
+  return `#${naarHex(r)}${naarHex(g)}${naarHex(b)}`;
+}
 // Gedeelde tag-rendering voor een planning-activiteit — gebruikt door Planning, Dashboard
 // en de Spellen-pagina zodat labels overal consistent en met de juiste kleur verschijnen.
 function activiteitTagHtml(a) {
@@ -2946,7 +2963,7 @@ function renderInstPlanningImport() {
       <strong>Formaat</strong> — komma of puntkomma als scheider, één spel per rij, dag moet een bestaande kampdag zijn:<br>
       <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Tijd,Type,Spelnaam,Leider,Duur</code>
       <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: Maandag,10:00,8-Kamp,Ochtendspel,Thomas,60</span><br>
-      <span style="color:var(--muted-light);font-size:.76rem">"Type" moet een bestaand label zijn (zie Kampbeheer → Labels). Bij het label "8-Kamp" wordt automatisch een 8-Kamp aangemaakt.</span>
+      <span style="color:var(--muted-light);font-size:.76rem">Bestaat het label bij "Type" nog niet? Dan wordt het automatisch aangemaakt (met een automatisch gekozen kleur) — zie Kampbeheer → Labels. Bij het label "8-Kamp" wordt ook automatisch een 8-Kamp aangemaakt.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplatePlanning()">&#8681; Download voorbeeld-CSV</button>
@@ -2962,7 +2979,37 @@ function renderInstPlanningImport() {
       <button class="btn btn-primary" style="font-size:.8rem" onclick="planningImportToepassen()">&#10003; Importeren &amp; toevoegen</button>
     </div>
     <div id="plan-csv-preview"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">&#128465;&#65039; Hele planning leegmaken</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px">
+      Verwijdert alle geplande activiteiten op alle kampdagen in één keer — handig als je een
+      volledig nieuwe planning gaat importeren. Labels, teams en leiders blijven staan.
+    </div>
+    <button class="btn btn-outline" style="color:var(--red);border-color:#FECACA" onclick="planningLeegmakenConfirm()">&#128465;&#65039; Hele planning leegmaken</button>
   </div>`;
+}
+
+function planningLeegmakenConfirm() {
+  document.getElementById('modal-title').textContent = 'Hele planning leegmaken?';
+  document.getElementById('modal-sub').textContent = `${planningData.reduce((n,d)=>n+d.acts.length,0)} activiteiten op ${planningData.length} dagen`;
+  document.getElementById('modal-body').innerHTML = `<div class="alert alert-warning">
+    Weet je het zeker? Alle geplande activiteiten op alle kampdagen worden verwijderd. Dit kan
+    niet ongedaan gemaakt worden. Labels, teams en leiders-accounts blijven gewoon staan.
+  </div>`;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">Annuleren</button>
+    <button class="btn" style="background:#DC2626;color:#fff" onclick="planningLeegmakenDoen()">&#10003; Ja, planning leegmaken</button>`;
+  openModal();
+}
+
+function planningLeegmakenDoen() {
+  const aantal = planningData.reduce((n,d)=>n+d.acts.length,0);
+  planningData.forEach(day => { day.acts.length = 0; });
+  closeModal();
+  logActie('Planning leeggemaakt', `${aantal} activiteiten verwijderd`);
+  showToast('&#10003; Planning leeggemaakt');
+  renderPlanning(); renderDashboard(); renderSpellen();
 }
 
 function planningLeesBestand(input) {
@@ -3013,7 +3060,7 @@ function planningPreviewCsv() {
         return `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}">
           <td style="padding:5px 8px;${dagOk?'':'color:var(--red);font-weight:700'}">${r.dag}${dagOk?'':' ⚠️ onbekende dag'}</td>
           <td style="padding:5px 8px;font-family:'DM Mono',monospace">${r.tijd}</td>
-          <td style="padding:5px 8px;${labelOk?'':'color:var(--red)'}">${r.typeLabel||'—'}${labelOk?'':' ⚠️'}</td>
+          <td style="padding:5px 8px;${labelOk?'':'color:var(--accent)'}">${r.typeLabel||'—'}${labelOk?'':' &#127912; nieuw label'}</td>
           <td style="padding:5px 8px;font-weight:600">${r.naam}</td>
           <td style="padding:5px 8px;color:var(--muted)">${r.leider||'—'}</td>
           <td style="padding:5px 8px;text-align:center;color:var(--muted)">${r.duur||'—'}</td>
@@ -3026,10 +3073,16 @@ function planningPreviewCsv() {
 function planningImportToepassen() {
   if(PLANNING_IMPORT.length === 0) { showToast('&#9888; Eerst een geldige CSV laden.'); return; }
   let toegevoegd = 0, overgeslagen = 0;
+  const nieuweLabels = [];
   PLANNING_IMPORT.forEach(r => {
     const dag = planningData.find(d => d.day.toLowerCase() === r.dag.toLowerCase());
     if(!dag) { overgeslagen++; return; }
-    const label = LABELS.find(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
+    let label = LABELS.find(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
+    if(!label && r.typeLabel) {
+      label = {id:'custom_'+(LABELS_NEXT_ID++), naam: r.typeLabel, kleur: labelAutoKleur(), systeem:false};
+      LABELS.push(label);
+      nieuweLabels.push(label.naam);
+    }
     const act = {name: r.naam, time: r.tijd, type: 'spel', klassement: label?.naam || undefined, leider: r.leider, duur: r.duur, vervallen: false};
     dag.acts.push(act);
     if(label?.naam === '8-Kamp') akZorgVoorInstantie(act);
@@ -3039,8 +3092,9 @@ function planningImportToepassen() {
   PLANNING_IMPORT = [];
   const ta = document.getElementById('plan-csv-tekst'); if(ta) ta.value = '';
   const pv = document.getElementById('plan-csv-preview'); if(pv) pv.innerHTML = '';
-  logActie('Planning geïmporteerd', `${toegevoegd} activiteiten${overgeslagen ? `, ${overgeslagen} overgeslagen (onbekende dag)` : ''}`);
-  showToast(`&#10003; ${toegevoegd} activiteiten geïmporteerd`);
+  logActie('Planning geïmporteerd', `${toegevoegd} activiteiten${nieuweLabels.length ? `, ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''} aangemaakt (${nieuweLabels.join(', ')})` : ''}${overgeslagen ? `, ${overgeslagen} overgeslagen (onbekende dag)` : ''}`);
+  showToast(`&#10003; ${toegevoegd} activiteiten geïmporteerd${nieuweLabels.length ? ` · ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''}` : ''}`);
+  if(nieuweLabels.length) renderInstLabels();
   renderPlanning(); renderDashboard(); renderSpellen();
 }
 
