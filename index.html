@@ -4,19 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pupillenkamp 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root {
   --accent: #2563EB;
+  --accent-dark: #1E3A8A;
   --accent-light: #EFF6FF;
   --accent-mid: #BFDBFE;
-  --bg: #F8FAFC;
+  --bg: #F5F7FC;
   --bg2: #FFFFFF;
   --bg3: #F1F5F9;
   --card: #FFFFFF;
   --border: #E2E8F0;
   --border-dark: #CBD5E1;
-  --text: #0F172A;
+  --text: #0B1E3F;
   --muted: #64748B;
   --muted-light: #94A3B8;
   --gold: #D97706;
@@ -31,51 +34,60 @@
   --yellow: #D97706;
   --yellow-bg: #FFFBEB;
   --orange: #EA580C;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04);
-  --shadow: 0 4px 12px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.04);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,0.1),0 4px 8px rgba(0,0,0,0.06);
+  --shadow-sm: 0 2px 8px -4px rgba(15,30,63,0.18);
+  --shadow: 0 12px 30px -22px rgba(15,30,63,0.55);
+  --shadow-lg: 0 20px 50px -20px rgba(15,30,63,0.45);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body{font-family:'Barlow',system-ui,sans-serif;color:var(--text);min-height:100vh;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, #dbe6ff 0%, rgba(219,230,255,0) 55%),
+    linear-gradient(180deg, #f5f7fc 0%, #eef2fa 100%);
+  background-attachment:fixed;}
 
-header{background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
-.header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--accent);}
-.logo span{color:var(--text);}
+header{background:rgba(255,255,255,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(15,30,63,.07);position:sticky;top:0;z-index:100;box-shadow:0 1px 0 rgba(255,255,255,.6) inset;}
+.header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:60px;}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:1px;color:var(--accent-dark);display:flex;align-items:center;gap:10px;}
+.logo::before{content:'⚽';display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#1e3a8a);font-size:16px;box-shadow:0 6px 16px -6px rgba(37,99,235,.55);flex-shrink:0;}
+.logo span{color:var(--accent);}
 .day-badge{background:var(--accent);color:#fff;font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:20px;}
 
-.nav-wrap{background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+.nav-wrap{background:transparent;overflow-x:auto;scrollbar-width:none;}
 .nav-wrap::-webkit-scrollbar{display:none;}
-nav{max-width:960px;margin:0 auto;display:flex;gap:2px;padding:8px 16px;}
-.nav-btn{font-size:0.8rem;font-weight:600;padding:7px 14px;border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s;}
+nav{max-width:960px;margin:0 auto;display:flex;gap:4px;padding:8px 16px 14px;}
+.nav-btn{font-size:0.8rem;font-weight:600;padding:8px 15px;border-radius:999px;border:none;background:transparent;color:#475569;cursor:pointer;white-space:nowrap;transition:all .15s;}
 .nav-btn:hover{background:var(--bg3);color:var(--text);}
-.nav-btn.active{background:var(--accent-light);color:var(--accent);font-weight:700;}
+.nav-btn.active{background:linear-gradient(135deg,#2563eb,#1e3a8a);color:#fff;font-weight:700;box-shadow:0 8px 18px -8px rgba(37,99,235,.6);}
 
 main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 .section{display:none;}
 .section.active{display:block;animation:fadeUp .25s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-.page-title{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;color:var(--text);margin-bottom:2px;}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.9rem;letter-spacing:1px;text-transform:uppercase;color:var(--text);margin-bottom:2px;}
 .page-sub{font-size:0.83rem;color:var(--muted);margin-bottom:18px;}
 
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
+.card{background:var(--card);border:1px solid rgba(15,30,63,.06);border-radius:18px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow);}
 .card-title{font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
 
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 @media(max-width:600px){.grid-2{grid-template-columns:1fr}.grid-4{grid-template-columns:repeat(2,1fr)}}
 
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;box-shadow:var(--shadow-sm);}
-.stat-card .num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);line-height:1;}
-.stat-card .lbl{font-size:0.7rem;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-top:3px;}
+.stat-card{position:relative;overflow:hidden;background:var(--bg2);border:1px solid rgba(15,30,63,.06);border-radius:16px;padding:16px 14px 14px;text-align:center;box-shadow:var(--shadow);transition:transform .18s ease;}
+.stat-card:hover{transform:translateY(-3px);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#2563eb,#3b82f6);}
+.stat-card:nth-child(3)::before{background:linear-gradient(90deg,#10b981,#34d399);}
+.stat-card:nth-child(4)::before{background:linear-gradient(90deg,#f59e0b,#fb923c);}
+.stat-card .num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.1rem;color:var(--accent-dark);line-height:1;}
+.stat-card .lbl{font-size:0.7rem;color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:3px;}
 
-.lb-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;margin-bottom:3px;border:1px solid transparent;transition:all .12s;}
+.lb-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:14px;margin-bottom:6px;border:1px solid transparent;transition:all .12s;}
 .lb-row:hover{background:var(--bg3);}
-.lb-row.rank-1{background:var(--gold-bg);border-color:#FDE68A;}
-.lb-row.rank-2{background:var(--silver-bg);border-color:var(--border-dark);}
-.lb-row.rank-3{background:#FFF7ED;border-color:#FED7AA;}
-.rank-num{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:24px;text-align:center;color:var(--muted-light);flex-shrink:0;}
+.lb-row.rank-1{background:linear-gradient(90deg,#fffbeb,#fff);border-color:#FDE68A;}
+.lb-row.rank-2{background:linear-gradient(90deg,#f8fafc,#fff);border-color:var(--border-dark);}
+.lb-row.rank-3{background:linear-gradient(90deg,#fff7ed,#fff);border-color:#FED7AA;}
+.rank-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.2rem;width:24px;text-align:center;color:var(--muted-light);flex-shrink:0;}
 .rank-1 .rank-num{color:var(--gold)}.rank-2 .rank-num{color:var(--silver)}.rank-3 .rank-num{color:var(--bronze);}
 .rank-medal{font-size:1rem;width:20px;flex-shrink:0;}
 .rank-name{flex:1;font-weight:600;font-size:.9rem;}
@@ -83,9 +95,9 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 .rank-bar-wrap{width:70px;height:4px;background:var(--border);border-radius:2px;}
 .rank-bar{height:4px;border-radius:2px;background:var(--accent);}
 
-.btn{font-size:.82rem;font-weight:700;padding:9px 18px;border-radius:7px;border:none;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
-.btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3);}
-.btn-primary:hover{background:#1D4ED8;transform:translateY(-1px);}
+.btn{font-size:.82rem;font-weight:700;padding:9px 18px;border-radius:10px;border:none;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,#2563eb,#1e3a8a);color:#fff;box-shadow:0 8px 18px -8px rgba(37,99,235,.55);}
+.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);}
 .btn-outline{background:transparent;border:1px solid var(--border-dark);color:var(--muted);}
 .btn-outline:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
 
@@ -94,7 +106,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 .alert-warning{background:var(--yellow-bg);border:1px solid #FDE68A;color:var(--yellow);}
 .alert-success{background:var(--green-bg);border:1px solid #A7F3D0;color:var(--green);}
 
-.day-header{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--accent);margin:20px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--accent-mid);display:flex;align-items:center;gap:8px;}
+.day-header{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:2px;color:var(--accent);margin:20px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--accent-mid);display:flex;align-items:center;gap:8px;}
 .activity-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:7px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid transparent;transition:all .15s;}
 .activity-row.clickable{cursor:pointer;}
 .activity-row.clickable:hover{border-color:var(--accent);background:var(--accent-light);transform:translateX(2px);}
@@ -128,7 +140,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 .team-card:hover{box-shadow:var(--shadow);transform:translateY(-2px);border-color:var(--accent-mid);}
 .team-card .t-name{font-weight:800;font-size:.95rem;margin-bottom:4px;}
 .team-card .t-leader{font-size:.77rem;color:var(--muted);}
-.team-card .t-pts{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--accent);margin:8px 0 4px;}
+.team-card .t-pts{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.8rem;color:var(--accent);margin:8px 0 4px;}
 .player-list{list-style:none;margin-top:8px;}
 .player-list li{display:flex;gap:8px;align-items:center;font-size:.83rem;padding:4px 0;border-bottom:1px solid var(--border);}
 .player-list li:last-child{border-bottom:none;}
@@ -152,21 +164,21 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
 .modal-overlay.open{opacity:1;pointer-events:all;}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);transform:translateY(16px);transition:transform .2s;max-height:90vh;overflow-y:auto;}
+.modal{background:var(--bg2);border:1px solid rgba(15,30,63,.06);border-radius:20px;padding:24px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);transform:translateY(16px);transition:transform .2s;max-height:90vh;overflow-y:auto;}
 .modal-overlay.open .modal{transform:translateY(0);}
-.modal h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:4px;}
+.modal h3{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
 .modal-sub{font-size:.8rem;color:var(--muted);margin-bottom:16px;}
 .modal-footer{margin-top:20px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
 
-.tab-row{display:flex;gap:4px;margin-bottom:16px;background:var(--bg3);padding:4px;border-radius:8px;width:fit-content;}
-.tab{font-size:.78rem;font-weight:700;padding:6px 14px;border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
-.tab.active{background:var(--bg2);color:var(--accent);box-shadow:var(--shadow-sm);}
+.tab-row{display:flex;gap:4px;margin-bottom:16px;background:var(--bg3);padding:4px;border-radius:999px;width:fit-content;flex-wrap:wrap;}
+.tab{font-size:.78rem;font-weight:700;padding:7px 15px;border-radius:999px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.tab.active{background:linear-gradient(135deg,#2563eb,#1e3a8a);color:#fff;box-shadow:0 6px 14px -6px rgba(37,99,235,.5);}
 
 .pen-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:8px;}
 .pen-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:7px;box-shadow:var(--shadow-sm);}
 .pen-name{font-weight:700;font-size:.85rem;}
 .pen-team{font-size:.7rem;}
-.pen-score{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);}
+.pen-score{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);}
 .pen-btns{display:flex;gap:4px;}
 .pen-btn{flex:1;padding:6px 0;border-radius:5px;border:1px solid var(--border);cursor:pointer;font-size:.75rem;font-weight:700;transition:all .1s;background:var(--bg3);color:var(--muted);}
 .pen-btn.goal{background:var(--green-bg);border-color:#A7F3D0;color:var(--green);}
@@ -176,7 +188,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 .duel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .duel-teams{font-weight:800;font-size:.92rem;}
 .vs{color:var(--muted);margin:0 6px;font-weight:400;}
-.duel-score{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--accent);}
+.duel-score{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;color:var(--accent);}
 .game-row{display:flex;align-items:center;gap:8px;font-size:.83rem;padding:5px 0;border-bottom:1px solid var(--border);}
 .game-row:last-child{border-bottom:none;}
 .game-name{flex:1;color:var(--muted);}
@@ -185,11 +197,12 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 .w2{background:var(--red-bg);color:var(--red);}
 .draw{background:var(--bg3);color:var(--muted);}
 
-.hero{background:linear-gradient(135deg,var(--accent) 0%,#1D4ED8 100%);border-radius:12px;padding:24px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden;}
-.hero::after{content:'⚽';position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:5rem;opacity:.12;}
-.hero-day{font-size:.75rem;font-weight:700;letter-spacing:1px;opacity:.75;margin-bottom:4px;}
-.hero-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;line-height:1;}
-.hero-sub{font-size:.82rem;opacity:.7;margin-top:6px;}
+.hero{background:linear-gradient(135deg,#14306e 0%,#1d4ed8 55%,#2f6bff 100%);border-radius:24px;padding:32px 34px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden;box-shadow:0 30px 60px -30px rgba(30,58,138,.6);}
+.hero::after{content:'⚽';position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-size:8rem;opacity:.14;animation:floatBall 6s ease-in-out infinite;}
+@keyframes floatBall{0%,100%{transform:translateY(-50%) rotate(0deg)}50%{transform:translateY(calc(-50% - 14px)) rotate(8deg)}}
+.hero-day{font-size:.75rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:.8;margin-bottom:4px;}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.4rem;letter-spacing:.5px;line-height:1;text-transform:uppercase;position:relative;z-index:1;}
+.hero-sub{font-size:.85rem;font-weight:600;opacity:.85;margin-top:10px;position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,.16);padding:8px 14px;border-radius:12px;}
 
 .score-input-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
 .score-input-row:last-child{border-bottom:none;}
@@ -204,9 +217,9 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 /* 8-KAMP */
 .ak-subgame{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);}
 .ak-subgame-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.ak-subgame-num{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);width:28px;flex-shrink:0;line-height:1;}
+.ak-subgame-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);width:28px;flex-shrink:0;line-height:1;}
 .ak-subgame-name{flex:1;}
-.ak-subgame-name input{width:100%;padding:7px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);}
+.ak-subgame-name input{width:100%;padding:7px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.88rem;color:var(--text);}
 .ak-subgame-name input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
 .ak-done-badge{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--green-bg);color:var(--green);border:1px solid #A7F3D0;}
 .ak-open-badge{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--yellow-bg);color:var(--yellow);border:1px solid #FDE68A;}
@@ -220,7 +233,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 /* LOGIN */
 #login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 100%);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
 .login-card{background:#fff;border-radius:16px;padding:32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
-.login-input{width:100%;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:.95rem;color:#0F172A;background:#F8FAFC;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .15s;box-sizing:border-box;}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:.95rem;color:#0F172A;background:#F8FAFC;outline:none;font-family:'Barlow',sans-serif;transition:border-color .15s;box-sizing:border-box;}
 .login-input:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,.12);}
 .rol-badge{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.3px;white-space:nowrap;}
 .rol-admin{background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;}
@@ -238,7 +251,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div id="login-overlay">
   <div class="login-card">
     <div style="text-align:center;margin-bottom:24px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;color:#2563EB">PUPILLEN<span style="color:#0F172A">KAMP</span></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.4rem;letter-spacing:3px;color:#2563EB">PUPILLEN<span style="color:#0F172A">KAMP</span></div>
       <div style="font-size:.83rem;color:#64748B;margin-top:4px">2026 · Inloggen om door te gaan</div>
     </div>
     <div style="margin-bottom:14px">
@@ -275,11 +288,10 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <button class="nav-btn" onclick="showSection('individueel',this)">&#127939; Individueel</button>
     <button class="nav-btn" onclick="showSection('preontbijt',this)">&#9728;&#65039; Pre-ontbijt</button>
     <button class="nav-btn" onclick="showSection('teams',this)">&#128085; Teams</button>
-    <button class="nav-btn" onclick="showSection('achtkamp',this)">&#127919; 8-Kamp</button>
     <button class="nav-btn" onclick="showSection('planning',this)">&#128197; Planning</button>
     <button class="nav-btn" onclick="showSection('spellen',this)">&#127918; Spellen</button>
     <button class="nav-btn" onclick="showSection('exporteren',this)">&#128229; Exporteren</button>
-    <button class="nav-btn" id="nav-instellingen" onclick="showSection('instellingen',this)">&#9881;&#65039; Instellingen</button>
+    <button class="nav-btn" id="nav-instellingen" onclick="showSection('instellingen',this)">&#9881;&#65039; Kampbeheer</button>
   </nav>
 </div>
 
@@ -389,11 +401,9 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
   <div class="tab-row">
     <button class="tab active" onclick="setTab('teams','overzicht',this)">&#128085; Teams</button>
     <button class="tab" onclick="setTab('teams','staf',this)">&#128101; Kampstaf</button>
-    <button class="tab" onclick="setTab('teams','beheren',this)">&#9881;&#65039; Beheren</button>
   </div>
   <div id="teams-overzicht"></div>
   <div id="teams-staf" style="display:none"></div>
-  <div id="teams-beheren" style="display:none"></div>
 </div>
 
 <!-- 8-KAMP -->
@@ -415,7 +425,6 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-planning">
   <div class="page-title">Weekplanning</div>
   <div class="page-sub" id="planning-sub">Klik op een spel om direct de score in te voeren</div>
-  <div id="planning-import"></div>
   <div id="planning-content"></div>
 </div>
 
@@ -435,18 +444,30 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 
 <!-- INSTELLINGEN -->
 <div class="section" id="section-instellingen">
-  <div class="page-title">Instellingen</div>
-  <div class="page-sub">Spelerslijst importeren en kampteams beheren</div>
+  <div class="page-title">Kampbeheer</div>
+  <div class="page-sub">Alles wat je moet instellen voor het kamp, op één plek</div>
   <div class="tab-row">
     <button class="tab active" onclick="setTab('inst','spelers',this)">&#128085; Spelers</button>
-    <button class="tab" onclick="setTab('inst','labels',this)">&#127991;&#65039; Labels</button>
+    <button class="tab" onclick="setTab('inst','teams',this)">&#128101; Teams</button>
     <button class="tab" onclick="setTab('inst','leiders',this)">&#128100; Leiders</button>
+    <button class="tab" onclick="setTab('inst','kampstaf',this)">&#128119; Kampstaf</button>
+    <button class="tab" onclick="setTab('inst','labels',this)">&#127991;&#65039; Labels</button>
+    <button class="tab" onclick="setTab('inst','planningimport',this)">&#128197; Planning importeren</button>
+    <button class="tab" onclick="setTab('inst','preimport',this)">&#129360; Pre-Ontbijt importeren</button>
+    <button class="tab" onclick="setTab('inst','atletiekimport',this)">&#127939; Atletiek importeren</button>
+    <button class="tab" onclick="setTab('inst','datums',this)">&#128198; Datums instellen</button>
     <button class="tab" onclick="setTab('inst','kamp',this)">&#128190; Kamp &amp; Archief</button>
     <button class="tab" onclick="setTab('inst','log',this)">&#128220; Log</button>
   </div>
   <div id="inst-spelers"></div>
-  <div id="inst-labels" style="display:none"></div>
+  <div id="inst-teams" style="display:none"></div>
   <div id="inst-leiders" style="display:none"></div>
+  <div id="inst-kampstaf" style="display:none"></div>
+  <div id="inst-labels" style="display:none"></div>
+  <div id="inst-planningimport" style="display:none"></div>
+  <div id="inst-preimport" style="display:none"></div>
+  <div id="inst-atletiekimport" style="display:none"></div>
+  <div id="inst-datums" style="display:none"></div>
   <div id="inst-kamp" style="display:none"></div>
   <div id="inst-log" style="display:none"></div>
 </div>
@@ -468,7 +489,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 
 <script>
 // ── AUTHENTICATIE ────────────────────────────────────────────
-// LEIDERS is de door de admin beheerde accountlijst (Instellingen → Leiders, admin-only).
+// LEIDERS is de door de admin beheerde accountlijst (Kampbeheer → Leiders, admin-only).
 // Login = voornaam+achternaam aan elkaar (lowercase). Wachtwoorden staan nooit in platte
 // tekst in de data — alleen als SHA-256 hash (zie hashWachtwoord()). Dit is geen
 // productiesterke beveiliging (de Supabase anon-key ligt sowieso open in dit bestand),
@@ -527,16 +548,18 @@ function updateGebruikerDisplay() {
   const teamNaam = rol === 'groepsleider' ? (TEAMS.find(t => t.id === huidigeGebruiker.teamId)?.name || '') : '';
   const rolLabel = rol==='admin' ? 'Admin' : rol==='groepsleider' ? `GL · ${teamNaam}` : 'Kampstaf';
   const naam = leiderNaam(huidigeGebruiker);
+  const initiaal = (naam||'?').trim().charAt(0).toUpperCase();
   el.innerHTML = `<span class="rol-badge rol-${rol}">${rolLabel}</span>
+    <span style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#334155,#0f172a);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0">${initiaal}</span>
     <span style="font-size:.82rem;font-weight:600;color:var(--text)">${naam}</span>
-    <button onclick="doLogout()" style="font-size:.72rem;padding:4px 9px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;cursor:pointer;color:var(--muted)">Uitloggen</button>`;
+    <button onclick="doLogout()" style="font-size:.72rem;padding:4px 9px;border-radius:8px;border:1px solid var(--border-dark);background:transparent;cursor:pointer;color:var(--muted)">Uitloggen</button>`;
   document.title = `Pupillenkamp — ${naam}`;
 }
 
 // ── AUDIT TRAIL ───────────────────────────────────────────────
 // Compacte activiteitenlog: elke belangrijke actie (scores, planning, teams, labels,
 // leiders, archief) wordt hier vastgelegd met tijdstip + wie het deed. Zichtbaar via
-// Instellingen → Log. Blijft gecapped op de laatste 500 acties (oudste eruit).
+// Kampbeheer → Log. Blijft gecapped op de laatste 500 acties (oudste eruit).
 let ACTIVITEITEN_LOG = [];
 function logActie(actie, details) {
   const gebruiker = huidigeGebruiker ? leiderNaam(huidigeGebruiker) : '—';
@@ -599,26 +622,60 @@ const VK_RONDES = [
 const PLAYERS_ALL = TEAMS.flatMap(t=>t.players.map(p=>({...p,team:t.name,teamId:t.id,color:t.color,indPts:Math.floor(Math.random()*20)})));
 
 // ── KAMP & ARCHIEF ────────────────────────────────────────────
-// Eén actief kamp tegelijk. "Kamp afsluiten" (Instellingen → Kamp & Archief) maakt een
+// Eén actief kamp tegelijk. "Kamp afsluiten" (Kampbeheer → Kamp & Archief) maakt een
 // snapshot van alle actieve data en zet die in ARCHIEF, waarna de actieve data leeg wordt
 // gemaakt voor een nieuw kamp. Teams/labels/leiders blijven staan (doorlopende configuratie).
-let KAMP_META = { naam: 'Pupillenkamp 2026', jaar: 2026, thema: '', gestartOp: new Date().toISOString() };
+let KAMP_META = { naam: 'Pupillenkamp 2026', jaar: 2026, thema: '', gestartOp: new Date().toISOString(),
+  startDatum: '2026-07-05', eindDatum: '2026-07-12' };
 let ARCHIEF = [];
 
+// ── KAMPDAGEN (flexibel datumbereik) ──────────────────────────
+// Canonieke bron voor alle dag-tabbladen (Planning, Penalty, Pre-Ontbijt, Individueel,
+// Vierkamp-weergave). `pasKampDagenToe()` (Kampbeheer → Datums instellen) herbouwt
+// KAMP_DAGEN + alle onderstaande dag-arrays wanneer het datumbereik wijzigt.
+const WEEKDAG_NAMEN = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+const MAAND_NAMEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+function genereerKampDagenLijst(startIso, eindIso) {
+  const dagen = [];
+  const start = new Date(startIso + 'T00:00:00');
+  const eind = new Date(eindIso + 'T00:00:00');
+  if(isNaN(start) || isNaN(eind) || eind < start) return dagen;
+  for(let d = new Date(start); d <= eind; d.setDate(d.getDate() + 1)) {
+    const weekdag = WEEKDAG_NAMEN[d.getDay()];
+    const weekdagLabel = weekdag.charAt(0).toUpperCase() + weekdag.slice(1);
+    dagen.push({ key: d.toISOString().slice(0,10), weekdag: weekdagLabel, label: `${weekdagLabel} ${d.getDate()} ${MAAND_NAMEN[d.getMonth()]}` });
+  }
+  return dagen;
+}
+let KAMP_DAGEN = genereerKampDagenLijst(KAMP_META.startDatum, KAMP_META.eindDatum);
+
 // ── PENALTY DATA ─────────────────────────────────────────────
-const KAMPdagen = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag'];
-const KAMPLAGEN = KAMPdagen;
+const KAMPdagen = KAMP_DAGEN.map(d => d.label);
 const LEADERS = TEAMS.map(t => t.leader);
 
-// Keepers per dag: dagIndex → [keeper1, keeper2]
-const penKeepersPerDag = { 0:['',''], 1:['',''], 2:['',''], 3:['',''], 4:['',''] };
+// Penalty-poules: puur organisatorisch (2 groepen van 4 teams, elk met een eigen keeperpaar
+// per dag, zodat er gelijktijdig op 2 doelen geschoten kan worden). De eindstand
+// (penTotaalSpeler e.d.) blijft één gezamenlijk klassement — dit raakt alleen hoe de
+// keepers/invoer per dag georganiseerd zijn.
+const penPoulePerTeam = {};
+TEAMS.forEach((t, i) => { penPoulePerTeam[t.id] = i < 4 ? 1 : 2; });
+function penPouleVoorTeam(teamId) { return penPoulePerTeam[teamId] || 1; }
+function penPouleVoorSpeler(naam) {
+  const p = PLAYERS_ALL.find(x => x.name === naam);
+  return p ? penPouleVoorTeam(p.teamId) : 1;
+}
+
+// Keepers per dag, per poule: dagIndex → {1:[keeper1,keeper2], 2:[keeper1,keeper2]}
+const penKeepersPerDag = {};
+KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = {1:['',''], 2:['','']}; });
 
 // Verdubbelaar: spelerNaam → dagIndex (0-4) | null
 const penVerdubbelaar = {};
 PLAYERS_ALL.forEach(p => { penVerdubbelaar[p.name] = null; });
 
 // Pogingen: dagIndex → [ {spelerNaam, keeperNaam, goal:bool|null, verdubbelaar:bool} ]
-const penData = KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: false }));
+// opgeslagen is per poule zodat poule 1 en poule 2 onafhankelijk afgerond kunnen worden.
+const penData = KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: {1:false, 2:false} }));
 
 // Huidige dag voor invoer
 let penHuidigeDag = 0;
@@ -690,26 +747,48 @@ function renderPenSetup() {
   const el = document.getElementById('pen-setup');
   if(!el) return;
 
-  // Keepers per dag
+  // Poule-indeling (organisatorisch — bepaalt alleen welke keepers een team gebruikt)
   let html = `<div class="card" style="margin-bottom:12px">
-    <div class="card-title">🧤 Keepers instellen per dag</div>
-    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag 2 keepers in. Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
+    <div class="card-title">&#128101; Poule-indeling</div>
+    <div class="alert alert-info" style="margin-bottom:12px">
+      Penalty wordt gelijktijdig in 2 poules van 4 teams geschoten (bv. op 2 doelen). De
+      eindstand blijft één gezamenlijk klassement — dit bepaalt alleen welke keepers een
+      team gebruikt.
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      ${TEAMS.map(t => `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.color}"></span>
+        <span style="font-weight:600;font-size:.85rem">${t.name}</span>
+        <select onchange="penSetPoule(${t.id},this.value)" style="padding:4px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.78rem;color:var(--text)">
+          <option value="1" ${penPoulePerTeam[t.id]===1?'selected':''}>Poule 1</option>
+          <option value="2" ${penPoulePerTeam[t.id]===2?'selected':''}>Poule 2</option>
+        </select>
+      </div>`).join('')}
+    </div>
+  </div>`;
+
+  // Keepers per dag, per poule
+  html += `<div class="card" style="margin-bottom:12px">
+    <div class="card-title">🧤 Keepers instellen per dag (per poule)</div>
+    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag en per poule 2 keepers in. Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
   KAMPdagen.forEach((dag, i) => {
-    const k = penKeepersPerDag[i];
-    html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-      <div style="font-weight:600;font-size:.88rem;width:80px;flex-shrink:0">${dag}</div>
-      <select onchange="penSetKeeper(${i},0,this.value)" style="flex:1;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
-        <option value="">Keeper 1...</option>
-        ${LEADERS.map(l=>`<option value="${l}" ${k[0]===l?'selected':''}>${l}</option>`).join('')}
-      </select>
-      <select onchange="penSetKeeper(${i},1,this.value)" style="flex:1;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
-        <option value="">Keeper 2...</option>
-        ${LEADERS.map(l=>`<option value="${l}" ${k[1]===l?'selected':''}>${l}</option>`).join('')}
-      </select>
-      <span style="font-size:.75rem;color:${k[0]&&k[1]?'var(--green)':'var(--muted)'}">
-        ${k[0]&&k[1]?'✓ ingesteld':'open'}
-      </span>
-    </div>`;
+    [1,2].forEach(poule => {
+      const k = penKeepersPerDag[i][poule];
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="font-weight:600;font-size:.85rem;width:130px;flex-shrink:0">${dag} <span style="color:var(--muted-light);font-size:.72rem">· Poule ${poule}</span></div>
+        <select onchange="penSetKeeper(${i},${poule},0,this.value)" style="flex:1;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
+          <option value="">Keeper 1...</option>
+          ${LEADERS.map(l=>`<option value="${l}" ${k[0]===l?'selected':''}>${l}</option>`).join('')}
+        </select>
+        <select onchange="penSetKeeper(${i},${poule},1,this.value)" style="flex:1;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
+          <option value="">Keeper 2...</option>
+          ${LEADERS.map(l=>`<option value="${l}" ${k[1]===l?'selected':''}>${l}</option>`).join('')}
+        </select>
+        <span style="font-size:.75rem;color:${k[0]&&k[1]?'var(--green)':'var(--muted)'}">
+          ${k[0]&&k[1]?'✓ ingesteld':'open'}
+        </span>
+      </div>`;
+    });
   });
   html += `</div>`;
 
@@ -755,11 +834,18 @@ function renderPenSetup() {
   el.innerHTML = html;
 }
 
-function penSetKeeper(dagIdx, slot, val) {
-  penKeepersPerDag[dagIdx][slot] = val;
-  const k = penKeepersPerDag[dagIdx];
-  if(k[0] && k[1]) showToast(`✓ Keepers ${KAMPdagen[dagIdx]}: ${k[0]} & ${k[1]}`);
+function penSetKeeper(dagIdx, poule, slot, val) {
+  penKeepersPerDag[dagIdx][poule][slot] = val;
+  const k = penKeepersPerDag[dagIdx][poule];
+  if(k[0] && k[1]) showToast(`✓ Keepers ${KAMPdagen[dagIdx]} (poule ${poule}): ${k[0]} & ${k[1]}`);
   renderPenSetup();
+}
+
+function penSetPoule(teamId, val) {
+  penPoulePerTeam[teamId] = parseInt(val);
+  logActie('Penalty-poule aangepast', `${TEAMS.find(t=>t.id===teamId)?.name} → poule ${val}`);
+  renderPenSetup();
+  renderPenInvoer();
 }
 
 function penSetVerdubbelaarSetup(naam, val) {
@@ -784,70 +870,76 @@ function renderPenInvoer() {
     <div class="card-title">Dag selecteren</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">`;
   KAMPdagen.forEach((dag, i) => {
-    const done = penData[i].opgeslagen;
+    const done = penData[i].opgeslagen[1] && penData[i].opgeslagen[2];
     const active = i === penHuidigeDag;
     html += `<button class="btn ${active?'btn-primary':'btn-outline'}" style="font-size:.78rem;padding:6px 12px" onclick="penSetDag(${i})">${dag}${done?' ✓':''}</button>`;
   });
   html += `</div></div>`;
 
   const dagData = penData[penHuidigeDag];
-  const keepers = penKeepersPerDag[penHuidigeDag];
-  const keeper1 = keepers[0] || '?';
-  const keeper2 = keepers[1] || '?';
-  const keepersOk = keepers[0] && keepers[1];
 
-  html += `<div class="alert ${keepersOk?'alert-info':'alert-warning'}">
-    📅 <strong>${KAMPdagen[penHuidigeDag]}</strong> —
-    Keeper 1: <strong>${keeper1}</strong> · Keeper 2: <strong>${keeper2}</strong>
-    ${!keepersOk?'<br>⚠️ Stel eerst de keepers in via het ⚙️ Instellen tabblad.':''}
-  </div>`;
+  [1,2].forEach(poule => {
+    const keepers = penKeepersPerDag[penHuidigeDag][poule];
+    const keeper1 = keepers[0] || '?';
+    const keeper2 = keepers[1] || '?';
+    const keepersOk = keepers[0] && keepers[1];
+    const opgeslagenPoule = dagData.opgeslagen[poule];
+    const teamsInPoule = TEAMS.filter(t => penPouleVoorTeam(t.id) === poule);
 
-  TEAMS.forEach(t => {
-    html += `<div class="ak-subgame" style="margin-bottom:10px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${t.color}"></span>
-        <strong style="color:${t.color}">${t.name}</strong>
-        <span style="font-size:.75rem;color:var(--muted)">— ${t.leader}</span>
-      </div>`;
+    html += `<div class="day-header" style="margin-top:20px">Poule ${poule}</div>`;
+    html += `<div class="alert ${keepersOk?'alert-info':'alert-warning'}">
+      📅 <strong>${KAMPdagen[penHuidigeDag]} — Poule ${poule}</strong> —
+      Keeper 1: <strong>${keeper1}</strong> · Keeper 2: <strong>${keeper2}</strong>
+      ${!keepersOk?'<br>⚠️ Stel eerst de keepers in via het ⚙️ Instellen tabblad.':''}
+    </div>`;
 
-    t.players.forEach(p => {
-      const fullName = p.name;
-      const verdVandaag = penVerdubbelaar[fullName] === penHuidigeDag;
-      const heeftVerd = penVerdubbelaar[fullName] !== null;
-      const bestaand = dagData.pogingen.filter(x => x.spelerNaam === fullName);
-      const p1 = bestaand[0] || null;
-      const p2 = bestaand[1] || null;
-      const dagPts = penDagTotaalSpeler(fullName, penHuidigeDag);
-      const totPts = penTotaalSpeler(fullName);
+    teamsInPoule.forEach(t => {
+      html += `<div class="ak-subgame" style="margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${t.color}"></span>
+          <strong style="color:${t.color}">${t.name}</strong>
+          <span style="font-size:.75rem;color:var(--muted)">— ${t.leader}</span>
+        </div>`;
 
-      html += `<div style="border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;background:var(--bg)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-          <span style="font-family:'DM Mono',monospace;color:var(--accent);font-size:.8rem">#${p.num}</span>
-          <span style="font-weight:700;font-size:.88rem;flex:1">${fullName}</span>
-          ${verdVandaag?`<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;border:1px solid #F0ABFC">2× vandaag</span>`:''}
-          ${heeftVerd&&!verdVandaag?`<span style="font-size:.7rem;color:var(--muted-light)">2× op ${KAMPdagen[penVerdubbelaar[fullName]]}</span>`:''}
-          <span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700">${dagPts}pt · ${totPts}pt tot</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          ${penShotRow(fullName, 0, p1, dagData.opgeslagen, keeper1)}
-          ${penShotRow(fullName, 1, p2, dagData.opgeslagen, keeper2)}
-        </div>
-      </div>`;
+      t.players.forEach(p => {
+        const fullName = p.name;
+        const verdVandaag = penVerdubbelaar[fullName] === penHuidigeDag;
+        const heeftVerd = penVerdubbelaar[fullName] !== null;
+        const bestaand = dagData.pogingen.filter(x => x.spelerNaam === fullName);
+        const p1 = bestaand[0] || null;
+        const p2 = bestaand[1] || null;
+        const dagPts = penDagTotaalSpeler(fullName, penHuidigeDag);
+        const totPts = penTotaalSpeler(fullName);
+
+        html += `<div style="border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;background:var(--bg)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+            <span style="font-family:'DM Mono',monospace;color:var(--accent);font-size:.8rem">#${p.num}</span>
+            <span style="font-weight:700;font-size:.88rem;flex:1">${fullName}</span>
+            ${verdVandaag?`<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;border:1px solid #F0ABFC">2× vandaag</span>`:''}
+            ${heeftVerd&&!verdVandaag?`<span style="font-size:.7rem;color:var(--muted-light)">2× op ${KAMPdagen[penVerdubbelaar[fullName]]}</span>`:''}
+            <span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700">${dagPts}pt · ${totPts}pt tot</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            ${penShotRow(fullName, 0, p1, opgeslagenPoule, keeper1)}
+            ${penShotRow(fullName, 1, p2, opgeslagenPoule, keeper2)}
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
     });
-    html += `</div>`;
-  });
 
-  if(!dagData.opgeslagen) {
-    html += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-      <button class="btn btn-primary" onclick="penOpslaanDag()">✓ ${KAMPdagen[penHuidigeDag]} opslaan</button>
-      <button class="btn btn-outline" onclick="penOpslaanDag(true)" style="font-size:.78rem">🔓 Opslaan (blijft bewerkbaar)</button>
-    </div>`;
-  } else {
-    html += `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <div class="alert alert-success" style="margin:0;flex:1">✓ ${KAMPdagen[penHuidigeDag]} opgeslagen.</div>
-      <button class="btn btn-outline" style="font-size:.78rem" onclick="penHeropen(${penHuidigeDag})">🔓 Heropenen (admin)</button>
-    </div>`;
-  }
+    if(!opgeslagenPoule) {
+      html += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+        <button class="btn btn-primary" onclick="penOpslaanDag(${poule})">✓ Poule ${poule} opslaan</button>
+        <button class="btn btn-outline" onclick="penOpslaanDag(${poule},true)" style="font-size:.78rem">🔓 Opslaan (blijft bewerkbaar)</button>
+      </div>`;
+    } else {
+      html += `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="alert alert-success" style="margin:0;flex:1">✓ Poule ${poule} — ${KAMPdagen[penHuidigeDag]} opgeslagen.</div>
+        <button class="btn btn-outline" style="font-size:.78rem" onclick="penHeropen(${penHuidigeDag},${poule})">🔓 Heropenen (admin)</button>
+      </div>`;
+    }
+  });
 
   el.innerHTML = html;
 }
@@ -894,7 +986,8 @@ function penUpdateShot(spelerNaam, shotIdx) {
 function penToggleGoal(spelerNaam, shotIdx, isGoal) {
   const dagData = penData[penHuidigeDag];
   const safeId = spelerNaam.replace(/[^a-z0-9]/gi,'');
-  const keeper = penKeepersPerDag[penHuidigeDag][shotIdx] || '';
+  const poule = penPouleVoorSpeler(spelerNaam);
+  const keeper = penKeepersPerDag[penHuidigeDag][poule][shotIdx] || '';
   const existing = dagData.pogingen.filter(p => p.spelerNaam === spelerNaam);
   const verdVandaag = penVerdubbelaar[spelerNaam] === penHuidigeDag;
   if(!existing[shotIdx]) {
@@ -953,16 +1046,16 @@ function penAdminSave(spelerNaam, dagIdx, shotIdx) {
 
 function penSetDag(idx) { penHuidigeDag = idx; renderPenInvoer(); }
 
-function penOpslaanDag(blijftBewerkbaar) {
-  if(!blijftBewerkbaar) penData[penHuidigeDag].opgeslagen = true;
-  showToast(`✓ ${KAMPdagen[penHuidigeDag]} opgeslagen!`);
-  logActie('Penalty dag opgeslagen', KAMPdagen[penHuidigeDag]);
+function penOpslaanDag(poule, blijftBewerkbaar) {
+  if(!blijftBewerkbaar) penData[penHuidigeDag].opgeslagen[poule] = true;
+  showToast(`✓ ${KAMPdagen[penHuidigeDag]} (poule ${poule}) opgeslagen!`);
+  logActie('Penalty dag opgeslagen', `${KAMPdagen[penHuidigeDag]} · poule ${poule}`);
   renderPenalty();
 }
 
-function penHeropen(dagIdx) {
-  penData[dagIdx].opgeslagen = false;
-  showToast(`🔓 ${KAMPdagen[dagIdx]} heropend`);
+function penHeropen(dagIdx, poule) {
+  penData[dagIdx].opgeslagen[poule] = false;
+  showToast(`🔓 ${KAMPdagen[dagIdx]} (poule ${poule}) heropend`);
   renderPenInvoer();
 }
 
@@ -1037,7 +1130,8 @@ function renderPenHistorie() {
     const goals=dagData.pogingen.filter(p=>p.goal).length;
     const n=dagData.pogingen.length;
     const keepers=penKeepersPerDag[dagIdx];
-    html += `<div class="day-header">📅 ${dag} <span style="font-size:.75rem;font-weight:400;color:var(--muted);letter-spacing:0">${dagData.opgeslagen?'✓':'open'} · ${goals}/${n} goals · 🧤 ${keepers[0]||'?'} & ${keepers[1]||'?'}</span></div>`;
+    const beideOpgeslagen = dagData.opgeslagen[1] && dagData.opgeslagen[2];
+    html += `<div class="day-header">📅 ${dag} <span style="font-size:.75rem;font-weight:400;color:var(--muted);letter-spacing:0">${beideOpgeslagen?'✓':'open'} · ${goals}/${n} goals · 🧤 P1: ${keepers[1][0]||'?'} &amp; ${keepers[1][1]||'?'} · P2: ${keepers[2][0]||'?'} &amp; ${keepers[2][1]||'?'}</span></div>`;
     if(n===0){
       html+=`<div style="font-size:.83rem;color:var(--muted);padding:8px 12px">Nog geen pogingen.</div>`;
     } else {
@@ -1135,7 +1229,7 @@ function renderPenFinale() {
     html+=`<div class="ak-subgame" style="margin-bottom:12px;${afgerond?'opacity:.85':''}">
       <!-- Ronde header -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);letter-spacing:1px">${ronde.naam}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);letter-spacing:1px">${ronde.naam}</div>
         <div style="font-size:.78rem;color:var(--muted);flex:1">${ronde.deelnemers.length} spelers · ${ronde.penPerSpeler} pen/speler · keeper: <strong>${ronde.keeper||'?'}</strong></div>
         ${afgerond?`<span style="font-size:.75rem;padding:3px 10px;border-radius:20px;background:var(--green-bg);color:var(--green);font-weight:700">✓ Afgesloten</span>`:''}
       </div>
@@ -1331,19 +1425,22 @@ function penRondeBeslissen(rondeIdx){
 }
 
 // ── PRE-ONTBIJTSPEL DATA ──────────────────────────────────────
-// 10 spellen: 5 dagen × 2 per dag. Elk spel: 4 duels (alle 8 teams, 1 duel per team per spel).
+// 2 spellen per kampdag. Elk spel: 4 duels (alle 8 teams, 1 duel per team per spel = 4 velden).
 // Win=3pt · Gelijk=1pt · Verlies=0pt. Eindklassement: 1e=8pt … 8e=1pt.
-let preSpellenData = Array.from({length:10},(_,i)=>({
-  naam:`Spel ${i+1}`,
-  dag:Math.floor(i/2),   // index KAMPdagen (0–4)
-  slot:i%2,              // 0 of 1 (volgorde binnen dag)
-  uitleg:'',
-  leider1:'',
-  leider2:'',
-  duels:Array.from({length:4},()=>({team1:'',team2:'',score1:null,score2:null})),
-  opgeslagen:false,
-  puntenGewicht:1        // admin: win=3×gw · gelijk=1×gw · verlies=0
-}));
+function genereerPreSpellenData() {
+  return Array.from({length: KAMPdagen.length * 2}, (_, i) => ({
+    naam: `Spel ${i+1}`,
+    dag: Math.floor(i / 2),   // index KAMPdagen
+    slot: i % 2,              // 0 of 1 (volgorde binnen dag)
+    uitleg: '',
+    leider1: '',
+    leider2: '',
+    duels: Array.from({length:4}, () => ({team1:'', team2:'', score1:null, score2:null})),
+    opgeslagen: false,
+    puntenGewicht: 1          // admin: win=3×gw · gelijk=1×gw · verlies=0
+  }));
+}
+let preSpellenData = genereerPreSpellenData();
 let preHuidigeDag = 0;
 
 function renderPreOntbijt(){renderPreSchema();renderPreInvoer();renderPreSpellen();}
@@ -1462,7 +1559,7 @@ function renderPreInvoer(){
     const nDuels=spel.duels.filter(d=>d.team1&&d.team2).length;
     html+=`<div class="ak-subgame" style="margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent)">${spel.naam}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent)">${spel.naam}</div>
         ${[spel.leider1,spel.leider2].filter(Boolean).length?`<span style="font-size:.75rem;color:var(--muted)">Leiders: ${[spel.leider1,spel.leider2].filter(Boolean).join(' &amp; ')}</span>`:''}
         ${spel.opgeslagen?`<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--green-bg);color:var(--green);font-weight:700">&#10003; Opgeslagen</span>`:''}
       </div>`;
@@ -1623,14 +1720,16 @@ function preHeropen(si){
   renderPreInvoer();renderTeamKlassement();
 }
 
-let planningData = [
-  {day:'Zondag',icon:'🌅',acts:[
+// Standaard-programma voor de eerste 6 kampdagen (pas na import/handmatig aan). Dagen
+// daarbuiten (bv. een extra zaterdag) krijgen een leeg basisprogramma met alleen maaltijden.
+const PLANNING_SJABLOON = [
+  {icon:'🌅',acts:[
     {time:'14:00',name:'Aankomst & inschrijving',type:'vrij',vervallen:false},
     {time:'16:00',name:'Veldspel',klassement:'Teamklassement',type:'spel',vervallen:false},
     {time:'18:30',name:'Avondeten',type:'maaltijd',vervallen:false},
     {time:'20:00',name:'Avondspel — Nachtspel',klassement:'Teamklassement',type:'spel',vervallen:false},
   ]},
-  {day:'Maandag',icon:'☀️',acts:[
+  {icon:'☀️',acts:[
     {time:'07:30',name:'Pre-ontbijtspel',klassement:'Teamklassement',type:'spel',vervallen:false},
     {time:'08:00',name:'Ontbijt',type:'maaltijd',vervallen:false},
     {time:'10:00',name:'Vierkamp — Ronde 1',klassement:'Vierkamp',type:'spel',vervallen:false},
@@ -1641,17 +1740,16 @@ let planningData = [
     {time:'18:30',name:'Avondeten',type:'maaltijd',vervallen:false},
     {time:'20:00',name:'Avondspel',klassement:'Teamklassement',type:'spel',vervallen:false},
   ]},
-  {day:'Dinsdag',icon:'⚽',acts:[
+  {icon:'⚽',acts:[
     {time:'07:30',name:'Pre-ontbijtspel',klassement:'Teamklassement',type:'spel',vervallen:false},
     {time:'08:00',name:'Ontbijt',type:'maaltijd',vervallen:false},
-    {time:'10:00',name:'8-Kamp',klassement:'8-Kamp',type:'spel',vervallen:false,achtkampId:1},
     {time:'12:00',name:'Individueel Klassement',klassement:'Individueel',type:'spel',vervallen:false},
     {time:'13:00',name:'Lunch',type:'maaltijd',vervallen:false},
     {time:'15:00',name:'Penalty Bokaal',klassement:'Penalty',type:'spel',vervallen:false},
     {time:'17:00',name:'Voetbalwedstrijden',klassement:'Teamklassement',type:'spel',vervallen:false},
     {time:'18:30',name:'Avondeten',type:'maaltijd',vervallen:false},
   ]},
-  {day:'Woensdag',icon:'🌤️',acts:[
+  {icon:'🌤️',acts:[
     {time:'08:00',name:'Ontbijt',type:'maaltijd',vervallen:false},
     {time:'10:00',name:'Vierkamp — Ronde 3',klassement:'Vierkamp',type:'spel',vervallen:false},
     {time:'12:00',name:'Individueel Klassement',klassement:'Individueel',type:'spel',vervallen:false},
@@ -1659,7 +1757,7 @@ let planningData = [
     {time:'15:00',name:'Penalty Bokaal',klassement:'Penalty',type:'spel',vervallen:false},
     {time:'19:00',name:'Groot avondspel',klassement:'Teamklassement',type:'spel',vervallen:false},
   ]},
-  {day:'Donderdag',icon:'🌦️',acts:[
+  {icon:'🌦️',acts:[
     {time:'07:30',name:'Pre-ontbijtspel',klassement:'Teamklassement',type:'spel',vervallen:false},
     {time:'08:00',name:'Ontbijt',type:'maaltijd',vervallen:false},
     {time:'10:00',name:'Vierkamp — Halve finale',klassement:'Vierkamp',type:'spel',vervallen:false},
@@ -1668,7 +1766,7 @@ let planningData = [
     {time:'15:00',name:'Penalty Bokaal',klassement:'Penalty',type:'spel',vervallen:false},
     {time:'17:00',name:'Voetbalwedstrijden',klassement:'Teamklassement',type:'spel',vervallen:false},
   ]},
-  {day:'Vrijdag',icon:'🏆',acts:[
+  {icon:'🏆',acts:[
     {time:'09:00',name:'Ontbijt',type:'maaltijd',vervallen:false},
     {time:'10:00',name:'Vierkamp — Finale',klassement:'Vierkamp',type:'spel',vervallen:false},
     {time:'12:00',name:'Penalty Bokaal — Finale',klassement:'Penalty',type:'spel',vervallen:false},
@@ -1676,6 +1774,13 @@ let planningData = [
     {time:'15:00',name:'Aftocht & vertrek',type:'vrij',vervallen:false},
   ]},
 ];
+function genereerPlanningData() {
+  return KAMP_DAGEN.map((d, i) => {
+    const sjabloon = PLANNING_SJABLOON[i];
+    return { day: d.label, icon: sjabloon?.icon || '📅', acts: sjabloon ? JSON.parse(JSON.stringify(sjabloon.acts)) : [] };
+  });
+}
+let planningData = genereerPlanningData();
 
 // ── HELPERS ─────────────────────────────────────────────────
 function getTeamTotals(){
@@ -1700,7 +1805,7 @@ function setTab(prefix,tab,btn){
   section.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   // hide all sub-panels
-  ['stand','historie','duels','invoer','detail','spelers','keepers','setup','finale','groepen','spellen','schema','staf','overzicht','leeftijd','beheren','labels','leiders','kamp','log'].forEach(p=>{const el=document.getElementById(prefix+'-'+p);if(el)el.style.display='none';});
+  ['stand','historie','duels','invoer','detail','spelers','keepers','setup','finale','groepen','spellen','schema','staf','overzicht','leeftijd','teams','kampstaf','labels','leiders','planningimport','preimport','atletiekimport','datums','kamp','log'].forEach(p=>{const el=document.getElementById(prefix+'-'+p);if(el)el.style.display='none';});
   const target=document.getElementById(prefix+'-'+tab);
   if(target)target.style.display='block';
   // re-render
@@ -1708,11 +1813,25 @@ function setTab(prefix,tab,btn){
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────
+// Hero-gradient per thema — 3 kant-en-klare sferen, met een neutrale blauwe fallback voor
+// elk ander/eigen thema-woord dat de admin intypt.
+const HERO_THEMA_GRADIENTEN = {
+  camping:        'linear-gradient(135deg,#14306e 0%,#1d4ed8 55%,#2f6bff 100%)',
+  stadion:        'linear-gradient(135deg,#052e16 0%,#15803d 55%,#22c55e 100%)',
+  zonsondergang:  'linear-gradient(135deg,#7c2d12 0%,#ea580c 50%,#f59e0b 100%)',
+};
+function heroGradientVoorThema(thema) {
+  const key = (thema||'').trim().toLowerCase();
+  return HERO_THEMA_GRADIENTEN[key] || HERO_THEMA_GRADIENTEN.camping;
+}
+
 function renderDashboard(){
   const heroDay = document.getElementById('hero-day');
   if(heroDay) heroDay.textContent = KAMP_META.naam.toUpperCase();
   const heroSub = document.getElementById('hero-sub');
-  if(heroSub) heroSub.textContent = KAMP_META.thema ? `Thema: ${KAMP_META.thema}` : 'Zorg dat alle scores van vandaag zijn ingevoerd ✅';
+  if(heroSub) heroSub.innerHTML = KAMP_META.thema ? `&#127957; Thema: ${KAMP_META.thema}` : 'Zorg dat alle scores van vandaag zijn ingevoerd &#9989;';
+  const heroEl = document.querySelector('.hero');
+  if(heroEl) heroEl.style.background = heroGradientVoorThema(KAMP_META.thema);
   const totals=getTeamTotals(),max=totals[0].pts||1;
   const penTop=[...PLAYERS_ALL].map(p=>({...p,pts:penTotaalSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
   const indTop=[...PLAYERS_ALL].filter(p=>isActief(p.name)).map(p=>({...p,pts:indPuntenSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
@@ -1953,11 +2072,17 @@ const IND_LEEFTIJDEN = [
   { cat:'O12', spelers:[] },
   { cat:'O13', spelers:[] },
 ];
-const IND_DAGEN = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag'];
-const indSpellen = IND_DAGEN.map(dag => ({
-  dag,
-  spellen: Array.from({length:4}, () => ({ naam:'', maker:'', leider:'', uitleg:'', opgeslagen:false, scores:{}, scoreType:'aantal' }))
-}));
+// IND_DAGEN wijst naar dezelfde array als KAMPdagen (canonieke kampdagen-lijst) — beide
+// namen blijven bestaan omdat ze door bestaande code gebruikt worden, maar het is bewust
+// dezelfde lijst zodat Individueel altijd exact dezelfde dagen toont als Planning/Penalty.
+const IND_DAGEN = KAMPdagen;
+function genereerIndSpellen() {
+  return IND_DAGEN.map(dag => ({
+    dag,
+    spellen: Array.from({length:4}, () => ({ naam:'', maker:'', leider1:'', leider2:'', uitleg:'', opgeslagen:false, scores:{}, scoreType:'aantal' }))
+  }));
+}
+let indSpellen = genereerIndSpellen();
 let indHuidigeDag = 0;
 
 function msToTijd(ms) {
@@ -2182,9 +2307,9 @@ function renderIndInvoer() {
 
     html += `<div class="ak-subgame" style="margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent)">${spelNaam}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent)">${spelNaam}</div>
         ${spel.maker?`<span style="font-size:.72rem;color:var(--muted)">maker: ${spel.maker}</span>`:''}
-        ${spel.leider?`<span style="font-size:.72rem;color:var(--muted)"> · leider: ${spel.leider}</span>`:''}
+        ${(spel.leider1||spel.leider2)?`<span style="font-size:.72rem;color:var(--muted)"> · leider: ${[spel.leider1,spel.leider2].filter(Boolean).join(' & ')}</span>`:''}
         <span style="font-size:.68rem;padding:2px 7px;border-radius:20px;background:${isTijd?'#EFF6FF':'#F0FDF4'};color:${isTijd?'#2563EB':'#16A34A'};font-weight:600">${isTijd?'⏱ Tijd':'# Aantal'}</span>
         ${spel.opgeslagen?`<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--green-bg);color:var(--green);font-weight:700">&#10003; opgeslagen</span>`:''}
       </div>
@@ -2224,7 +2349,8 @@ function renderIndGroepen() {
   if(!el) return;
   const inGroep = IND_GROEPEN.flatMap(g=>g.spelers);
   const vrij = PLAYERS_ALL.filter(p=>!inGroep.includes(p.name));
-  let html = `<div class="alert alert-info" style="margin-bottom:12px">Vaste indeling op leeftijd &amp; niveau — onafhankelijk van teams. Groepsnamen zijn bewerkbaar.</div>`;
+  let html = `<div class="alert alert-info" style="margin-bottom:12px">Vaste indeling op leeftijd &amp; niveau — onafhankelijk van teams. Groepsnamen zijn bewerkbaar.</div>
+  <div style="margin-bottom:12px"><button class="btn btn-outline" onclick="indFilterModal()">&#128269; Filter (naam / leeftijd / huidig team)</button></div>`;
   IND_GROEPEN.forEach((g,gi) => {
     html += `<div class="ak-subgame" style="margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -2238,6 +2364,10 @@ function renderIndGroepen() {
             ${naam}<button onclick="indVerwijderUitGroep(${gi},'${naam}')" style="background:none;border:none;color:inherit;cursor:pointer;line-height:1;padding:0 0 0 2px;opacity:.7">&#10005;</button></span>`;
         }).join('')}
         ${g.spelers.length===0?`<span style="font-size:.75rem;color:var(--muted-light);font-style:italic">Leeg</span>`:''}
+      </div>
+      <div style="position:relative">
+        <input type="text" placeholder="Typ een naam om snel toe te voegen..." oninput="indZoekInGroep(${gi},this.value)" style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.82rem;color:var(--text)">
+        <div id="ind-zoek-resultaat-${gi}" style="margin-top:2px"></div>
       </div>
     </div>`;
   });
@@ -2259,6 +2389,76 @@ function renderIndGroepen() {
 function indVoegToeAanGroep(gi,naam) { IND_GROEPEN.forEach(g=>{g.spelers=g.spelers.filter(n=>n!==naam);}); IND_GROEPEN[gi].spelers.push(naam); renderIndGroepen(); }
 function indVerwijderUitGroep(gi,naam) { IND_GROEPEN[gi].spelers=IND_GROEPEN[gi].spelers.filter(n=>n!==naam); renderIndGroepen(); }
 
+// Snel-zoeken binnen een groepskaart: typen filtert nog-niet-ingedeelde spelers op naam,
+// klikken op een resultaat voegt direct toe (indVoegToeAanGroep haalt de speler al overal
+// elders weg, dus eenmaal toegevoegd verdwijnt hij automatisch uit deze en andere lijsten).
+function indZoekInGroep(gi, tekst) {
+  const resultEl = document.getElementById('ind-zoek-resultaat-' + gi);
+  if(!resultEl) return;
+  const q = tekst.trim().toLowerCase();
+  if(!q) { resultEl.innerHTML = ''; return; }
+  const inGroep = IND_GROEPEN.flatMap(g => g.spelers);
+  const matches = PLAYERS_ALL.filter(p => !inGroep.includes(p.name) && p.name.toLowerCase().includes(q)).slice(0, 8);
+  if(matches.length === 0) { resultEl.innerHTML = '<div style="font-size:.75rem;color:var(--muted-light);padding:4px 2px">Geen (niet-ingedeelde) spelers gevonden.</div>'; return; }
+  resultEl.innerHTML = matches.map(p => `<div onclick="indVoegToeAanGroep(${gi},'${p.name.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:.82rem" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${p.color}"></span>
+    <span style="font-weight:600;flex:1">${p.name}</span>
+    <span style="color:var(--muted-light);font-size:.72rem">${p.team}</span>
+  </div>`).join('');
+}
+
+// Filter-modal: zoek spelers op naam/leeftijd/huidig team, en wijs direct toe aan een groep.
+function indFilterModal() {
+  const leeftijden = [...new Set(PLAYERS_ALL.map(p => p.leeftijd).filter(l => l != null))].sort((a,b) => a-b);
+  const huidigeTeams = [...new Set(PLAYERS_ALL.map(p => p.huidigTeam).filter(Boolean))].sort();
+  document.getElementById('modal-title').textContent = 'Spelers filteren';
+  document.getElementById('modal-sub').textContent = 'Zoek op naam, leeftijd of huidig team';
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <input id="indf-naam" placeholder="Naam..." oninput="indFilterUitvoeren()" style="padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+      <select id="indf-leeftijd" onchange="indFilterUitvoeren()" style="padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
+        <option value="">Alle leeftijden</option>${leeftijden.map(l => `<option value="${l}">${l} jaar</option>`).join('')}
+      </select>
+    </div>
+    <select id="indf-team" onchange="indFilterUitvoeren()" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text);margin-bottom:10px">
+      <option value="">Alle huidige teams</option>${huidigeTeams.map(t => `<option value="${t}">${t}</option>`).join('')}
+    </select>
+    <div id="indf-resultaten" style="max-height:340px;overflow-y:auto"></div>`;
+  document.getElementById('modal-footer').innerHTML = `<button class="btn btn-outline" onclick="closeModal()">Sluiten</button>`;
+  openModal();
+  indFilterUitvoeren();
+}
+
+function indFilterUitvoeren() {
+  const naam = (document.getElementById('indf-naam')?.value || '').trim().toLowerCase();
+  const leeftijd = document.getElementById('indf-leeftijd')?.value;
+  const team = document.getElementById('indf-team')?.value;
+  const inGroep = IND_GROEPEN.flatMap(g => g.spelers);
+  const resultaten = PLAYERS_ALL.filter(p => {
+    if(naam && !p.name.toLowerCase().includes(naam)) return false;
+    if(leeftijd && String(p.leeftijd) !== leeftijd) return false;
+    if(team && p.huidigTeam !== team) return false;
+    return true;
+  });
+  const el = document.getElementById('indf-resultaten');
+  if(!el) return;
+  if(resultaten.length === 0) { el.innerHTML = '<div class="alert alert-info">Geen spelers gevonden.</div>'; return; }
+  el.innerHTML = resultaten.map(p => {
+    const ingedeeld = inGroep.includes(p.name);
+    const huidigeGroep = ingedeeld ? IND_GROEPEN.find(g => g.spelers.includes(p.name))?.naam : null;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--border)">
+      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color}"></span>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:.85rem">${p.name}</div>
+        <div style="font-size:.72rem;color:var(--muted-light)">${p.team}${p.leeftijd?` · ${p.leeftijd}j`:''}${p.huidigTeam?` · ${p.huidigTeam}`:''}${ingedeeld?` · in ${huidigeGroep}`:''}</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;max-width:220px">
+        ${IND_GROEPEN.map((g,gi) => `<button class="btn btn-outline" style="font-size:.66rem;padding:2px 7px" onclick="indVoegToeAanGroep(${gi},'${p.name.replace(/'/g,"\\'")}');indFilterUitvoeren()">+${g.naam}</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderIndSpellen() {
   const el = document.getElementById('ind-spellen');
   if(!el) return;
@@ -2279,9 +2479,12 @@ function renderIndSpellen() {
           <div><label style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">MAKER</label>
             <select style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)" onchange="indSpellen[${di}].spellen[${si}].maker=this.value">
               <option value="">Kies...</option>${KAMPSTAF.map(s=>`<option value="${s}" ${spel.maker===s?'selected':''}>${s}</option>`).join('')}</select></div>
-          <div><label style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">LEIDER (uitvoering)</label>
-            <select style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)" onchange="indSpellen[${di}].spellen[${si}].leider=this.value">
-              <option value="">Kies...</option>${KAMPSTAF.map(s=>`<option value="${s}" ${spel.leider===s?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div><label style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">LEIDER 1 (uitvoering)</label>
+            <select style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)" onchange="indSpellen[${di}].spellen[${si}].leider1=this.value">
+              <option value="">Kies...</option>${KAMPSTAF.map(s=>`<option value="${s}" ${spel.leider1===s?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div><label style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">LEIDER 2 (uitvoering)</label>
+            <select style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)" onchange="indSpellen[${di}].spellen[${si}].leider2=this.value">
+              <option value="">Kies...</option>${KAMPSTAF.map(s=>`<option value="${s}" ${spel.leider2===s?'selected':''}>${s}</option>`).join('')}</select></div>
         </div>
         <div><label style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">UITLEG (zichtbaar voor leider)</label>
           <textarea placeholder="Regels, benodigdheden, duur..." style="width:100%;padding:7px 9px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);resize:vertical;min-height:52px" onchange="indSpellen[${di}].spellen[${si}].uitleg=this.value">${spel.uitleg}</textarea></div>
@@ -2295,7 +2498,6 @@ function renderIndSpellen() {
 function renderTeams(){
   renderTeamsOverzicht();
   renderTeamsStaf();
-  renderTeamsBeheren();
 }
 
 function renderTeamsOverzicht(){
@@ -2365,10 +2567,7 @@ function stafToevoegen() {
   const naam = input?.value?.trim();
   if(!naam) return;
   EXTRA_STAF.push(naam);
-  // Sync naar KAMPSTAF array
-  KAMPSTAF.length = 0;
-  LEADERS.forEach(l => KAMPSTAF.push(l));
-  EXTRA_STAF.forEach(l => KAMPSTAF.push(l));
+  herbouwKampstaf();
   input.value = '';
   showToast(`&#10003; ${naam} toegevoegd aan kampstaf`);
   renderTeamsStaf();
@@ -2376,9 +2575,7 @@ function stafToevoegen() {
 
 function stafVerwijder(idx) {
   EXTRA_STAF.splice(idx, 1);
-  KAMPSTAF.length = 0;
-  LEADERS.forEach(l => KAMPSTAF.push(l));
-  EXTRA_STAF.forEach(l => KAMPSTAF.push(l));
+  herbouwKampstaf();
   renderTeamsStaf();
 }
 
@@ -2399,14 +2596,14 @@ function showTeamModal(id){
   openModal();
 }
 
-// ── TEAMS BEHEREN (naam/leider/kleur — verandert elk jaar) ────
-function renderTeamsBeheren() {
-  const el = document.getElementById('teams-beheren');
+// ── KAMPBEHEER → TEAMS (naam/leider/kleur — verandert elk jaar) ──
+function renderInstTeams() {
+  const el = document.getElementById('inst-teams');
   if(!el) return;
   if(!isAdmin()) { el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>'; return; }
   let html = `<div class="alert alert-info" style="margin-bottom:12px">
     Pas hier de teamnaam, groepsleider en kleur aan — handig omdat dit elk jaar verandert.
-    Het aantal teams en de spelerslijst wijzig je via CSV-import (Instellingen → Spelers).
+    Het aantal teams en de spelerslijst wijzig je via CSV-import (tab Spelers).
   </div>`;
   TEAMS.forEach((t,i) => {
     html += `<div class="card" style="margin-bottom:8px">
@@ -2420,6 +2617,24 @@ function renderTeamsBeheren() {
       </div>
     </div>`;
   });
+  html += `<div class="card" style="margin-top:4px">
+    <div class="card-title">&#128229; Teams/leiders importeren (CSV)</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
+      <strong>Formaat</strong> — één rij per team, in dezelfde volgorde als hierboven:<br>
+      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Naam,Leider,Kleur</code>
+      <span style="color:var(--muted-light);font-size:.76rem">Kleur is optioneel (bv. #DC2626) — laat leeg om de huidige kleur te behouden.</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <input type="file" id="teams-csv-file" accept=".csv,.txt" style="display:none" onchange="teamsCsvLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('teams-csv-file').click()">&#128196; Bestand uploaden</button>
+      <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
+    </div>
+    <textarea id="teams-csv-tekst" placeholder="Naam,Leider,Kleur&#10;Rood Vuur,Thomas,#DC2626"
+      style="width:100%;min-height:80px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
+    <div style="margin-top:8px">
+      <button class="btn btn-primary" style="font-size:.8rem" onclick="teamsCsvToepassen()">&#10003; Importeren &amp; toepassen</button>
+    </div>
+  </div>`;
   el.innerHTML = html;
 }
 
@@ -2430,14 +2645,41 @@ function teamSetVeld(i, veld, waarde) {
   t[veld] = waarde;
   if(veld === 'leader') LEADERS[i] = waarde; // LEADERS is afgeleid — in sync houden
   logActie('Team aangepast', `${veld}: "${oud}" → "${waarde}"`);
-  renderTeams(); renderDashboard(); renderTeamKlassement();
+  renderTeams(); renderInstTeams(); renderDashboard(); renderTeamKlassement();
+}
+
+function teamsCsvLeesBestand(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { const ta = document.getElementById('teams-csv-tekst'); if(ta) ta.value = e.target.result; };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function teamsCsvToepassen() {
+  const tekst = document.getElementById('teams-csv-tekst')?.value || '';
+  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een CSV.'); return; }
+  const rijen = parseCsvGeneriek(tekst, ['naam','leider','kleur']).filter(r => r.naam);
+  if(rijen.length === 0) { showToast('&#9888; Geen geldige regels gevonden.'); return; }
+  let aangepast = 0;
+  rijen.forEach((r, i) => {
+    const t = TEAMS[i];
+    if(!t) return;
+    t.name = r.naam;
+    if(r.leider) { t.leader = r.leider; LEADERS[i] = r.leider; }
+    if(r.kleur) t.color = r.kleur;
+    aangepast++;
+  });
+  logActie('Teams geïmporteerd', `${aangepast} teams bijgewerkt`);
+  showToast(`&#10003; ${aangepast} teams bijgewerkt`);
+  renderTeams(); renderInstTeams(); renderDashboard(); renderTeamKlassement();
 }
 
 // ── PLANNING ─────────────────────────────────────────────────
 // LABELS vervangt de vroeger hardcoded PLANNING_KLASSEMENTEN-lijst. De 6 "systeem"-labels
 // hebben echte scoring-logica erachter (Teamklassement/Vierkamp/etc.) en zijn daarom niet
 // verwijderbaar — alleen hun kleur is aanpasbaar. Custom labels zijn puur organisatorisch
-// (geen scoring) en vrij toe te voegen/verwijderen door de admin (Instellingen → Labels).
+// (geen scoring) en vrij toe te voegen/verwijderen door de admin (Kampbeheer → Labels).
 let LABELS = [
   {id:'Teamklassement', naam:'Teamklassement', kleur:'#2563EB', systeem:true},
   {id:'Vierkamp',       naam:'Vierkamp',       kleur:'#7C3AED', systeem:true},
@@ -2469,7 +2711,6 @@ function activiteitTagHtml(a) {
 }
 
 function renderPlanning(){
-  renderPlanningImport();
   const el = document.getElementById('planning-content');
   if(!el) return;
   const admin = isAdmin();
@@ -2702,8 +2943,8 @@ function planningAddSave(di) {
 // ── PLANNING / SPELLEN IMPORTEREN (admin) ─────────────────────
 let PLANNING_IMPORT = [];
 
-function renderPlanningImport() {
-  const el = document.getElementById('planning-import');
+function renderInstPlanningImport() {
+  const el = document.getElementById('inst-planningimport');
   if(!el) return;
   if(!isAdmin()) { el.innerHTML = ''; return; }
   el.innerHTML = `<div class="card" style="margin-bottom:12px">
@@ -2712,7 +2953,7 @@ function renderPlanningImport() {
       <strong>Formaat</strong> — komma of puntkomma als scheider, één spel per rij, dag moet een bestaande kampdag zijn:<br>
       <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Tijd,Type,Spelnaam,Leider,Duur</code>
       <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: Maandag,10:00,8-Kamp,Ochtendspel,Thomas,60</span><br>
-      <span style="color:var(--muted-light);font-size:.76rem">"Type" moet een bestaand label zijn (zie Instellingen → Labels). Bij het label "8-Kamp" wordt automatisch een 8-Kamp aangemaakt.</span>
+      <span style="color:var(--muted-light);font-size:.76rem">"Type" moet een bestaand label zijn (zie Kampbeheer → Labels). Bij het label "8-Kamp" wordt automatisch een 8-Kamp aangemaakt.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <input type="file" id="plan-csv-file" accept=".csv,.txt" style="display:none" onchange="planningLeesBestand(this)">
@@ -3267,12 +3508,19 @@ function renderInstellingen() {
   if(!isAdmin()) {
     const el = document.getElementById('inst-spelers');
     if(el) el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>';
-    ['inst-labels','inst-leiders','inst-kamp','inst-log'].forEach(id => { const e = document.getElementById(id); if(e) e.innerHTML = ''; });
+    ['inst-teams','inst-labels','inst-leiders','inst-kampstaf','inst-planningimport','inst-preimport','inst-atletiekimport','inst-datums','inst-kamp','inst-log']
+      .forEach(id => { const e = document.getElementById(id); if(e) e.innerHTML = ''; });
     return;
   }
   renderInstSpelers();
+  renderInstTeams();
   renderInstLabels();
   renderInstLeiders();
+  renderInstKampstaf();
+  renderInstPlanningImport();
+  renderInstPreImport();
+  renderInstAtletiekImport();
+  renderInstDatums();
   renderInstKamp();
   renderInstLog();
 }
@@ -3737,12 +3985,12 @@ function kampAfsluitenDoen() {
   PLAYERS_ALL.length = 0;
   GAME_HISTORY.length = 0;
   VK_RONDES.forEach(r => { r.spellen = r.spellen.map(()=>null); r.afgesloten = false; });
-  Object.keys(penKeepersPerDag).forEach(k => penKeepersPerDag[k] = ['','']);
+  Object.keys(penKeepersPerDag).forEach(k => penKeepersPerDag[k] = {1:['',''], 2:['','']});
   Object.keys(penVerdubbelaar).forEach(k => delete penVerdubbelaar[k]);
-  penData.forEach(d => { d.pogingen = []; d.opgeslagen = false; });
+  penData.forEach(d => { d.pogingen = []; d.opgeslagen = {1:false, 2:false}; });
   penFinale.drempel = null; penFinale.rondes = []; penFinale.handmatigDeelnemers = null; penFinale.actieveRonde = null; penFinale.schietBeurt = 0;
   IND_LEEFTIJDEN.forEach(c => c.spelers = []);
-  indSpellen.forEach(d => { d.spellen.forEach(s => { s.naam=''; s.maker=''; s.leider=''; s.uitleg=''; s.opgeslagen=false; s.scores={}; }); });
+  indSpellen.forEach(d => { d.spellen.forEach(s => { s.naam=''; s.maker=''; s.leider1=''; s.leider2=''; s.uitleg=''; s.opgeslagen=false; s.scores={}; }); });
   preSpellenData.forEach(sp => { sp.opgeslagen = false; sp.duels.forEach(d => { d.score1=null; d.score2=null; }); });
   ACHTKAMP_INSTANTIES.length = 0;
   ACHTKAMP_INSTANTIES.push({id:1, naam:'8-Kamp', verwerkt:false, subspellen: akNieuweSubspellen()});
@@ -3758,6 +4006,72 @@ function kampAfsluitenDoen() {
   logActie('Kamp afgesloten & gearchiveerd', ARCHIEF[ARCHIEF.length-1].kampNaam);
   showToast('&#10003; Kamp gearchiveerd — nieuw kamp gestart');
   renderInstellingen(); renderDashboard();
+}
+
+// ── KAMPDAGEN OPNIEUW GENEREREN (flexibel datumbereik) ────────
+// Vierkamp-rondes verwijzen naar dagen als losse labels (niet als index) — bij het
+// herbouwen van de dagenlijst mappen we de bestaande VK-dag-labels 1-op-1 door naar de
+// nieuwe labels (op volgorde, +1 om de aankomstdag over te slaan) zodat het rondeschema
+// zelf intact blijft en alleen de weergave-labels meeveranderen.
+function hermapVkDagen(nieuweLabels) {
+  const oudeDagen = [...new Set(VK_RONDES.map(r => r.dag))];
+  const mapping = {};
+  oudeDagen.forEach((oud, i) => { mapping[oud] = nieuweLabels[i+1] || nieuweLabels[nieuweLabels.length-1] || oud; });
+  VK_RONDES.forEach(r => { if(mapping[r.dag]) r.dag = mapping[r.dag]; });
+}
+
+// Herbouwt KAMP_DAGEN + alle afgeleide dag-arrays voor een nieuw datumbereik. Puur data —
+// de aanroeper regelt bevestiging/logging/render (zie pasKampDagenToeDoen hieronder, en de
+// stille toepassing bij een binnenkomende sync-update van kamp_meta).
+function toepassenKampDagen(start, eind) {
+  const nieuweDagen = genereerKampDagenLijst(start, eind);
+  if(nieuweDagen.length === 0) return false;
+  const nieuweLabels = nieuweDagen.map(d => d.label);
+
+  hermapVkDagen(nieuweLabels);
+  KAMP_DAGEN.splice(0, KAMP_DAGEN.length, ...nieuweDagen);
+  KAMPdagen.splice(0, KAMPdagen.length, ...nieuweLabels);
+  // IND_DAGEN === KAMPdagen (zelfde array) — automatisch mee bijgewerkt.
+
+  planningData.splice(0, planningData.length, ...genereerPlanningData());
+  Object.keys(penKeepersPerDag).forEach(k => delete penKeepersPerDag[k]);
+  KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = {1:['',''], 2:['','']}; });
+  penData.splice(0, penData.length, ...KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: {1:false, 2:false} })));
+  penHuidigeDag = 0;
+  preSpellenData.splice(0, preSpellenData.length, ...genereerPreSpellenData());
+  preHuidigeDag = 0;
+  indSpellen.splice(0, indSpellen.length, ...genereerIndSpellen());
+  indHuidigeDag = 0;
+  return true;
+}
+
+function pasKampDagenToeConfirm() {
+  const start = document.getElementById('km-startdatum')?.value;
+  const eind = document.getElementById('km-einddatum')?.value;
+  if(!start || !eind) { showToast('&#9888; Vul start- en einddatum in'); return; }
+  const nieuweDagen = genereerKampDagenLijst(start, eind);
+  if(nieuweDagen.length === 0) { showToast('&#9888; Einddatum moet op of na de startdatum liggen'); return; }
+  document.getElementById('modal-title').textContent = 'Kampdagen (opnieuw) genereren?';
+  document.getElementById('modal-sub').textContent = `${nieuweDagen.length} dagen: ${nieuweDagen[0].label} t/m ${nieuweDagen[nieuweDagen.length-1].label}`;
+  document.getElementById('modal-body').innerHTML = `<div class="alert alert-warning">
+    Dit herbouwt de dag-tabbladen van Planning, Penalty, Pre-Ontbijt en Individueel voor deze
+    ${nieuweDagen.length} dagen. Al ingevoerde planning/scores op de huidige dagen gaan
+    daarbij verloren (teams, labels en leiders blijven wel gewoon staan).
+  </div>`;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">Annuleren</button>
+    <button class="btn" style="background:#DC2626;color:#fff" onclick="pasKampDagenToeDoen('${start}','${eind}')">&#10003; Ja, dagen genereren</button>`;
+  openModal();
+}
+
+function pasKampDagenToeDoen(start, eind) {
+  if(!toepassenKampDagen(start, eind)) return;
+  KAMP_META.startDatum = start;
+  KAMP_META.eindDatum = eind;
+  closeModal();
+  logActie('Kampdagen gegenereerd', `${KAMP_DAGEN.length} dagen (${start} t/m ${eind})`);
+  showToast(`&#10003; ${KAMP_DAGEN.length} kampdagen ingesteld`);
+  renderInstellingen(); renderDashboard(); renderPlanning(); renderPenalty(); renderPreOntbijt(); renderInd();
 }
 
 function archiefDownload(id) {
@@ -3798,6 +4112,210 @@ function renderInstLog() {
   });
   html += `</tbody></table></div></div>`;
   el.innerHTML = html;
+}
+
+// ── KAMPBEHEER → KAMPSTAF IMPORTEREN ──────────────────────────
+// Gedeelde helper: KAMPSTAF (LEADERS + EXTRA_STAF) in-place herbouwen zodat elke <select>
+// die op KAMPSTAF is gebaseerd (penalty-keepers, pre-ontbijt/individueel-leiders) meteen de
+// nieuwste lijst ziet zonder dat de array-referentie verandert.
+function herbouwKampstaf() {
+  KAMPSTAF.length = 0;
+  LEADERS.forEach(l => KAMPSTAF.push(l));
+  EXTRA_STAF.forEach(l => KAMPSTAF.push(l));
+}
+
+function renderInstKampstaf() {
+  const el = document.getElementById('inst-kampstaf');
+  if(!el) return;
+  if(!isAdmin()) { el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>'; return; }
+  el.innerHTML = `<div class="alert alert-info" style="margin-bottom:12px">
+    Groepsleiders staan er automatisch bij. Voeg hier in bulk extra kampstaf toe (bv. koks,
+    EHBO, kampleiding) — één naam per rij. Losse namen toevoegen/verwijderen kan ook nog via
+    Teams → Kampstaf.
+  </div>
+  <div class="card">
+    <div class="card-title">&#128229; Kampstaf importeren (CSV)</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
+      <strong>Formaat</strong> — één naam per rij:<br>
+      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Naam</code>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <input type="file" id="kampstaf-csv-file" accept=".csv,.txt" style="display:none" onchange="kampstafCsvLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('kampstaf-csv-file').click()">&#128196; Bestand uploaden</button>
+      <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
+    </div>
+    <textarea id="kampstaf-csv-tekst" placeholder="Naam&#10;Kok Piet&#10;EHBO Anna"
+      style="width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
+    <div style="margin-top:8px">
+      <button class="btn btn-primary" style="font-size:.8rem" onclick="kampstafCsvToepassen()">&#10003; Importeren &amp; toevoegen</button>
+    </div>
+    <div style="margin-top:14px;font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)">Huidige kampstaf (${KAMPSTAF.length})</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+      ${KAMPSTAF.map(n=>`<span style="font-size:.78rem;padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border-dark)">${n}</span>`).join('')}
+    </div>
+  </div>`;
+}
+
+function kampstafCsvLeesBestand(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { const ta = document.getElementById('kampstaf-csv-tekst'); if(ta) ta.value = e.target.result; };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function kampstafCsvToepassen() {
+  const tekst = document.getElementById('kampstaf-csv-tekst')?.value || '';
+  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een lijst met namen.'); return; }
+  const namen = parseCsvGeneriek(tekst, ['naam']).map(r => r.naam.trim()).filter(Boolean);
+  if(namen.length === 0) { showToast('&#9888; Geen geldige namen gevonden.'); return; }
+  let toegevoegd = 0;
+  namen.forEach(naam => { if(!EXTRA_STAF.includes(naam)) { EXTRA_STAF.push(naam); toegevoegd++; } });
+  herbouwKampstaf();
+  logActie('Kampstaf geïmporteerd', `${toegevoegd} nieuwe stafleden`);
+  showToast(`&#10003; ${toegevoegd} stafleden toegevoegd`);
+  renderTeamsStaf(); renderInstKampstaf();
+}
+
+// ── KAMPBEHEER → ATLETIEK-/INDIVIDUEEL-SPELLEN IMPORTEREN ─────
+function renderInstAtletiekImport() {
+  const el = document.getElementById('inst-atletiekimport');
+  if(!el) return;
+  if(!isAdmin()) { el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>'; return; }
+  el.innerHTML = `<div class="card">
+    <div class="card-title">&#128229; Atletiek-/individueel-spellen importeren</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
+      <strong>Formaat</strong> — komma of puntkomma als scheider, één spel per rij:<br>
+      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Slot,Spelnaam,Leider1,Leider2,ScoreType</code>
+      <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: ${IND_DAGEN[1]||'Maandag'},1,Kogelstoten,Thomas,Sven,aantal</span><br>
+      <span style="color:var(--muted-light);font-size:.76rem">Slot is 1 t/m 4 (het spel-nummer die dag). ScoreType is "aantal" of "tijd".</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <input type="file" id="atletiek-csv-file" accept=".csv,.txt" style="display:none" onchange="atletiekCsvLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('atletiek-csv-file').click()">&#128196; Bestand uploaden</button>
+      <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
+    </div>
+    <textarea id="atletiek-csv-tekst" placeholder="Dag,Slot,Spelnaam,Leider1,Leider2,ScoreType"
+      style="width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
+    <div style="margin-top:8px">
+      <button class="btn btn-primary" style="font-size:.8rem" onclick="atletiekCsvToepassen()">&#10003; Importeren &amp; toepassen</button>
+    </div>
+  </div>`;
+}
+
+function atletiekCsvLeesBestand(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { const ta = document.getElementById('atletiek-csv-tekst'); if(ta) ta.value = e.target.result; };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function atletiekCsvToepassen() {
+  const tekst = document.getElementById('atletiek-csv-tekst')?.value || '';
+  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een CSV.'); return; }
+  const rijen = parseCsvGeneriek(tekst, ['dag','slot','naam','leider1','leider2','scoretype']);
+  let toegepast = 0, overgeslagen = 0;
+  rijen.forEach(r => {
+    const dagIdx = IND_DAGEN.findIndex(d => d.toLowerCase() === (r.dag||'').trim().toLowerCase());
+    const slot = parseInt(r.slot) - 1;
+    if(dagIdx < 0 || isNaN(slot) || slot < 0 || slot >= (indSpellen[dagIdx]?.spellen.length||0) || !r.naam) { overgeslagen++; return; }
+    const spel = indSpellen[dagIdx].spellen[slot];
+    spel.naam = r.naam.trim();
+    if(r.leider1) spel.leider1 = r.leider1.trim();
+    if(r.leider2) spel.leider2 = r.leider2.trim();
+    const st = (r.scoretype||'').trim().toLowerCase();
+    if(st === 'tijd' || st === 'aantal') spel.scoreType = st;
+    toegepast++;
+  });
+  logActie('Atletiek-spellen geïmporteerd', `${toegepast} spellen${overgeslagen?`, ${overgeslagen} overgeslagen`:''}`);
+  showToast(`&#10003; ${toegepast} spellen geïmporteerd`);
+  renderInd();
+}
+
+// ── KAMPBEHEER → PRE-ONTBIJT IMPORTEREN ───────────────────────
+function renderInstPreImport() {
+  const el = document.getElementById('inst-preimport');
+  if(!el) return;
+  if(!isAdmin()) { el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>'; return; }
+  el.innerHTML = `<div class="card">
+    <div class="card-title">&#128229; Pre-Ontbijtspellen importeren</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
+      <strong>Formaat</strong> — één rij per veld/duel (4 rijen per spel, 2 spellen per kampdag):<br>
+      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Slot,SpelNaam,Leider1,Leider2,Veld,Team1,Team2</code>
+      <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: ${KAMPdagen[1]||'Maandag'},1,Zaklopen,Thomas,Sven,1,Rood Vuur,Blauw Staal</span><br>
+      <span style="color:var(--muted-light);font-size:.76rem">Slot is 1 of 2 (welk van de 2 pre-ontbijtspellen die dag). Veld is 1 t/m 4.</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <input type="file" id="pre-csv-file" accept=".csv,.txt" style="display:none" onchange="preCsvLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('pre-csv-file').click()">&#128196; Bestand uploaden</button>
+      <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
+    </div>
+    <textarea id="pre-csv-tekst" placeholder="Dag,Slot,SpelNaam,Leider1,Leider2,Veld,Team1,Team2"
+      style="width:100%;min-height:100px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
+    <div style="margin-top:8px">
+      <button class="btn btn-primary" style="font-size:.8rem" onclick="preCsvToepassen()">&#10003; Importeren &amp; toepassen</button>
+    </div>
+  </div>`;
+}
+
+function preCsvLeesBestand(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { const ta = document.getElementById('pre-csv-tekst'); if(ta) ta.value = e.target.result; };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function preCsvToepassen() {
+  const tekst = document.getElementById('pre-csv-tekst')?.value || '';
+  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een CSV.'); return; }
+  const rijen = parseCsvGeneriek(tekst, ['dag','slot','naam','leider1','leider2','veld','team1','team2']);
+  let toegepast = 0, overgeslagen = 0;
+  rijen.forEach(r => {
+    const dagIdx = KAMPdagen.findIndex(d => d.toLowerCase() === (r.dag||'').trim().toLowerCase());
+    const slot = parseInt(r.slot) - 1;
+    const veld = parseInt(r.veld) - 1;
+    if(dagIdx < 0 || (slot!==0 && slot!==1) || isNaN(veld) || veld<0 || veld>3) { overgeslagen++; return; }
+    const spel = preSpellenData.find(s => s.dag === dagIdx && s.slot === slot);
+    if(!spel) { overgeslagen++; return; }
+    if(r.naam) spel.naam = r.naam.trim();
+    if(r.leider1) spel.leider1 = r.leider1.trim();
+    if(r.leider2) spel.leider2 = r.leider2.trim();
+    spel.duels[veld] = { team1: r.team1||'', team2: r.team2||'', score1:null, score2:null };
+    toegepast++;
+  });
+  logActie('Pre-Ontbijt geïmporteerd', `${toegepast} velden${overgeslagen?`, ${overgeslagen} overgeslagen`:''}`);
+  showToast(`&#10003; ${toegepast} velden geïmporteerd`);
+  renderPreOntbijt();
+}
+
+// ── KAMPBEHEER → DATUMS INSTELLEN ──────────────────────────────
+function renderInstDatums() {
+  const el = document.getElementById('inst-datums');
+  if(!el) return;
+  if(!isAdmin()) { el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>'; return; }
+  el.innerHTML = `<div class="card">
+    <div class="card-title">Kampdagen</div>
+    <div class="alert alert-info" style="margin-bottom:12px">
+      Stel de start- en einddatum van het kamp in. Planning, Penalty, Pre-Ontbijt en
+      Individueel krijgen automatisch een dag-tabblad per kalenderdag in dit bereik
+      (dus ook een zaterdag als die erin valt).
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">STARTDATUM</label>
+        <input id="km-startdatum" type="date" value="${KAMP_META.startDatum}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">EINDDATUM</label>
+        <input id="km-einddatum" type="date" value="${KAMP_META.eindDatum}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
+    </div>
+    <button class="btn btn-primary" onclick="pasKampDagenToeConfirm()">&#128198; Dagen genereren</button>
+    <div style="margin-top:14px">
+      <div style="font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Huidige kampdagen (${KAMP_DAGEN.length})</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${KAMP_DAGEN.map(d => `<span style="font-size:.78rem;padding:4px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border-dark)">${d.label}</span>`).join('')}
+      </div>
+    </div>
+  </div>`;
 }
 
 function renderExport() {
@@ -3975,6 +4493,7 @@ const SYNC_MODULES = {
   game_history:     { get: () => GAME_HISTORY,       set: v => _vulArray(GAME_HISTORY, v) },
   vierkamp:         { get: () => VK_RONDES,          set: v => _vulArray(VK_RONDES, v) },
   pen_keepers:      { get: () => penKeepersPerDag,   set: v => _vulObject(penKeepersPerDag, v) },
+  pen_poules:       { get: () => penPoulePerTeam,    set: v => _vulObject(penPoulePerTeam, v) },
   pen_verdubbelaar: { get: () => penVerdubbelaar,    set: v => _vulObject(penVerdubbelaar, v) },
   pen_data:         { get: () => penData,            set: v => _vulArray(penData, v) },
   pen_finale:       { get: () => penFinale,          set: v => _vulObject(penFinale, v) },
@@ -3987,15 +4506,17 @@ const SYNC_MODULES = {
   inactief:         { get: () => [...inactiefSpelers],
                       set: v => { inactiefSpelers.clear(); (v || []).forEach(n => inactiefSpelers.add(n)); } },
   extra_staf:       { get: () => EXTRA_STAF,
-                      set: v => {
-                        _vulArray(EXTRA_STAF, v);
-                        KAMPSTAF.length = 0;
-                        LEADERS.forEach(l => KAMPSTAF.push(l));
-                        EXTRA_STAF.forEach(l => KAMPSTAF.push(l));
-                      } },
+                      set: v => { _vulArray(EXTRA_STAF, v); herbouwKampstaf(); } },
   labels:           { get: () => LABELS,             set: v => _vulArray(LABELS, v) },
   leiders:          { get: () => LEIDERS,            set: v => _vulArray(LEIDERS, v) },
-  kamp_meta:        { get: () => KAMP_META,          set: v => _vulObject(KAMP_META, v) },
+  kamp_meta:        { get: () => KAMP_META,
+                      set: v => {
+                        const nieuw = v || {};
+                        const datumGewijzigd = nieuw.startDatum && nieuw.eindDatum &&
+                          (nieuw.startDatum !== KAMP_META.startDatum || nieuw.eindDatum !== KAMP_META.eindDatum);
+                        _vulObject(KAMP_META, nieuw);
+                        if(datumGewijzigd) toepassenKampDagen(KAMP_META.startDatum, KAMP_META.eindDatum);
+                      } },
   archief:          { get: () => ARCHIEF,            set: v => _vulArray(ARCHIEF, v) },
   activiteiten_log: { get: () => ACTIVITEITEN_LOG,   set: v => _vulArray(ACTIVITEITEN_LOG, v) },
   teams_meta:       { get: () => TEAMS.map(t => ({id:t.id, name:t.name, leader:t.leader, color:t.color})),
