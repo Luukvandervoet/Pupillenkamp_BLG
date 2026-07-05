@@ -287,7 +287,6 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <button class="nav-btn" onclick="showSection('penalty',this)">&#9917; Penalty Bokaal</button>
     <button class="nav-btn" onclick="showSection('individueel',this)">&#127939; Individueel</button>
     <button class="nav-btn" onclick="showSection('preontbijt',this)">&#9728;&#65039; Pre-ontbijt</button>
-    <button class="nav-btn" onclick="showSection('teams',this)">&#128085; Teams</button>
     <button class="nav-btn" onclick="showSection('planning',this)">&#128197; Planning</button>
     <button class="nav-btn" onclick="showSection('spellen',this)">&#127918; Spellen</button>
     <button class="nav-btn" onclick="showSection('exporteren',this)">&#128229; Exporteren</button>
@@ -321,13 +320,17 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <!-- TEAMKLASSEMENT -->
 <div class="section" id="section-teamklassement">
   <div class="page-title">Teamklassement</div>
-  <div class="page-sub">Totaalstand op basis van alle ingevoerde spellen</div>
+  <div class="page-sub">Totaalstand, teams &amp; kampstaf op één plek</div>
   <div class="tab-row">
     <button class="tab active" onclick="setTab('tk','stand',this)">Stand</button>
     <button class="tab" onclick="setTab('tk','historie',this)">Spelhistorie</button>
+    <button class="tab" onclick="setTab('tk','teams',this)">&#128085; Teams</button>
+    <button class="tab" onclick="setTab('tk','staf',this)">&#128101; Kampstaf</button>
   </div>
   <div id="tk-stand"></div>
   <div id="tk-historie" style="display:none"></div>
+  <div id="tk-teams" style="display:none"></div>
+  <div id="tk-staf" style="display:none"></div>
 </div>
 
 <!-- VIERKAMP -->
@@ -392,18 +395,6 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
   <div id="pre-schema"></div>
   <div id="pre-invoer" style="display:none"></div>
   <div id="pre-spellen" style="display:none"></div>
-</div>
-
-<!-- TEAMS -->
-<div class="section" id="section-teams">
-  <div class="page-title">Teams &amp; Spelers</div>
-  <div class="page-sub">Klik op een team voor details en speler-beheer</div>
-  <div class="tab-row">
-    <button class="tab active" onclick="setTab('teams','overzicht',this)">&#128085; Teams</button>
-    <button class="tab" onclick="setTab('teams','staf',this)">&#128101; Kampstaf</button>
-  </div>
-  <div id="teams-overzicht"></div>
-  <div id="teams-staf" style="display:none"></div>
 </div>
 
 <!-- 8-KAMP -->
@@ -1794,12 +1785,12 @@ function showSection(id,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('section-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
-  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,teams:renderTeams,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,exporteren:renderExport,instellingen:renderInstellingen})[id]?.();
+  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,exporteren:renderExport,instellingen:renderInstellingen})[id]?.();
 }
 
 // ── TAB SWITCHER ─────────────────────────────────────────────
 function setTab(prefix,tab,btn){
-  const sectionMap={tk:'teamklassement',vk:'vierkamp',pen:'penalty',ak:'achtkamp',ind:'individueel',pre:'preontbijt',teams:'teams',inst:'instellingen'};
+  const sectionMap={tk:'teamklassement',vk:'vierkamp',pen:'penalty',ak:'achtkamp',ind:'individueel',pre:'preontbijt',inst:'instellingen'};
   const section=document.getElementById('section-'+sectionMap[prefix]);
   if(!section) return;
   section.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -1809,7 +1800,7 @@ function setTab(prefix,tab,btn){
   const target=document.getElementById(prefix+'-'+tab);
   if(target)target.style.display='block';
   // re-render
-  ({tk:renderTeamKlassement,vk:renderVierkamp,pen:renderPenalty,ak:renderAchtkamp,ind:renderInd,pre:renderPreOntbijt,teams:renderTeams,inst:renderInstellingen})[prefix]?.();
+  ({tk:renderTeamKlassement,vk:renderVierkamp,pen:renderPenalty,ak:renderAchtkamp,ind:renderInd,pre:renderPreOntbijt,inst:renderInstellingen})[prefix]?.();
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────
@@ -1858,6 +1849,7 @@ function renderDashboard(){
 
 // ── TEAM KLASSEMENT ──────────────────────────────────────────
 function renderTeamKlassement(){
+  renderTeams();
   // STAND
   const totals=getTeamTotals(),max=totals[0].pts||1;
   document.getElementById('tk-stand').innerHTML=totals.map((t,i)=>`
@@ -2501,7 +2493,7 @@ function renderTeams(){
 }
 
 function renderTeamsOverzicht(){
-  const el = document.getElementById('teams-overzicht');
+  const el = document.getElementById('tk-teams');
   if(!el) return;
   el.innerHTML = `<div class="grid-2">${TEAMS.map(t=>{
     const tot=getTeamTotals().find(x=>x.id===t.id);
@@ -2517,7 +2509,7 @@ function renderTeamsOverzicht(){
 }
 
 function renderTeamsStaf(){
-  const el = document.getElementById('teams-staf');
+  const el = document.getElementById('tk-staf');
   if(!el) return;
 
   let html = `<div class="alert alert-info" style="margin-bottom:12px">
@@ -4644,7 +4636,7 @@ function herRenderActieveSectie() {
   const id = actief.id.replace('section-', '');
   const map = {
     dashboard: renderDashboard, teamklassement: renderTeamKlassement, vierkamp: renderVierkamp,
-    penalty: renderPenalty, individueel: renderInd, teams: renderTeams, planning: renderPlanning,
+    penalty: renderPenalty, individueel: renderInd, planning: renderPlanning,
     spellen: renderSpellen, achtkamp: renderAchtkamp, preontbijt: renderPreOntbijt, exporteren: renderExport,
     instellingen: renderInstellingen
   };
