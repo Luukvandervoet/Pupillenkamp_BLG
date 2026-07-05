@@ -3977,10 +3977,13 @@ function leiderBewerken(i) {
 
 async function leiderBewerkenOpslaan(i) {
   const l = LEIDERS[i];
+  const nieuweRol = document.getElementById('ln-rol')?.value || l.rol;
+  const isLaatsteAdmin = l.rol === 'admin' && nieuweRol !== 'admin' && LEIDERS.filter(x => x.rol === 'admin').length <= 1;
+  if(isLaatsteAdmin) { showToast('&#9888; Je kunt de rol van het laatste admin-account niet wijzigen — maak eerst een ander admin-account aan'); return; }
   l.voornaam = document.getElementById('ln-voornaam')?.value?.trim() || l.voornaam;
   l.achternaam = document.getElementById('ln-achternaam')?.value?.trim() || '';
   l.login = leiderLogin(l.voornaam, l.achternaam);
-  l.rol = document.getElementById('ln-rol')?.value || l.rol;
+  l.rol = nieuweRol;
   l.teamId = l.rol==='groepsleider' ? parseInt(document.getElementById('ln-team')?.value) : null;
   const nieuwWachtwoord = document.getElementById('ln-wachtwoord')?.value;
   if(nieuwWachtwoord) l.wachtwoordHash = await hashWachtwoord(nieuwWachtwoord);
@@ -3992,6 +3995,8 @@ async function leiderBewerkenOpslaan(i) {
 
 function leiderVerwijderen(i) {
   if(LEIDERS.length <= 1) { showToast('&#9888; Je kunt niet de laatste leider verwijderen'); return; }
+  const isLaatsteAdmin = LEIDERS[i].rol === 'admin' && LEIDERS.filter(l => l.rol === 'admin').length <= 1;
+  if(isLaatsteAdmin) { showToast('&#9888; Je kunt niet het laatste admin-account verwijderen — maak eerst een ander admin-account aan'); return; }
   const naam = leiderNaam(LEIDERS[i]);
   LEIDERS.splice(i,1);
   closeModal();
