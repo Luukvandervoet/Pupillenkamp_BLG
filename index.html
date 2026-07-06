@@ -3981,14 +3981,35 @@ function instPreviewCsv() {
 function instToepassen() {
   if(SPELERLIJST_IMPORT.length === 0) { showToast('&#9888; Eerst een geldig Excel-bestand laden.'); return; }
   const kampteams = [...new Set(SPELERLIJST_IMPORT.map(s => s.kampTeam))];
+
+  // Koppel elk kampteam uit het bestand aan het BESTAANDE team met dezelfde naam — ongeacht
+  // in welke volgorde de kampteams in het bestand voorkomen. Voorheen kreeg het 1e kampteam
+  // dat in het bestand voorkwam altijd team-id 1 (met diens leider/kleur), ongeacht de naam;
+  // stonden de spelers van "Blauw Staal" toevallig vóór die van "Rood Vuur" in het bestand,
+  // dan verwisselden leider en kleur van team onderling. Een kampteam dat nergens matcht
+  // krijgt een vrij team-id (hergebruik van een team-slot dat niet meer voorkomt in het
+  // bestand, anders een nieuw team-id) met een kleur uit het palet en een lege leider.
   const kleurMap = {};
-  kampteams.forEach((t,i) => { kleurMap[t] = KAMPTEAM_KLEUREN_PALET[i % KAMPTEAM_KLEUREN_PALET.length]; });
+  const teamIdVoorKampteam = {};
+  const vrijeTeamIds = TEAMS.filter(t => !kampteams.some(k => k.toLowerCase() === t.name.toLowerCase())).map(t => t.id);
+  let vrijIdx = 0, volgendeKleurIdx = 0;
+  kampteams.forEach(naam => {
+    const bestaand = TEAMS.find(t => t.name.toLowerCase() === naam.toLowerCase());
+    if(bestaand) {
+      teamIdVoorKampteam[naam] = bestaand.id;
+    } else if(vrijIdx < vrijeTeamIds.length) {
+      teamIdVoorKampteam[naam] = vrijeTeamIds[vrijIdx++];
+    } else {
+      teamIdVoorKampteam[naam] = Math.max(0, ...TEAMS.map(t => t.id), ...Object.values(teamIdVoorKampteam)) + 1;
+    }
+    kleurMap[naam] = KAMPTEAM_KLEUREN_PALET[volgendeKleurIdx++ % KAMPTEAM_KLEUREN_PALET.length];
+  });
 
   // Nummer spelers per team (net als de vaste teamlijst: #1, #2, ... binnen elk team),
   // niet doorlopend over de hele CSV heen.
   const volgnrPerTeam = {};
   const nieuweSpelers = SPELERLIJST_IMPORT.map(s => {
-    const teamId = kampteams.indexOf(s.kampTeam) + 1;
+    const teamId = teamIdVoorKampteam[s.kampTeam];
     volgnrPerTeam[teamId] = (volgnrPerTeam[teamId] || 0) + 1;
     return {
       num: volgnrPerTeam[teamId],
@@ -4007,7 +4028,7 @@ function instToepassen() {
 
   // Teams bijwerken zodat de Teams-pagina/-modal de geïmporteerde spelers laat zien i.p.v.
   // de oude voorbeelddata (dit werd eerder gemist — TEAMS[i].players stond los van PLAYERS_ALL).
-  instSyncTeams(kampteams, kleurMap);
+  instSyncTeams(kampteams, teamIdVoorKampteam, kleurMap);
 
   // Initialiseer penalty-verdubbelaar voor nieuwe spelers
   nieuweSpelers.forEach(p => { if(!(p.name in penVerdubbelaar)) penVerdubbelaar[p.name] = null; });
@@ -4030,13 +4051,13 @@ function instToepassen() {
 }
 
 // Zet de spelerslijst per kampteam (uit PLAYERS_ALL) terug in TEAMS[i].players, zodat de
-// Teams-pagina/-modal altijd de laatst geïmporteerde spelers tonen. Teamnaam wordt
-// gesynchroniseerd met de "Kampteam"-kolom uit de CSV; leider/kleur van een bestaand team
-// blijven staan (die stel je apart in via Kampbeheer → Teams) — alleen nieuwe teams krijgen
-// een kleur uit het palet en een lege leider.
-function instSyncTeams(kampteams, kleurMap) {
-  kampteams.forEach((naam, i) => {
-    const teamId = i + 1;
+// Teams-pagina/-modal altijd de laatst geïmporteerde spelers tonen. teamIdVoorKampteam komt
+// uit instToepassen en koppelt elk kampteam aan het bestaande team met dezelfde naam (of een
+// vrij/nieuw team-id) — leider/kleur van een bestaand team blijven daardoor bij de juiste
+// naam staan, ongeacht de volgorde in het geïmporteerde bestand.
+function instSyncTeams(kampteams, teamIdVoorKampteam, kleurMap) {
+  kampteams.forEach(naam => {
+    const teamId = teamIdVoorKampteam[naam];
     let team = TEAMS.find(t => t.id === teamId);
     if(!team) {
       team = { id: teamId, name: naam, leader: '', color: kleurMap[naam], players: [] };
