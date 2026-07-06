@@ -2673,7 +2673,7 @@ function renderInstTeams() {
   if(!isAdmin()) { el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>'; return; }
   let html = `<div class="alert alert-info" style="margin-bottom:12px">
     Pas hier de teamnaam, groepsleider en kleur aan — handig omdat dit elk jaar verandert.
-    Het aantal teams en de spelerslijst wijzig je via CSV-import (tab Spelers).
+    Het aantal teams en de spelerslijst wijzig je via Excel-import (tab Spelers).
   </div>`;
   TEAMS.forEach((t,i) => {
     html += `<div class="card" style="margin-bottom:8px">
@@ -2688,15 +2688,15 @@ function renderInstTeams() {
     </div>`;
   });
   html += `<div class="card" style="margin-top:4px">
-    <div class="card-title">&#128229; Teams/leiders importeren (CSV)</div>
+    <div class="card-title">&#128229; Teams/leiders importeren (Excel)</div>
     <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
       <strong>Formaat</strong> — één rij per team, in dezelfde volgorde als hierboven:<br>
       <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Naam,Leider,Kleur</code>
       <span style="color:var(--muted-light);font-size:.76rem">Kleur is optioneel (bv. #DC2626) — laat leeg om de huidige kleur te behouden.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateTeams()">&#8681; Download huidige teams als CSV</button>
-      <input type="file" id="teams-csv-file" accept=".csv,.txt" style="display:none" onchange="teamsCsvLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateTeams()">&#8681; Download huidige teams als Excel</button>
+      <input type="file" id="teams-csv-file" accept=".xlsx,.xls" style="display:none" onchange="teamsCsvLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('teams-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
@@ -2722,14 +2722,12 @@ function teamSetVeld(i, veld, waarde) {
 function teamsCsvLeesBestand(input) {
   const file = input.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { const ta = document.getElementById('teams-csv-tekst'); if(ta) ta.value = e.target.result; };
-  reader.readAsText(file, 'UTF-8');
+  xlsxBestandNaarCsv(file, tekst => { const ta = document.getElementById('teams-csv-tekst'); if(ta) ta.value = tekst; });
 }
 
 function teamsCsvToepassen() {
   const tekst = document.getElementById('teams-csv-tekst')?.value || '';
-  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een CSV.'); return; }
+  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een Excel-bestand.'); return; }
   const rijen = parseCsvGeneriek(tekst, ['naam','leider','kleur']).filter(r => r.naam);
   if(rijen.length === 0) { showToast('&#9888; Geen geldige regels gevonden.'); return; }
   let aangepast = 0;
@@ -3140,8 +3138,8 @@ function renderInstPlanningImport() {
       <span style="color:var(--muted-light);font-size:.76rem">Tijd wordt automatisch genormaliseerd (bv. "9:00" → "09:00") zodat de volgorde in de planning altijd klopt.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplatePlanning()">&#8681; Download voorbeeld-CSV</button>
-      <input type="file" id="plan-csv-file" accept=".csv,.txt" style="display:none" onchange="planningLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplatePlanning()">&#8681; Download voorbeeld-Excel</button>
+      <input type="file" id="plan-csv-file" accept=".xlsx,.xls" style="display:none" onchange="planningLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('plan-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
@@ -3189,12 +3187,10 @@ function planningLeegmakenDoen() {
 function planningLeesBestand(input) {
   const file = input.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
+  xlsxBestandNaarCsv(file, tekst => {
     const ta = document.getElementById('plan-csv-tekst');
-    if(ta) { ta.value = e.target.result; planningPreviewCsv(); }
-  };
-  reader.readAsText(file, 'UTF-8');
+    if(ta) { ta.value = tekst; planningPreviewCsv(); }
+  });
 }
 
 function planningParseCsv(tekst) {
@@ -3248,7 +3244,7 @@ function planningPreviewCsv() {
 }
 
 function planningImportToepassen() {
-  if(PLANNING_IMPORT.length === 0) { showToast('&#9888; Eerst een geldige CSV laden.'); return; }
+  if(PLANNING_IMPORT.length === 0) { showToast('&#9888; Eerst een geldig Excel-bestand laden.'); return; }
   let toegevoegd = 0, overgeslagen = 0;
   const nieuweLabels = [];
   PLANNING_IMPORT.forEach(r => {
@@ -3766,7 +3762,7 @@ function renderInstSpelers() {
       Na import worden leeftijdscategorieën automatisch ingevuld.
     </div>
     <div class="card" style="margin-bottom:12px">
-      <div class="card-title">&#128229; CSV importeren</div>
+      <div class="card-title">&#128229; Excel importeren</div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
         <strong>Formaat</strong> — komma of puntkomma als scheider, één speler per rij:<br>
         <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Naam,Leeftijd,HuidigTeam,Kampteam</code>
@@ -3774,8 +3770,8 @@ function renderInstSpelers() {
         <span style="color:var(--muted-light);font-size:.76rem">Een kopregel (Naam, Name, Speler) wordt automatisch overgeslagen.</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-        <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateSpelers()">&#8681; Download voorbeeld-CSV</button>
-        <input type="file" id="inst-csv-file" accept=".csv,.txt" style="display:none" onchange="instLeesBestand(this)">
+        <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateSpelers()">&#8681; Download voorbeeld-Excel</button>
+        <input type="file" id="inst-csv-file" accept=".xlsx,.xls" style="display:none" onchange="instLeesBestand(this)">
         <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('inst-csv-file').click()">&#128196; Bestand uploaden</button>
         <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
       </div>
@@ -3797,57 +3793,43 @@ function renderInstSpelers() {
 function instLeesBestand(input) {
   const file = input.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('inst-csv-tekst').value = e.target.result;
+  xlsxBestandNaarCsv(file, tekst => {
+    document.getElementById('inst-csv-tekst').value = tekst;
     instPreviewCsv();
-  };
-  reader.readAsText(file, 'UTF-8');
+  });
 }
 
 // ── DOWNLOAD-TEMPLATES VOOR IMPORTS ───────────────────────────
-// Elke import-tab in Kampbeheer heeft een knop om een lege/ingevulde voorbeeld-CSV te
-// downloaden (te openen/bewerken in Excel of Google Sheets), zodat je nooit zelf het
-// kolomformaat hoeft uit te zoeken. Gebruikt hetzelfde BOM+Blob-downloadpatroon als
-// exportCsv/archiefDownload.
-function csvVeld(v) {
-  v = v == null ? '' : String(v);
-  return /[",;\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-}
-function csvRegel(velden) { return velden.map(csvVeld).join(','); }
-function downloadTekstBestand(bestandsnaam, inhoud, mimeType) {
-  const BOM = '﻿';
-  const blob = new Blob([BOM + inhoud], {type: mimeType + ';charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = bestandsnaam; a.click();
-  URL.revokeObjectURL(url);
-}
-function downloadCsvTemplate(bestandsnaam, headers, rijen) {
-  const csv = [csvRegel(headers), ...rijen.map(csvRegel)].join('\n') + '\n';
-  downloadTekstBestand(bestandsnaam, csv, 'text/csv');
+// Elke import-tab in Kampbeheer heeft een knop om een lege/ingevulde voorbeeld-Excel te
+// downloaden, zodat je nooit zelf het kolomformaat hoeft uit te zoeken.
+function downloadExcelTemplate(bestandsnaam, headers, rijen) {
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rijen]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  XLSX.writeFile(wb, bestandsnaam);
   showToast(`&#8681; ${bestandsnaam} gedownload`);
 }
 
 function downloadTemplateSpelers() {
-  downloadCsvTemplate('spelers_template.csv', ['Naam','Leeftijd','HuidigTeam','Kampteam'], [
+  downloadExcelTemplate('spelers_template.xlsx', ['Naam','Leeftijd','HuidigTeam','Kampteam'], [
     ['Liam Vermeer', 9, 'FC Utrecht', TEAMS[0]?.name || 'Rood Vuur'],
     ['Noah Dekker', 10, 'Ajax', TEAMS[1]?.name || 'Blauw Staal'],
   ]);
 }
 
 function downloadTemplateTeams() {
-  downloadCsvTemplate('teams_template.csv', ['Naam','Leider','Kleur'], TEAMS.map(t => [t.name, t.leader, t.color]));
+  downloadExcelTemplate('teams_template.xlsx', ['Naam','Leider','Kleur'], TEAMS.map(t => [t.name, t.leader, t.color]));
 }
 
 function downloadTemplateKampstaf() {
-  downloadCsvTemplate('kampstaf_template.csv', ['Naam'],
+  downloadExcelTemplate('kampstaf_template.xlsx', ['Naam'],
     EXTRA_STAF.length ? EXTRA_STAF.map(n => [n]) : [['Kok Piet'], ['EHBO Anna']]);
 }
 
 function downloadTemplatePlanning() {
   const dag = KAMPdagen[1] || KAMPdagen[0] || 'Maandag';
   const label1 = LABELS.find(l => l.systeem)?.naam || 'Teamklassement';
-  downloadCsvTemplate('planning_template.csv', ['Dag','Tijd','Type','Spelnaam','Leider','Duur'], [
+  downloadExcelTemplate('planning_template.xlsx', ['Dag','Tijd','Type','Spelnaam','Leider','Duur'], [
     [dag, '10:00', '8-Kamp', 'Ochtendspel', LEADERS[0] || 'Thomas', 60],
     [dag, '15:00', label1, 'Middagspel', `${LEADERS[1] || 'Sven'} & ${LEADERS[2] || 'Rick'}`, 45],
   ]);
@@ -3856,7 +3838,7 @@ function downloadTemplatePlanning() {
 function downloadTemplatePreOntbijt() {
   const dag = KAMPdagen[1] || KAMPdagen[0] || 'Maandag';
   const t = TEAMS;
-  downloadCsvTemplate('pre_ontbijt_template.csv', ['Dag','Slot','SpelNaam','Leider1','Leider2','Veld','Team1','Team2'], [
+  downloadExcelTemplate('pre_ontbijt_template.xlsx', ['Dag','Slot','SpelNaam','Leider1','Leider2','Veld','Team1','Team2'], [
     [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 1, t[0]?.name||'Rood Vuur', t[1]?.name||'Blauw Staal'],
     [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 2, t[2]?.name||'Groen Woud', t[3]?.name||'Geel Zand'],
     [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 3, t[4]?.name||'Oranje Zon', t[5]?.name||'Paars Veld'],
@@ -3866,7 +3848,7 @@ function downloadTemplatePreOntbijt() {
 
 function downloadTemplateAtletiek() {
   const dag = KAMPdagen[1] || KAMPdagen[0] || 'Maandag';
-  downloadCsvTemplate('atletiek_template.csv', ['Dag','Slot','Spelnaam','Leider1','Leider2','ScoreType'], [
+  downloadExcelTemplate('atletiek_template.xlsx', ['Dag','Slot','Spelnaam','Leider1','Leider2','ScoreType'], [
     [dag, 1, 'Kogelstoten', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 'aantal'],
     [dag, 2, '60m Sprint', LEADERS[2]||'Rick', LEADERS[3]||'Pieter', 'tijd'],
   ]);
@@ -3876,10 +3858,24 @@ function downloadTemplateAtletiek() {
 // in het bestand voorkomen. Detecteert scheidingsteken (; of ,) en slaat een kopregel over
 // als het eerste veld overeenkomt met een van de kolomnamen (of een gangbaar header-woord).
 // Hergebruikt door zowel de spelers-import (Instellingen) als de planning/spellen-import.
+// Leest een geüpload Excel-bestand (.xlsx/.xls), pakt het eerste werkblad en zet het om naar
+// CSV-tekst — zo kunnen alle bestaande parsers hieronder ongewijzigd blijven werken, of de
+// data nu uit een Excel-bestand komt of geplakt is.
+function xlsxBestandNaarCsv(file, callback) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const wb = XLSX.read(e.target.result, {type:'array'});
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    callback(XLSX.utils.sheet_to_csv(sheet, {FS:',', blankrows:false}));
+  };
+  reader.readAsArrayBuffer(file);
+}
+
 function parseCsvGeneriek(tekst, kolommen) {
   const regels = tekst.trim().split(/\r?\n/).filter(r => r.trim());
   if(regels.length === 0) return [];
-  const scheider = regels[0].includes(';') ? ';' : ',';
+  // Tab = direct geplakt vanuit Excel/Sheets, anders komma/puntkomma zoals bij een CSV.
+  const scheider = regels[0].includes('\t') ? '\t' : regels[0].includes(';') ? ';' : ',';
   const eersteVeld = regels[0].split(scheider)[0].trim().toLowerCase();
   // Exacte match tegen kolomnamen (of gangbare synoniemen) — een losse substring-check zou
   // bv. "Maandag" (bevat "dag") onterecht als kopregel aanmerken.
@@ -3944,7 +3940,7 @@ function instPreviewCsv() {
 }
 
 function instToepassen() {
-  if(SPELERLIJST_IMPORT.length === 0) { showToast('&#9888; Eerst een geldige CSV laden.'); return; }
+  if(SPELERLIJST_IMPORT.length === 0) { showToast('&#9888; Eerst een geldig Excel-bestand laden.'); return; }
   const kampteams = [...new Set(SPELERLIJST_IMPORT.map(s => s.kampTeam))];
   const kleurMap = {};
   kampteams.forEach((t,i) => { kleurMap[t] = KAMPTEAM_KLEUREN_PALET[i % KAMPTEAM_KLEUREN_PALET.length]; });
@@ -3987,7 +3983,7 @@ function instToepassen() {
   logActie('Spelers geïmporteerd', `${nieuweSpelers.length} spelers in ${kampteams.length} kampteams`);
   showToast(`&#10003; ${nieuweSpelers.length} spelers geïmporteerd in ${kampteams.length} kampteams!`);
   if(kampteams.length !== TEAMS.length) {
-    showToast(`&#9888; CSV heeft ${kampteams.length} kampteams, app heeft er ${TEAMS.length} — controleer Kampbeheer → Teams`);
+    showToast(`&#9888; Bestand heeft ${kampteams.length} kampteams, app heeft er ${TEAMS.length} — controleer Kampbeheer → Teams`);
   }
   SPELERLIJST_IMPORT = [];
   renderInstellingen();
@@ -4473,14 +4469,14 @@ function renderInstKampstaf() {
     Teams → Kampstaf.
   </div>
   <div class="card">
-    <div class="card-title">&#128229; Kampstaf importeren (CSV)</div>
+    <div class="card-title">&#128229; Kampstaf importeren (Excel)</div>
     <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
       <strong>Formaat</strong> — één naam per rij:<br>
       <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Naam</code>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateKampstaf()">&#8681; Download voorbeeld-CSV</button>
-      <input type="file" id="kampstaf-csv-file" accept=".csv,.txt" style="display:none" onchange="kampstafCsvLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateKampstaf()">&#8681; Download voorbeeld-Excel</button>
+      <input type="file" id="kampstaf-csv-file" accept=".xlsx,.xls" style="display:none" onchange="kampstafCsvLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('kampstaf-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
@@ -4499,9 +4495,7 @@ function renderInstKampstaf() {
 function kampstafCsvLeesBestand(input) {
   const file = input.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { const ta = document.getElementById('kampstaf-csv-tekst'); if(ta) ta.value = e.target.result; };
-  reader.readAsText(file, 'UTF-8');
+  xlsxBestandNaarCsv(file, tekst => { const ta = document.getElementById('kampstaf-csv-tekst'); if(ta) ta.value = tekst; });
 }
 
 function kampstafCsvToepassen() {
@@ -4531,8 +4525,8 @@ function renderInstAtletiekImport() {
       <span style="color:var(--muted-light);font-size:.76rem">Slot is 1 t/m 4 (het spel-nummer die dag). ScoreType is "aantal" of "tijd".</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateAtletiek()">&#8681; Download voorbeeld-CSV</button>
-      <input type="file" id="atletiek-csv-file" accept=".csv,.txt" style="display:none" onchange="atletiekCsvLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateAtletiek()">&#8681; Download voorbeeld-Excel</button>
+      <input type="file" id="atletiek-csv-file" accept=".xlsx,.xls" style="display:none" onchange="atletiekCsvLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('atletiek-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
@@ -4547,14 +4541,12 @@ function renderInstAtletiekImport() {
 function atletiekCsvLeesBestand(input) {
   const file = input.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { const ta = document.getElementById('atletiek-csv-tekst'); if(ta) ta.value = e.target.result; };
-  reader.readAsText(file, 'UTF-8');
+  xlsxBestandNaarCsv(file, tekst => { const ta = document.getElementById('atletiek-csv-tekst'); if(ta) ta.value = tekst; });
 }
 
 function atletiekCsvToepassen() {
   const tekst = document.getElementById('atletiek-csv-tekst')?.value || '';
-  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een CSV.'); return; }
+  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een Excel-bestand.'); return; }
   const rijen = parseCsvGeneriek(tekst, ['dag','slot','naam','leider1','leider2','scoretype']);
   let toegepast = 0, overgeslagen = 0;
   rijen.forEach(r => {
@@ -4588,8 +4580,8 @@ function renderInstPreImport() {
       <span style="color:var(--muted-light);font-size:.76rem">Slot is 1 of 2 (welk van de 2 pre-ontbijtspellen die dag). Veld is 1 t/m 4.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplatePreOntbijt()">&#8681; Download voorbeeld-CSV</button>
-      <input type="file" id="pre-csv-file" accept=".csv,.txt" style="display:none" onchange="preCsvLeesBestand(this)">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplatePreOntbijt()">&#8681; Download voorbeeld-Excel</button>
+      <input type="file" id="pre-csv-file" accept=".xlsx,.xls" style="display:none" onchange="preCsvLeesBestand(this)">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('pre-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
@@ -4604,14 +4596,12 @@ function renderInstPreImport() {
 function preCsvLeesBestand(input) {
   const file = input.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { const ta = document.getElementById('pre-csv-tekst'); if(ta) ta.value = e.target.result; };
-  reader.readAsText(file, 'UTF-8');
+  xlsxBestandNaarCsv(file, tekst => { const ta = document.getElementById('pre-csv-tekst'); if(ta) ta.value = tekst; });
 }
 
 function preCsvToepassen() {
   const tekst = document.getElementById('pre-csv-tekst')?.value || '';
-  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een CSV.'); return; }
+  if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een Excel-bestand.'); return; }
   const rijen = parseCsvGeneriek(tekst, ['dag','slot','naam','leider1','leider2','veld','team1','team2']);
   let toegepast = 0, overgeslagen = 0;
   rijen.forEach(r => {
@@ -4677,13 +4667,13 @@ function renderExport() {
     </div>
 
     <div class="export-card">
-      <div style="font-weight:700;font-size:1rem;margin-bottom:6px">📊 CSV Exporteren (Excel)</div>
-      <p style="font-size:.85rem;color:var(--muted);margin-bottom:4px">Download ruwe scoredata als CSV-bestand. Open in Excel of Google Sheets voor verdere analyse.</p>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:6px">📊 Excel Exporteren</div>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:4px">Download ruwe scoredata als Excel-bestand voor verdere analyse.</p>
       <div class="export-btn-wrap">
-        <button class="btn btn-outline" onclick="exportCsv('teamklassement')">⬇️ Teamklassement</button>
-        <button class="btn btn-outline" onclick="exportCsv('penalty')">⬇️ Penalty Bokaal</button>
-        <button class="btn btn-outline" onclick="exportCsv('individueel')">⬇️ Individueel Klassement</button>
-        <button class="btn btn-outline" onclick="exportCsv('vierkamp')">⬇️ Vierkamp</button>
+        <button class="btn btn-outline" onclick="exportExcel('teamklassement')">⬇️ Teamklassement</button>
+        <button class="btn btn-outline" onclick="exportExcel('penalty')">⬇️ Penalty Bokaal</button>
+        <button class="btn btn-outline" onclick="exportExcel('individueel')">⬇️ Individueel Klassement</button>
+        <button class="btn btn-outline" onclick="exportExcel('vierkamp')">⬇️ Vierkamp</button>
       </div>
     </div>
 
@@ -4755,51 +4745,45 @@ function exportIndSamenvatting() {
   </div>`;
 }
 
-function exportCsv(type) {
-  let csv = '', filename = '';
-  const BOM = '\uFEFF';
+function exportExcel(type) {
+  let rows = null, filename = '';
 
   if(type === 'teamklassement') {
-    filename = 'teamklassement.csv';
+    filename = 'teamklassement.xlsx';
     const games = GAME_HISTORY.filter(g => g.klassement === 'Teamklassement');
-    csv = 'Spel,Dag,Tijd,' + TEAMS.map(t => `"${t.name}"`).join(',') + '\n';
-    games.forEach(g => {
-      csv += `"${g.name}","${g.date}","${g.time}",` + g.scores.join(',') + '\n';
-    });
-    csv += 'Totaal,,,';
-    csv += TEAMS.map((_,i) => games.reduce((s,g) => s+g.scores[i], 0)).join(',') + '\n';
+    rows = [['Spel','Dag','Tijd', ...TEAMS.map(t => t.name)]];
+    games.forEach(g => rows.push([g.name, g.date, g.time, ...g.scores]));
+    rows.push(['Totaal','','', ...TEAMS.map((_,i) => games.reduce((s,g) => s+g.scores[i], 0))]);
   }
   else if(type === 'penalty') {
-    filename = 'penalty_bokaal.csv';
-    csv = 'Speler,Team,' + KAMPdagen.map(d => `"${d}"`).join(',') + ',Totaal\n';
+    filename = 'penalty_bokaal.xlsx';
+    rows = [['Speler','Team', ...KAMPdagen, 'Totaal']];
     PLAYERS_ALL.forEach(p => {
       const dagPts = KAMPdagen.map((_,i) => penDagTotaalSpeler(p.name, i));
-      csv += `"${p.name}","${p.team}",${dagPts.join(',')},${penTotaalSpeler(p.name)}\n`;
+      rows.push([p.name, p.team, ...dagPts, penTotaalSpeler(p.name)]);
     });
   }
   else if(type === 'individueel') {
-    filename = 'individueel_klassement.csv';
-    csv = 'Speler,Team,Actief,Totaal punten\n';
-    PLAYERS_ALL.forEach(p => {
-      csv += `"${p.name}","${p.team}",${isActief(p.name)?'Ja':'Nee'},${indPuntenSpeler(p.name)}\n`;
-    });
+    filename = 'individueel_klassement.xlsx';
+    rows = [['Speler','Team','Actief','Totaal punten']];
+    PLAYERS_ALL.forEach(p => rows.push([p.name, p.team, isActief(p.name)?'Ja':'Nee', indPuntenSpeler(p.name)]));
   }
   else if(type === 'vierkamp') {
-    filename = 'vierkamp.csv';
-    csv = 'Dag,Team 1,Team 2,' + VK_SPELLEN.map(s => `"${s}"`).join(',') + ',Score,Afgesloten\n';
+    filename = 'vierkamp.xlsx';
+    rows = [['Dag','Team 1','Team 2', ...VK_SPELLEN, 'Score','Afgesloten']];
     VK_RONDES.forEach(r => {
       const t1 = vkGetTeam(r.team1Id), t2 = vkGetTeam(r.team2Id);
       const t1w = r.spellen.filter(w => w===1).length, t2w = r.spellen.filter(w => w===2).length;
-      const spelResultaten = r.spellen.map(w => w===1?`"${t1?.name}"`:w===2?`"${t2?.name}"`:'Gelijk');
-      csv += `"${r.dag}","${t1?.name}","${t2?.name}",${spelResultaten.join(',')},${t1w}-${t2w},${r.afgesloten?'Ja':'Nee'}\n`;
+      const spelResultaten = r.spellen.map(w => w===1?t1?.name:w===2?t2?.name:'Gelijk');
+      rows.push([r.dag, t1?.name, t2?.name, ...spelResultaten, `${t1w}-${t2w}`, r.afgesloten?'Ja':'Nee']);
     });
   }
 
-  if(!csv) { showToast('⚠️ Geen data om te exporteren'); return; }
-  const blob = new Blob([BOM + csv], {type: 'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
-  URL.revokeObjectURL(url);
+  if(!rows) { showToast('⚠️ Geen data om te exporteren'); return; }
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Data');
+  XLSX.writeFile(wb, filename);
   showToast(`⬇️ ${filename} gedownload!`);
 }
 
@@ -4807,6 +4791,7 @@ function exportCsv(type) {
 // Login overlay is standaard zichtbaar — renderDashboard() wordt aangeroepen na inloggen
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 // ═════════════════════════════════════════════════════════════
 //  SUPABASE SYNC-ENGINE
