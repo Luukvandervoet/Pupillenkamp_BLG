@@ -2683,13 +2683,27 @@ let LABELS = [
 ];
 let LABELS_NEXT_ID = 1;
 const TYPE_KLEUREN = { maaltijd:'#EA580C', vrij:'#64748B', info:'#2563EB', pauze:'#64748B' };
+// "Vierkamp"/"Penalty Bokaal"/"Individuele Spellen" zijn sneltoetsen in de TYPE-keuze: ze
+// slaan onder water gewoon op als type:'spel' met een vast klassement (zodat scoreinvoer,
+// filters en CSS-classes — die allemaal op a.type / a.klassement rekenen — ongewijzigd
+// blijven werken). "Spel" (algemeen) blijft de enige optie waarbij je zelf nog een LABEL kiest
+// (Teamklassement, 8-Kamp, Pre-Ontbijt, of een eigen label).
 const PLANNING_TYPES = [
-  {val:'spel',    label:'⚽ Spel'},
-  {val:'maaltijd',label:'🍽️ Maaltijd'},
-  {val:'vrij',    label:'☀️ Vrij'},
-  {val:'info',    label:'💬 Info / Aankondiging'},
-  {val:'pauze',   label:'⏸️ Pauze'},
+  {val:'spel',        label:'⚽ Spel',                type:'spel'},
+  {val:'vierkamp',    label:'🏅 Vierkamp',            type:'spel', klassement:'Vierkamp'},
+  {val:'penalty',     label:'🥅 Penalty Bokaal',       type:'spel', klassement:'Penalty'},
+  {val:'individueel', label:'🏃 Individuele Spellen',  type:'spel', klassement:'Individueel'},
+  {val:'maaltijd',    label:'🍽️ Maaltijd',            type:'maaltijd'},
+  {val:'vrij',        label:'☀️ Vrij',                type:'vrij'},
+  {val:'info',        label:'💬 Info / Aankondiging', type:'info'},
+  {val:'pauze',       label:'⏸️ Pauze',               type:'pauze'},
 ];
+// Geeft de te selecteren TYPE-optie voor een bestaande activiteit terug — herkent een
+// sneltoets (Vierkamp/Penalty/Individueel) aan het klassement, anders het gewone type.
+function planningTypeWaarde(a) {
+  const sneltoets = PLANNING_TYPES.find(t => t.klassement && t.klassement === a.klassement && a.type === 'spel');
+  return sneltoets ? sneltoets.val : a.type;
+}
 
 // Tijden worden altijd als HH:MM vergeleken op basis van minuten-sinds-middernacht (niet
 // als tekst) — anders sorteert bv. "9:00" (ongepadde CSV-invoer) na "10:00" t/m "23:00" en
@@ -2802,6 +2816,7 @@ function renderPlanning(){
 // ── PLANNING BEWERKEN (admin) ─────────────────────────────────
 function planningEdit(di, ai) {
   const a = planningData[di].acts[ai];
+  const typeVal = planningTypeWaarde(a);
   document.getElementById('modal-title').textContent = 'Activiteit bewerken';
   document.getElementById('modal-sub').textContent = `${planningData[di].day} · ${a.time}`;
   document.getElementById('modal-body').innerHTML = `
@@ -2818,11 +2833,11 @@ function planningEdit(di, ai) {
         <div>
           <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TYPE</label>
           <select id="pe-type" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)" onchange="planningTypeChange('pe')">
-            ${PLANNING_TYPES.map(t=>`<option value="${t.val}" ${a.type===t.val?'selected':''}>${t.label}</option>`).join('')}
+            ${PLANNING_TYPES.map(t=>`<option value="${t.val}" ${typeVal===t.val?'selected':''}>${t.label}</option>`).join('')}
           </select>
         </div>
       </div>
-      <div id="pe-kl-row" style="display:${a.type==='spel'?'block':'none'}">
+      <div id="pe-kl-row" style="display:${typeVal==='spel'?'block':'none'}">
         <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LABEL</label>
         <select id="pe-kl" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
           <option value="">Geen (los spel)</option>
@@ -2860,17 +2875,18 @@ function planningEdit(di, ai) {
 }
 
 function planningTypeChange(prefix) {
-  const type = document.getElementById(`${prefix}-type`)?.value;
+  const val = document.getElementById(`${prefix}-type`)?.value;
   const row = document.getElementById(`${prefix}-kl-row`);
-  if(row) row.style.display = type === 'spel' ? 'block' : 'none';
+  if(row) row.style.display = val === 'spel' ? 'block' : 'none';
 }
 
 function planningEditSave(di, ai) {
   const a = planningData[di].acts[ai];
   a.name       = document.getElementById('pe-naam')?.value?.trim() || a.name;
   a.time       = document.getElementById('pe-time')?.value || a.time;
-  a.type       = document.getElementById('pe-type')?.value || a.type;
-  a.klassement = a.type==='spel' ? (document.getElementById('pe-kl')?.value||undefined) : undefined;
+  const typeOptie = PLANNING_TYPES.find(t => t.val === document.getElementById('pe-type')?.value) || PLANNING_TYPES[0];
+  a.type       = typeOptie.type;
+  a.klassement = typeOptie.klassement || (typeOptie.val==='spel' ? (document.getElementById('pe-kl')?.value||undefined) : undefined);
   a.leiders    = [...document.querySelectorAll('#pe-leiders input[type=checkbox]:checked')].map(el=>el.value);
   const duurVal = document.getElementById('pe-duur')?.value;
   a.duur       = duurVal ? parseInt(duurVal) : undefined;
@@ -2955,9 +2971,10 @@ function planningAdd(di) {
 function planningAddSave(di) {
   const naam = document.getElementById('pa-naam')?.value?.trim();
   if(!naam){ showToast('&#9888;&#65039; Vul een naam in'); return; }
-  const type = document.getElementById('pa-type')?.value || 'spel';
+  const typeOptie = PLANNING_TYPES.find(t => t.val === document.getElementById('pa-type')?.value) || PLANNING_TYPES[0];
+  const type = typeOptie.type;
   const time = document.getElementById('pa-time')?.value || '12:00';
-  const kl   = type==='spel' ? (document.getElementById('pa-kl')?.value||undefined) : undefined;
+  const kl   = typeOptie.klassement || (typeOptie.val==='spel' ? (document.getElementById('pa-kl')?.value||undefined) : undefined);
   const leiders = [...document.querySelectorAll('#pa-leiders input[type=checkbox]:checked')].map(el=>el.value);
   const duurVal = document.getElementById('pa-duur')?.value;
   const duur = duurVal ? parseInt(duurVal) : undefined;
