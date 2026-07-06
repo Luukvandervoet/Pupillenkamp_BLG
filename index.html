@@ -283,13 +283,8 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
   <nav>
     <button class="nav-btn active" onclick="showSection('dashboard',this)">&#127968; Dashboard</button>
     <button class="nav-btn" onclick="showSection('teamklassement',this)">&#127942; Teamklassement</button>
-    <button class="nav-btn" onclick="showSection('vierkamp',this)">&#9876;&#65039; Vierkamp</button>
-    <button class="nav-btn" onclick="showSection('penalty',this)">&#9917; Penalty Bokaal</button>
-    <button class="nav-btn" onclick="showSection('individueel',this)">&#127939; Individueel</button>
-    <button class="nav-btn" onclick="showSection('preontbijt',this)">&#9728;&#65039; Pre-ontbijt</button>
     <button class="nav-btn" onclick="showSection('planning',this)">&#128197; Planning</button>
     <button class="nav-btn" onclick="showSection('spellen',this)">&#127918; Spellen</button>
-    <button class="nav-btn" onclick="showSection('exporteren',this)">&#128229; Exporteren</button>
     <button class="nav-btn" id="nav-instellingen" onclick="showSection('instellingen',this)">&#9881;&#65039; Kampbeheer</button>
   </nav>
 </div>
@@ -337,6 +332,13 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-vierkamp">
   <div class="page-title">Vierkamp</div>
   <div class="page-sub">4 vaste spellen per ronde — 2 teams per duel</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab spellen-sub-btn" data-sub="spellen" onclick="showSpellenSub('spellen')">&#127918; Overzicht</button>
+    <button class="tab spellen-sub-btn" data-sub="preontbijt" onclick="showSpellenSub('preontbijt')">&#9728;&#65039; Pre-ontbijt</button>
+    <button class="tab active spellen-sub-btn" data-sub="vierkamp" onclick="showSpellenSub('vierkamp')">&#9876;&#65039; Vierkamp</button>
+    <button class="tab spellen-sub-btn" data-sub="penalty" onclick="showSpellenSub('penalty')">&#9917; Penaltybokaal</button>
+    <button class="tab spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
+  </div>
   <div class="tab-row">
     <button class="tab active" onclick="setTab('vk','stand',this)">Stand</button>
     <button class="tab" onclick="setTab('vk','duels',this)">Duels</button>
@@ -349,6 +351,13 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-penalty">
   <div class="page-title">Penalty Bokaal</div>
   <div class="page-sub">Elke dag 2 penalty's per speler op 2 verschillende keepers</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab spellen-sub-btn" data-sub="spellen" onclick="showSpellenSub('spellen')">&#127918; Overzicht</button>
+    <button class="tab spellen-sub-btn" data-sub="preontbijt" onclick="showSpellenSub('preontbijt')">&#9728;&#65039; Pre-ontbijt</button>
+    <button class="tab spellen-sub-btn" data-sub="vierkamp" onclick="showSpellenSub('vierkamp')">&#9876;&#65039; Vierkamp</button>
+    <button class="tab active spellen-sub-btn" data-sub="penalty" onclick="showSpellenSub('penalty')">&#9917; Penaltybokaal</button>
+    <button class="tab spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
+  </div>
   <div class="tab-row">
     <button class="tab active" onclick="setTab('pen','setup',this)">⚙️ Instellen</button>
     <button class="tab" onclick="setTab('pen','invoer',this)">📝 Invoer</button>
@@ -369,6 +378,13 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-individueel">
   <div class="page-title">Individueel Klassement</div>
   <div class="page-sub">Dagelijkse spellen in vaste groepen — op leeftijd &amp; niveau</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab spellen-sub-btn" data-sub="spellen" onclick="showSpellenSub('spellen')">&#127918; Overzicht</button>
+    <button class="tab spellen-sub-btn" data-sub="preontbijt" onclick="showSpellenSub('preontbijt')">&#9728;&#65039; Pre-ontbijt</button>
+    <button class="tab spellen-sub-btn" data-sub="vierkamp" onclick="showSpellenSub('vierkamp')">&#9876;&#65039; Vierkamp</button>
+    <button class="tab spellen-sub-btn" data-sub="penalty" onclick="showSpellenSub('penalty')">&#9917; Penaltybokaal</button>
+    <button class="tab active spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
+  </div>
   <div class="tab-row">
     <button class="tab active" onclick="setTab('ind','stand',this)">&#127941; Stand</button>
     <button class="tab" onclick="setTab('ind','leeftijd',this)">&#127875; Leeftijd</button>
@@ -387,6 +403,13 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-preontbijt">
   <div class="page-title">Pre-Ontbijtspel</div>
   <div class="page-sub">Elke ochtend — 10 spellen · 5 dagen × 2 per dag · alle 8 teams · Win=3pt · Gelijk=1pt</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab spellen-sub-btn" data-sub="spellen" onclick="showSpellenSub('spellen')">&#127918; Overzicht</button>
+    <button class="tab active spellen-sub-btn" data-sub="preontbijt" onclick="showSpellenSub('preontbijt')">&#9728;&#65039; Pre-ontbijt</button>
+    <button class="tab spellen-sub-btn" data-sub="vierkamp" onclick="showSpellenSub('vierkamp')">&#9876;&#65039; Vierkamp</button>
+    <button class="tab spellen-sub-btn" data-sub="penalty" onclick="showSpellenSub('penalty')">&#9917; Penaltybokaal</button>
+    <button class="tab spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
+  </div>
   <div class="tab-row">
     <button class="tab active" onclick="setTab('pre','schema',this)">&#128202; Schema &amp; Stand</button>
     <button class="tab" onclick="setTab('pre','invoer',this)">&#128221; Invoer</button>
@@ -423,14 +446,14 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-spellen">
   <div class="page-title">Spellen</div>
   <div class="page-sub">Alle spellen op een rij, met leider en duur — filter om snel te zien wanneer iemand speelt</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab active spellen-sub-btn" data-sub="spellen" onclick="showSpellenSub('spellen')">&#127918; Overzicht</button>
+    <button class="tab spellen-sub-btn" data-sub="preontbijt" onclick="showSpellenSub('preontbijt')">&#9728;&#65039; Pre-ontbijt</button>
+    <button class="tab spellen-sub-btn" data-sub="vierkamp" onclick="showSpellenSub('vierkamp')">&#9876;&#65039; Vierkamp</button>
+    <button class="tab spellen-sub-btn" data-sub="penalty" onclick="showSpellenSub('penalty')">&#9917; Penaltybokaal</button>
+    <button class="tab spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
+  </div>
   <div id="spellen-content"></div>
-</div>
-
-<!-- EXPORTEREN -->
-<div class="section" id="section-exporteren">
-  <div class="page-title">Exporteren</div>
-  <div class="page-sub">Klassementen exporteren als PDF of CSV voor archief en uitreiking</div>
-  <div id="export-content"></div>
 </div>
 
 <!-- INSTELLINGEN -->
@@ -447,6 +470,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <button class="tab" onclick="setTab('inst','preimport',this)">&#129360; Pre-Ontbijt importeren</button>
     <button class="tab" onclick="setTab('inst','atletiekimport',this)">&#127939; Atletiek importeren</button>
     <button class="tab" onclick="setTab('inst','datums',this)">&#128198; Datums instellen</button>
+    <button class="tab" onclick="setTab('inst','exporteren',this)">&#128229; Exporteren</button>
     <button class="tab" onclick="setTab('inst','kamp',this)">&#128190; Kamp &amp; Archief</button>
     <button class="tab" onclick="setTab('inst','log',this)">&#128220; Log</button>
   </div>
@@ -459,6 +483,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
   <div id="inst-preimport" style="display:none"></div>
   <div id="inst-atletiekimport" style="display:none"></div>
   <div id="inst-datums" style="display:none"></div>
+  <div id="inst-exporteren" style="display:none"></div>
   <div id="inst-kamp" style="display:none"></div>
   <div id="inst-log" style="display:none"></div>
 </div>
@@ -644,29 +669,17 @@ let KAMP_DAGEN = genereerKampDagenLijst(KAMP_META.startDatum, KAMP_META.eindDatu
 const KAMPdagen = KAMP_DAGEN.map(d => d.label);
 const LEADERS = TEAMS.map(t => t.leader);
 
-// Penalty-poules: puur organisatorisch (2 groepen van 4 teams, elk met een eigen keeperpaar
-// per dag, zodat er gelijktijdig op 2 doelen geschoten kan worden). De eindstand
-// (penTotaalSpeler e.d.) blijft één gezamenlijk klassement — dit raakt alleen hoe de
-// keepers/invoer per dag georganiseerd zijn.
-const penPoulePerTeam = {};
-TEAMS.forEach((t, i) => { penPoulePerTeam[t.id] = i < 4 ? 1 : 2; });
-function penPouleVoorTeam(teamId) { return penPoulePerTeam[teamId] || 1; }
-function penPouleVoorSpeler(naam) {
-  const p = PLAYERS_ALL.find(x => x.name === naam);
-  return p ? penPouleVoorTeam(p.teamId) : 1;
-}
-
-// Keepers per dag, per poule: dagIndex → {1:[keeper1,keeper2], 2:[keeper1,keeper2]}
+// Keepers per dag: dagIndex → [keeper1, keeper2]. Elke keeper mag een bestaand kampstaflid
+// zijn óf een vrij ingetypte naam (bv. een bestuurslid of bezoeker die eenmalig keept).
 const penKeepersPerDag = {};
-KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = {1:['',''], 2:['','']}; });
+KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = ['','']; });
 
 // Verdubbelaar: spelerNaam → dagIndex (0-4) | null
 const penVerdubbelaar = {};
 PLAYERS_ALL.forEach(p => { penVerdubbelaar[p.name] = null; });
 
 // Pogingen: dagIndex → [ {spelerNaam, keeperNaam, goal:bool|null, verdubbelaar:bool} ]
-// opgeslagen is per poule zodat poule 1 en poule 2 onafhankelijk afgerond kunnen worden.
-const penData = KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: {1:false, 2:false} }));
+const penData = KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: false }));
 
 // Huidige dag voor invoer
 let penHuidigeDag = 0;
@@ -714,6 +727,12 @@ function penDagTegengoalsKeeper(keeperNaam, dagIdx) {
   return { goals, total };
 }
 
+// Keeper mag elk kampstaflid zijn, of een vrij ingetypte naam (bv. bestuurslid/bezoeker die
+// eenmalig keept) — die naam blijft dan als extra optie staan zolang hij is ingevuld.
+function penKeeperOpties(huidig) {
+  return (huidig && !KAMPSTAF.includes(huidig)) ? [...KAMPSTAF, huidig] : KAMPSTAF;
+}
+
 function penKwalificeerden() {
   if(penFinale.handmatigDeelnemers) return penFinale.handmatigDeelnemers;
   if(penFinale.drempel === null) return [];
@@ -738,48 +757,28 @@ function renderPenSetup() {
   const el = document.getElementById('pen-setup');
   if(!el) return;
 
-  // Poule-indeling (organisatorisch — bepaalt alleen welke keepers een team gebruikt)
+  // Keepers per dag
   let html = `<div class="card" style="margin-bottom:12px">
-    <div class="card-title">&#128101; Poule-indeling</div>
-    <div class="alert alert-info" style="margin-bottom:12px">
-      Penalty wordt gelijktijdig in 2 poules van 4 teams geschoten (bv. op 2 doelen). De
-      eindstand blijft één gezamenlijk klassement — dit bepaalt alleen welke keepers een
-      team gebruikt.
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px">
-      ${TEAMS.map(t => `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">
-        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.color}"></span>
-        <span style="font-weight:600;font-size:.85rem">${t.name}</span>
-        <select onchange="penSetPoule(${t.id},this.value)" style="padding:4px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.78rem;color:var(--text)">
-          <option value="1" ${penPoulePerTeam[t.id]===1?'selected':''}>Poule 1</option>
-          <option value="2" ${penPoulePerTeam[t.id]===2?'selected':''}>Poule 2</option>
-        </select>
-      </div>`).join('')}
-    </div>
-  </div>`;
-
-  // Keepers per dag, per poule
-  html += `<div class="card" style="margin-bottom:12px">
-    <div class="card-title">🧤 Keepers instellen per dag (per poule)</div>
-    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag en per poule 2 keepers in. Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
+    <div class="card-title">🧤 Keepers instellen per dag</div>
+    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag 2 keepers in — een kampstaflid, of typ een naam handmatig in (bv. voor een bestuurslid of bezoeker die eenmalig keept). Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
   KAMPdagen.forEach((dag, i) => {
-    [1,2].forEach(poule => {
-      const k = penKeepersPerDag[i][poule];
-      html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="font-weight:600;font-size:.85rem;width:130px;flex-shrink:0">${dag} <span style="color:var(--muted-light);font-size:.72rem">· Poule ${poule}</span></div>
-        <select onchange="penSetKeeper(${i},${poule},0,this.value)" style="flex:1;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
-          <option value="">Keeper 1...</option>
-          ${LEADERS.map(l=>`<option value="${l}" ${k[0]===l?'selected':''}>${l}</option>`).join('')}
-        </select>
-        <select onchange="penSetKeeper(${i},${poule},1,this.value)" style="flex:1;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
-          <option value="">Keeper 2...</option>
-          ${LEADERS.map(l=>`<option value="${l}" ${k[1]===l?'selected':''}>${l}</option>`).join('')}
-        </select>
-        <span style="font-size:.75rem;color:${k[0]&&k[1]?'var(--green)':'var(--muted)'}">
-          ${k[0]&&k[1]?'✓ ingesteld':'open'}
-        </span>
-      </div>`;
-    });
+    const k = penKeepersPerDag[i];
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
+      <div style="font-weight:600;font-size:.85rem;width:110px;flex-shrink:0">${dag}</div>
+      <select onchange="penSetKeeper(${i},0,this.value)" style="flex:1;min-width:120px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
+        <option value="">Keeper 1...</option>
+        ${penKeeperOpties(k[0]).map(l=>`<option value="${l}" ${k[0]===l?'selected':''}>${l}</option>`).join('')}
+      </select>
+      <input type="text" placeholder="of typ een naam..." onchange="penSetKeeper(${i},0,this.value)" style="width:110px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.78rem;color:var(--text)">
+      <select onchange="penSetKeeper(${i},1,this.value)" style="flex:1;min-width:120px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
+        <option value="">Keeper 2...</option>
+        ${penKeeperOpties(k[1]).map(l=>`<option value="${l}" ${k[1]===l?'selected':''}>${l}</option>`).join('')}
+      </select>
+      <input type="text" placeholder="of typ een naam..." onchange="penSetKeeper(${i},1,this.value)" style="width:110px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.78rem;color:var(--text)">
+      <span style="font-size:.75rem;color:${k[0]&&k[1]?'var(--green)':'var(--muted)'}">
+        ${k[0]&&k[1]?`✓ ${k[0]} &amp; ${k[1]}`:'open'}
+      </span>
+    </div>`;
   });
   html += `</div>`;
 
@@ -825,18 +824,11 @@ function renderPenSetup() {
   el.innerHTML = html;
 }
 
-function penSetKeeper(dagIdx, poule, slot, val) {
-  penKeepersPerDag[dagIdx][poule][slot] = val;
-  const k = penKeepersPerDag[dagIdx][poule];
-  if(k[0] && k[1]) showToast(`✓ Keepers ${KAMPdagen[dagIdx]} (poule ${poule}): ${k[0]} & ${k[1]}`);
+function penSetKeeper(dagIdx, slot, val) {
+  penKeepersPerDag[dagIdx][slot] = val;
+  const k = penKeepersPerDag[dagIdx];
+  if(k[0] && k[1]) showToast(`✓ Keepers ${KAMPdagen[dagIdx]}: ${k[0]} & ${k[1]}`);
   renderPenSetup();
-}
-
-function penSetPoule(teamId, val) {
-  penPoulePerTeam[teamId] = parseInt(val);
-  logActie('Penalty-poule aangepast', `${TEAMS.find(t=>t.id===teamId)?.name} → poule ${val}`);
-  renderPenSetup();
-  renderPenInvoer();
 }
 
 function penSetVerdubbelaarSetup(naam, val) {
@@ -861,76 +853,71 @@ function renderPenInvoer() {
     <div class="card-title">Dag selecteren</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">`;
   KAMPdagen.forEach((dag, i) => {
-    const done = penData[i].opgeslagen[1] && penData[i].opgeslagen[2];
+    const done = penData[i].opgeslagen;
     const active = i === penHuidigeDag;
     html += `<button class="btn ${active?'btn-primary':'btn-outline'}" style="font-size:.78rem;padding:6px 12px" onclick="penSetDag(${i})">${dag}${done?' ✓':''}</button>`;
   });
   html += `</div></div>`;
 
   const dagData = penData[penHuidigeDag];
+  const keepers = penKeepersPerDag[penHuidigeDag];
+  const keeper1 = keepers[0] || '?';
+  const keeper2 = keepers[1] || '?';
+  const keepersOk = keepers[0] && keepers[1];
+  const opgeslagen = dagData.opgeslagen;
 
-  [1,2].forEach(poule => {
-    const keepers = penKeepersPerDag[penHuidigeDag][poule];
-    const keeper1 = keepers[0] || '?';
-    const keeper2 = keepers[1] || '?';
-    const keepersOk = keepers[0] && keepers[1];
-    const opgeslagenPoule = dagData.opgeslagen[poule];
-    const teamsInPoule = TEAMS.filter(t => penPouleVoorTeam(t.id) === poule);
+  html += `<div class="alert ${keepersOk?'alert-info':'alert-warning'}">
+    📅 <strong>${KAMPdagen[penHuidigeDag]}</strong> —
+    Keeper 1: <strong>${keeper1}</strong> · Keeper 2: <strong>${keeper2}</strong>
+    ${!keepersOk?'<br>⚠️ Stel eerst de keepers in via het ⚙️ Instellen tabblad.':''}
+  </div>`;
 
-    html += `<div class="day-header" style="margin-top:20px">Poule ${poule}</div>`;
-    html += `<div class="alert ${keepersOk?'alert-info':'alert-warning'}">
-      📅 <strong>${KAMPdagen[penHuidigeDag]} — Poule ${poule}</strong> —
-      Keeper 1: <strong>${keeper1}</strong> · Keeper 2: <strong>${keeper2}</strong>
-      ${!keepersOk?'<br>⚠️ Stel eerst de keepers in via het ⚙️ Instellen tabblad.':''}
-    </div>`;
+  TEAMS.forEach(t => {
+    html += `<div class="ak-subgame" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${t.color}"></span>
+        <strong style="color:${t.color}">${t.name}</strong>
+        <span style="font-size:.75rem;color:var(--muted)">— ${t.leader}</span>
+      </div>`;
 
-    teamsInPoule.forEach(t => {
-      html += `<div class="ak-subgame" style="margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${t.color}"></span>
-          <strong style="color:${t.color}">${t.name}</strong>
-          <span style="font-size:.75rem;color:var(--muted)">— ${t.leader}</span>
-        </div>`;
+    t.players.forEach(p => {
+      const fullName = p.name;
+      const verdVandaag = penVerdubbelaar[fullName] === penHuidigeDag;
+      const heeftVerd = penVerdubbelaar[fullName] !== null;
+      const bestaand = dagData.pogingen.filter(x => x.spelerNaam === fullName);
+      const p1 = bestaand[0] || null;
+      const p2 = bestaand[1] || null;
+      const dagPts = penDagTotaalSpeler(fullName, penHuidigeDag);
+      const totPts = penTotaalSpeler(fullName);
 
-      t.players.forEach(p => {
-        const fullName = p.name;
-        const verdVandaag = penVerdubbelaar[fullName] === penHuidigeDag;
-        const heeftVerd = penVerdubbelaar[fullName] !== null;
-        const bestaand = dagData.pogingen.filter(x => x.spelerNaam === fullName);
-        const p1 = bestaand[0] || null;
-        const p2 = bestaand[1] || null;
-        const dagPts = penDagTotaalSpeler(fullName, penHuidigeDag);
-        const totPts = penTotaalSpeler(fullName);
-
-        html += `<div style="border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;background:var(--bg)">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-            <span style="font-family:'DM Mono',monospace;color:var(--accent);font-size:.8rem">#${p.num}</span>
-            <span style="font-weight:700;font-size:.88rem;flex:1">${fullName}</span>
-            ${verdVandaag?`<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;border:1px solid #F0ABFC">2× vandaag</span>`:''}
-            ${heeftVerd&&!verdVandaag?`<span style="font-size:.7rem;color:var(--muted-light)">2× op ${KAMPdagen[penVerdubbelaar[fullName]]}</span>`:''}
-            <span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700">${dagPts}pt · ${totPts}pt tot</span>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            ${penShotRow(fullName, 0, p1, opgeslagenPoule, keeper1)}
-            ${penShotRow(fullName, 1, p2, opgeslagenPoule, keeper2)}
-          </div>
-        </div>`;
-      });
-      html += `</div>`;
+      html += `<div style="border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;background:var(--bg)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <span style="font-family:'DM Mono',monospace;color:var(--accent);font-size:.8rem">#${p.num}</span>
+          <span style="font-weight:700;font-size:.88rem;flex:1">${fullName}</span>
+          ${verdVandaag?`<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;border:1px solid #F0ABFC">2× vandaag</span>`:''}
+          ${heeftVerd&&!verdVandaag?`<span style="font-size:.7rem;color:var(--muted-light)">2× op ${KAMPdagen[penVerdubbelaar[fullName]]}</span>`:''}
+          <span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700">${dagPts}pt · ${totPts}pt tot</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${penShotRow(fullName, 0, p1, opgeslagen, keeper1)}
+          ${penShotRow(fullName, 1, p2, opgeslagen, keeper2)}
+        </div>
+      </div>`;
     });
-
-    if(!opgeslagenPoule) {
-      html += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-        <button class="btn btn-primary" onclick="penOpslaanDag(${poule})">✓ Poule ${poule} opslaan</button>
-        <button class="btn btn-outline" onclick="penOpslaanDag(${poule},true)" style="font-size:.78rem">🔓 Opslaan (blijft bewerkbaar)</button>
-      </div>`;
-    } else {
-      html += `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <div class="alert alert-success" style="margin:0;flex:1">✓ Poule ${poule} — ${KAMPdagen[penHuidigeDag]} opgeslagen.</div>
-        <button class="btn btn-outline" style="font-size:.78rem" onclick="penHeropen(${penHuidigeDag},${poule})">🔓 Heropenen (admin)</button>
-      </div>`;
-    }
+    html += `</div>`;
   });
+
+  if(!opgeslagen) {
+    html += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+      <button class="btn btn-primary" onclick="penOpslaanDag()">✓ Dag opslaan</button>
+      <button class="btn btn-outline" onclick="penOpslaanDag(true)" style="font-size:.78rem">🔓 Opslaan (blijft bewerkbaar)</button>
+    </div>`;
+  } else {
+    html += `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="alert alert-success" style="margin:0;flex:1">✓ ${KAMPdagen[penHuidigeDag]} opgeslagen.</div>
+      <button class="btn btn-outline" style="font-size:.78rem" onclick="penHeropen(${penHuidigeDag})">🔓 Heropenen (admin)</button>
+    </div>`;
+  }
 
   el.innerHTML = html;
 }
@@ -977,8 +964,7 @@ function penUpdateShot(spelerNaam, shotIdx) {
 function penToggleGoal(spelerNaam, shotIdx, isGoal) {
   const dagData = penData[penHuidigeDag];
   const safeId = spelerNaam.replace(/[^a-z0-9]/gi,'');
-  const poule = penPouleVoorSpeler(spelerNaam);
-  const keeper = penKeepersPerDag[penHuidigeDag][poule][shotIdx] || '';
+  const keeper = penKeepersPerDag[penHuidigeDag][shotIdx] || '';
   const existing = dagData.pogingen.filter(p => p.spelerNaam === spelerNaam);
   const verdVandaag = penVerdubbelaar[spelerNaam] === penHuidigeDag;
   if(!existing[shotIdx]) {
@@ -1002,10 +988,11 @@ function penAdminEdit(spelerNaam, dagIdx, shotIdx) {
   document.getElementById('modal-body').innerHTML = `
     <div style="margin-bottom:12px">
       <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Keeper</label>
-      <select id="admin-keeper" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem">
+      <select id="admin-keeper" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;margin-bottom:6px">
         <option value="">—</option>
-        ${LEADERS.map(l=>`<option value="${l}" ${bestaand?.keeperNaam===l?'selected':''}>${l}</option>`).join('')}
+        ${penKeeperOpties(bestaand?.keeperNaam).map(l=>`<option value="${l}" ${bestaand?.keeperNaam===l?'selected':''}>${l}</option>`).join('')}
       </select>
+      <input id="admin-keeper-manual" type="text" placeholder="of typ een naam (bv. bezoeker)..." style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text);box-sizing:border-box">
     </div>
     <div>
       <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Resultaat</label>
@@ -1021,7 +1008,7 @@ function penAdminEdit(spelerNaam, dagIdx, shotIdx) {
 }
 
 function penAdminSave(spelerNaam, dagIdx, shotIdx) {
-  const keeper = document.getElementById('admin-keeper').value;
+  const keeper = document.getElementById('admin-keeper-manual')?.value?.trim() || document.getElementById('admin-keeper').value;
   const goalBtn = document.getElementById('admin-goal');
   const isGoal = goalBtn.className.includes('btn-green') ? true : false;
   const existing = penData[dagIdx].pogingen.filter(p => p.spelerNaam === spelerNaam);
@@ -1037,16 +1024,16 @@ function penAdminSave(spelerNaam, dagIdx, shotIdx) {
 
 function penSetDag(idx) { penHuidigeDag = idx; renderPenInvoer(); }
 
-function penOpslaanDag(poule, blijftBewerkbaar) {
-  if(!blijftBewerkbaar) penData[penHuidigeDag].opgeslagen[poule] = true;
-  showToast(`✓ ${KAMPdagen[penHuidigeDag]} (poule ${poule}) opgeslagen!`);
-  logActie('Penalty dag opgeslagen', `${KAMPdagen[penHuidigeDag]} · poule ${poule}`);
+function penOpslaanDag(blijftBewerkbaar) {
+  if(!blijftBewerkbaar) penData[penHuidigeDag].opgeslagen = true;
+  showToast(`✓ ${KAMPdagen[penHuidigeDag]} opgeslagen!`);
+  logActie('Penalty dag opgeslagen', KAMPdagen[penHuidigeDag]);
   renderPenalty();
 }
 
-function penHeropen(dagIdx, poule) {
-  penData[dagIdx].opgeslagen[poule] = false;
-  showToast(`🔓 ${KAMPdagen[dagIdx]} (poule ${poule}) heropend`);
+function penHeropen(dagIdx) {
+  penData[dagIdx].opgeslagen = false;
+  showToast(`🔓 ${KAMPdagen[dagIdx]} heropend`);
   renderPenInvoer();
 }
 
@@ -1079,7 +1066,8 @@ function renderPenSpelers() {
 function renderPenKeepers() {
   const el = document.getElementById('pen-keepers');
   if(!el) return;
-  const keeperStats = LEADERS.map(naam => {
+  const alleKeeperNamen = [...new Set([...KAMPSTAF, ...penData.flatMap(d => d.pogingen.map(p => p.keeperNaam)).filter(Boolean)])];
+  const keeperStats = alleKeeperNamen.map(naam => {
     let totGoals=0, totPogingen=0;
     const perDag = KAMPdagen.map((dag,i)=>{
       const {goals,total}=penDagTegengoalsKeeper(naam,i);
@@ -1121,8 +1109,7 @@ function renderPenHistorie() {
     const goals=dagData.pogingen.filter(p=>p.goal).length;
     const n=dagData.pogingen.length;
     const keepers=penKeepersPerDag[dagIdx];
-    const beideOpgeslagen = dagData.opgeslagen[1] && dagData.opgeslagen[2];
-    html += `<div class="day-header">📅 ${dag} <span style="font-size:.75rem;font-weight:400;color:var(--muted);letter-spacing:0">${beideOpgeslagen?'✓':'open'} · ${goals}/${n} goals · 🧤 P1: ${keepers[1][0]||'?'} &amp; ${keepers[1][1]||'?'} · P2: ${keepers[2][0]||'?'} &amp; ${keepers[2][1]||'?'}</span></div>`;
+    html += `<div class="day-header">📅 ${dag} <span style="font-size:.75rem;font-weight:400;color:var(--muted);letter-spacing:0">${dagData.opgeslagen?'✓':'open'} · ${goals}/${n} goals · 🧤 ${keepers[0]||'?'} &amp; ${keepers[1]||'?'}</span></div>`;
     if(n===0){
       html+=`<div style="font-size:.83rem;color:var(--muted);padding:8px 12px">Nog geen pogingen.</div>`;
     } else {
@@ -1231,8 +1218,9 @@ function renderPenFinale() {
           <label style="font-size:.75rem;font-weight:700;color:var(--muted)">KEEPER</label>
           <select onchange="penFinale.rondes[${ri}].keeper=this.value;renderPenFinale()" style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
             <option value="">Kies...</option>
-            ${LEADERS.map(l=>`<option value="${l}" ${ronde.keeper===l?'selected':''}>${l}</option>`).join('')}
+            ${penKeeperOpties(ronde.keeper).map(l=>`<option value="${l}" ${ronde.keeper===l?'selected':''}>${l}</option>`).join('')}
           </select>
+          <input type="text" placeholder="of typ een naam..." onchange="penFinale.rondes[${ri}].keeper=this.value;renderPenFinale()" style="width:110px;padding:5px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.78rem;color:var(--text)">
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <label style="font-size:.75rem;font-weight:700;color:var(--muted)">PEN/SPELER</label>
@@ -1785,7 +1773,19 @@ function showSection(id,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('section-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
-  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,exporteren:renderExport,instellingen:renderInstellingen})[id]?.();
+  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,instellingen:renderInstellingen})[id]?.();
+}
+
+// "Spellen" is het hoofdmenu-item voor de 5 spel-onderdelen (Overzicht, Pre-ontbijt,
+// Vierkamp, Penaltybokaal, Individueel) — elk blijft een eigen .section (ongewijzigd van
+// binnen), alleen de navigatie ernaartoe loopt nu via dit submenu i.p.v. losse hoofdknoppen.
+function spellenSubActiefZetten(id) {
+  document.querySelectorAll('.spellen-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id));
+}
+function showSpellenSub(id) {
+  const btn = document.querySelector('.nav-btn[onclick*="spellen"]');
+  showSection(id, btn);
+  spellenSubActiefZetten(id);
 }
 
 // ── TAB SWITCHER ─────────────────────────────────────────────
@@ -1793,10 +1793,10 @@ function setTab(prefix,tab,btn){
   const sectionMap={tk:'teamklassement',vk:'vierkamp',pen:'penalty',ak:'achtkamp',ind:'individueel',pre:'preontbijt',inst:'instellingen'};
   const section=document.getElementById('section-'+sectionMap[prefix]);
   if(!section) return;
-  section.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  section.querySelectorAll('.tab:not(.spellen-sub-btn)').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   // hide all sub-panels
-  ['stand','historie','duels','invoer','detail','spelers','keepers','setup','finale','groepen','spellen','schema','staf','overzicht','leeftijd','teams','kampstaf','labels','leiders','planningimport','preimport','atletiekimport','datums','kamp','log'].forEach(p=>{const el=document.getElementById(prefix+'-'+p);if(el)el.style.display='none';});
+  ['stand','historie','duels','invoer','detail','spelers','keepers','setup','finale','groepen','spellen','schema','staf','overzicht','leeftijd','teams','kampstaf','labels','leiders','planningimport','preimport','atletiekimport','datums','exporteren','kamp','log'].forEach(p=>{const el=document.getElementById(prefix+'-'+p);if(el)el.style.display='none';});
   const target=document.getElementById(prefix+'-'+tab);
   if(target)target.style.display='block';
   // re-render
@@ -3270,7 +3270,7 @@ function openScoreModal(spelNaam,tijd,klassement){
     document.getElementById('modal-footer').innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Annuleren</button><button class="btn btn-primary" onclick="saveScoreModal('${(spelNaam||'').replace(/'/g,"\\'")}','${tijd||''}','Teamklassement')">✓ Opslaan</button>`;
   }else if(klassement==='Penalty'){
     document.getElementById('modal-body').innerHTML=`<p style="color:var(--muted);font-size:.88rem">Ga naar het <strong>Penalty Bokaal</strong> tabblad om scores in te voeren per speler.</p>`;
-    document.getElementById('modal-footer').innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Sluiten</button><button class="btn btn-primary" onclick="closeModal();showSection('penalty',document.querySelectorAll('.nav-btn')[3])">Naar Penalty Bokaal →</button>`;
+    document.getElementById('modal-footer').innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Sluiten</button><button class="btn btn-primary" onclick="closeModal();showSpellenSub('penalty')">Naar Penalty Bokaal →</button>`;
   }else{
     document.getElementById('modal-body').innerHTML=`<p style="color:var(--muted);font-size:.88rem">Score invoer voor <strong>${klassement}</strong> — gebruik het bijbehorende klassementscherm.</p>`;
     document.getElementById('modal-footer').innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Sluiten</button>`;
@@ -3564,7 +3564,7 @@ function openAkVanuitPlanning(di, ai){
   if(!act) return;
   akHuidigeId = akZorgVoorInstantie(act);
   // Navigeer naar 8-kamp sectie, open invoer tab
-  const btn = document.querySelector('.nav-btn[onclick*="achtkamp"]');
+  const btn = document.querySelector('.nav-btn[onclick*="spellen"]');
   showSection('achtkamp', btn);
   // Zorg dat invoer tab actief is
   const akSection = document.getElementById('section-achtkamp');
@@ -3576,11 +3576,12 @@ function openAkVanuitPlanning(di, ai){
 
 // Vanuit planning naar individueel sectie springen
 function openIndVanuitPlanning(dagNaam) {
-  const btn = document.querySelector('.nav-btn[onclick*="individueel"]');
+  const btn = document.querySelector('.nav-btn[onclick*="spellen"]');
   showSection('individueel', btn);
+  spellenSubActiefZetten('individueel');
   const section = document.getElementById('section-individueel');
-  section.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  section.querySelectorAll('.tab')[1].classList.add('active');
+  section.querySelectorAll('.tab:not(.spellen-sub-btn)').forEach(t => t.classList.remove('active'));
+  section.querySelectorAll('.tab:not(.spellen-sub-btn)')[1].classList.add('active');
   ['ind-stand','ind-groepen','ind-spellen'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
   document.getElementById('ind-invoer').style.display = 'block';
   const dagIdx = IND_DAGEN.indexOf(dagNaam);
@@ -3597,6 +3598,9 @@ const KAMPTEAM_KLEUREN_PALET = [
 ];
 
 function renderInstellingen() {
+  // Exporteren blijft voor iedereen bruikbaar (was vroeger een eigen hoofdmenu-item, geen
+  // admin-only functie) — dus altijd renderen, los van de admin-check hieronder.
+  renderExport();
   if(!isAdmin()) {
     const el = document.getElementById('inst-spelers');
     if(el) el.innerHTML = '<div class="alert alert-warning">&#9888; Alleen beschikbaar voor admins.</div>';
@@ -4186,9 +4190,9 @@ function kampAfsluitenDoen() {
   PLAYERS_ALL.length = 0;
   GAME_HISTORY.length = 0;
   VK_RONDES.forEach(r => { r.spellen = r.spellen.map(()=>null); r.afgesloten = false; });
-  Object.keys(penKeepersPerDag).forEach(k => penKeepersPerDag[k] = {1:['',''], 2:['','']});
+  Object.keys(penKeepersPerDag).forEach(k => penKeepersPerDag[k] = ['','']);
   Object.keys(penVerdubbelaar).forEach(k => delete penVerdubbelaar[k]);
-  penData.forEach(d => { d.pogingen = []; d.opgeslagen = {1:false, 2:false}; });
+  penData.forEach(d => { d.pogingen = []; d.opgeslagen = false; });
   penFinale.drempel = null; penFinale.rondes = []; penFinale.handmatigDeelnemers = null; penFinale.actieveRonde = null; penFinale.schietBeurt = 0;
   IND_LEEFTIJDEN.forEach(c => c.spelers = []);
   indSpellen.forEach(d => { d.spellen.forEach(s => { s.naam=''; s.maker=''; s.leider1=''; s.leider2=''; s.uitleg=''; s.opgeslagen=false; s.scores={}; }); });
@@ -4236,8 +4240,8 @@ function toepassenKampDagen(start, eind) {
 
   planningData.splice(0, planningData.length, ...genereerPlanningData());
   Object.keys(penKeepersPerDag).forEach(k => delete penKeepersPerDag[k]);
-  KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = {1:['',''], 2:['','']}; });
-  penData.splice(0, penData.length, ...KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: {1:false, 2:false} })));
+  KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = ['','']; });
+  penData.splice(0, penData.length, ...KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: false })));
   penHuidigeDag = 0;
   preSpellenData.splice(0, preSpellenData.length, ...genereerPreSpellenData());
   preHuidigeDag = 0;
@@ -4523,7 +4527,7 @@ function renderInstDatums() {
 }
 
 function renderExport() {
-  const el = document.getElementById('export-content');
+  const el = document.getElementById('inst-exporteren');
   if(!el) return;
   el.innerHTML = `
     <div class="export-card">
@@ -4697,7 +4701,6 @@ const SYNC_MODULES = {
   game_history:     { get: () => GAME_HISTORY,       set: v => _vulArray(GAME_HISTORY, v) },
   vierkamp:         { get: () => VK_RONDES,          set: v => _vulArray(VK_RONDES, v) },
   pen_keepers:      { get: () => penKeepersPerDag,   set: v => _vulObject(penKeepersPerDag, v) },
-  pen_poules:       { get: () => penPoulePerTeam,    set: v => _vulObject(penPoulePerTeam, v) },
   pen_verdubbelaar: { get: () => penVerdubbelaar,    set: v => _vulObject(penVerdubbelaar, v) },
   pen_data:         { get: () => penData,            set: v => _vulArray(penData, v) },
   pen_finale:       { get: () => penFinale,          set: v => _vulObject(penFinale, v) },
