@@ -107,10 +107,15 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 .alert-success{background:var(--green-bg);border:1px solid #A7F3D0;color:var(--green);}
 
 .day-header{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:2px;color:var(--accent);margin:20px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--accent-mid);display:flex;align-items:center;gap:8px;}
-.activity-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:7px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid transparent;transition:all .15s;}
+.activity-row{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:7px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid transparent;transition:all .15s;}
+.activity-row-main{display:flex;align-items:center;gap:10px;}
+.activity-extra{font-size:.74rem;color:var(--muted);padding-left:54px;}
 .activity-row.clickable{cursor:pointer;}
 .activity-row.clickable:hover{border-color:var(--accent);background:var(--accent-light);transform:translateX(2px);}
 .activity-row.clickable:hover .activity-name{color:var(--accent);}
+.activity-row.act-huidig{background:var(--green-bg);border-left-color:var(--green);}
+.activity-row.act-voorbij{background:var(--bg3);}
+.activity-row.act-voorbij .activity-name{color:var(--muted);}
 .activity-row.type-spel{border-left-color:var(--accent);}
 .activity-row.type-maaltijd{border-left-color:var(--orange);}
 .activity-row.type-vrij{border-left-color:var(--muted-light);}
@@ -1774,6 +1779,16 @@ function showSection(id,btn){
   document.getElementById('section-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
   ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,instellingen:renderInstellingen})[id]?.();
+  if(id === 'planning') planningScrollNaarVandaag();
+}
+
+// Bij het openen van Planning meteen naar de huidige kampdag scrollen (indien vandaag
+// binnen de kampperiode valt) — buiten de kampperiode gewoon bovenaan laten beginnen.
+function planningScrollNaarVandaag() {
+  const idx = huidigeKampDagIndex();
+  if(idx < 0) return;
+  const dagEl = document.querySelectorAll('#planning-content .day-header')[idx];
+  if(dagEl) dagEl.scrollIntoView({block:'start'});
 }
 
 // "Spellen" is het hoofdmenu-item voor de 5 spel-onderdelen (Overzicht, Pre-ontbijt,
@@ -1840,10 +1855,20 @@ function renderDashboard(){
     <div class="rank-name">${p.name} <span style="color:var(--muted-light);font-size:.75rem">${p.team}</span></div>
     <div class="rank-pts">${p.pts}pt</div></div>`).join('');
   document.getElementById('dash-spellen').textContent=GAME_HISTORY.length;
-  const today=planningData[0];
-  document.getElementById('dash-today').innerHTML=today.acts.map(a=>{
-    return `<div class="activity-row type-${a.type}">
-      <div class="activity-time">${a.time}</div><div class="activity-name">${a.name}</div>${activiteitTagHtml(a)}</div>`;
+  const vandaagIdx = huidigeKampDagIndex();
+  const todayDi = vandaagIdx >= 0 ? vandaagIdx : 0;
+  const today = planningData[todayDi];
+  const huidig = planningHuidigeActiviteit();
+  document.getElementById('dash-today').innerHTML=today.acts.map((a,ai)=>{
+    const isHuidig = !a.vervallen && huidig && huidig.di===todayDi && huidig.ai===ai;
+    const mom = a.vervallen ? null : planningActiviteitMoment(todayDi, a.time);
+    const isVoorbij = !a.vervallen && !isHuidig && mom && mom <= new Date();
+    return `<div class="activity-row type-${a.type}${a.vervallen?' act-vervallen':''}${isHuidig?' act-huidig':''}${isVoorbij?' act-voorbij':''}">
+      <div class="activity-row-main">
+        <div class="activity-time">${a.time}</div><div class="activity-name">${a.name}</div>${activiteitTagHtml(a)}
+      </div>
+      ${activiteitExtraHtml(a)}
+    </div>`;
   }).join('');
 }
 
@@ -2752,6 +2777,44 @@ function activiteitTagHtml(a) {
   const hex = kl ? labelKleur(kl) : (TYPE_KLEUREN[a.type] || '#64748B');
   return `<span class="activity-tag" style="background:${hex}1a;color:${hex}">${tekst}</span>`;
 }
+// Toont spelverantwoordelijke(n) en een eventuele opmerking onder de activiteit, zonder te
+// hoeven klikken — gebruikt door zowel Planning als de "Vandaag"-kaart op het dashboard.
+function activiteitExtraHtml(a) {
+  const parts = [];
+  if(a.leiders && a.leiders.length) parts.push(`&#128100; ${a.leiders.join(' &amp; ')}`);
+  if(a.opmerking) parts.push(a.opmerking);
+  return parts.length ? `<div class="activity-extra">${parts.join(' &middot; ')}</div>` : '';
+}
+
+// ── PLANNING: "waar zijn we nu" ────────────────────────────────
+// Vergelijkt elke activiteit (dag + tijd, gekoppeld aan de echte kalenderdatum via
+// KAMP_DAGEN) met het huidige moment, zodat Planning en dashboard consistent kunnen tonen
+// welke activiteit nu bezig is (lichtgroen) en welke al voorbij zijn (lichtgrijs).
+function huidigeKampDagIndex() {
+  const vandaag = new Date().toISOString().slice(0,10);
+  return KAMP_DAGEN.findIndex(d => d.key === vandaag);
+}
+function planningActiviteitMoment(dagIdx, tijd) {
+  const dagKey = KAMP_DAGEN[dagIdx]?.key;
+  if(!dagKey) return null;
+  const m = /^(\d{1,2}):(\d{2})$/.exec((tijd||'').trim());
+  const hh = m ? m[1].padStart(2,'0') : '00', mm = m ? m[2] : '00';
+  return new Date(`${dagKey}T${hh}:${mm}:00`);
+}
+// De "huidige" activiteit is de laatste (chronologisch) die al begonnen is — alles daarvoor
+// is voorbij, alles daarna is toekomst. Vervallen activiteiten tellen niet mee.
+function planningHuidigeActiviteit() {
+  const nu = new Date();
+  let best = null;
+  planningData.forEach((day, di) => {
+    day.acts.forEach((a, ai) => {
+      if(a.vervallen) return;
+      const mom = planningActiviteitMoment(di, a.time);
+      if(mom && mom <= nu && (!best || mom >= best.mom)) best = {di, ai, mom};
+    });
+  });
+  return best;
+}
 
 function renderPlanning(){
   const el = document.getElementById('planning-content');
@@ -2761,6 +2824,7 @@ function renderPlanning(){
   if(sub) sub.textContent = admin
     ? 'Klik op een activiteit om te bewerken · + toevoegen per dag · Vervallen verklaren mogelijk'
     : 'Klik op een spel om direct de score in te voeren';
+  const huidig = planningHuidigeActiviteit();
 
   el.innerHTML = planningData.map((day, di) => `
     <div class="day-header">${day.icon} ${day.day}
@@ -2802,12 +2866,18 @@ function renderPlanning(){
       }
 
       const clickable = !admin && !!kl && !a.vervallen;
-      return `<div class="activity-row type-${a.type}${clickable?' clickable':''}${admin?' admin-editable':''}${a.vervallen?' act-vervallen':''}" ${click}>
-        <div class="activity-time" style="${a.vervallen?'text-decoration:line-through;':''}">${a.time}</div>
-        <div class="activity-name" style="${a.vervallen?'text-decoration:line-through;color:var(--muted);':''}">${a.name}</div>
-        ${activiteitTagHtml(a)}
-        ${statusTag}
-        ${admin ? `<span style="font-size:.8rem;opacity:.3;margin-left:auto;flex-shrink:0">&#9998;</span>` : ''}
+      const isHuidig = !a.vervallen && huidig && huidig.di===di && huidig.ai===ai;
+      const mom = a.vervallen ? null : planningActiviteitMoment(di, a.time);
+      const isVoorbij = !a.vervallen && !isHuidig && mom && mom <= new Date();
+      return `<div class="activity-row type-${a.type}${clickable?' clickable':''}${admin?' admin-editable':''}${a.vervallen?' act-vervallen':''}${isHuidig?' act-huidig':''}${isVoorbij?' act-voorbij':''}" ${click}>
+        <div class="activity-row-main">
+          <div class="activity-time" style="${a.vervallen?'text-decoration:line-through;':''}">${a.time}</div>
+          <div class="activity-name" style="${a.vervallen?'text-decoration:line-through;color:var(--muted);':''}">${a.name}</div>
+          ${activiteitTagHtml(a)}
+          ${statusTag}
+          ${admin ? `<span style="font-size:.8rem;opacity:.3;margin-left:auto;flex-shrink:0">&#9998;</span>` : ''}
+        </div>
+        ${activiteitExtraHtml(a)}
       </div>`;
     }).join('')}
   `).join('');
@@ -2862,6 +2932,10 @@ function planningEdit(di, ai) {
           <input id="pe-label" value="${a.customLabel||''}" placeholder="Overschrijft standaard label..." style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
         </div>
       </div>
+      <div>
+        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">OPMERKING <span style="font-weight:400;opacity:.7">(optioneel, zichtbaar onder de activiteit)</span></label>
+        <input id="pe-opmerking" value="${(a.opmerking||'').replace(/"/g,'&quot;')}" placeholder="bijv. Neem regenjas mee" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+      </div>
       <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--red-bg);border-radius:8px;border:1px solid #FECACA;cursor:pointer">
         <input type="checkbox" id="pe-vervallen" ${a.vervallen?'checked':''} style="width:18px;height:18px">
         <span style="font-size:.88rem;font-weight:600;color:var(--red)">Activiteit vervallen verklaren</span>
@@ -2892,6 +2966,8 @@ function planningEditSave(di, ai) {
   a.duur       = duurVal ? parseInt(duurVal) : undefined;
   const lbl    = document.getElementById('pe-label')?.value?.trim();
   a.customLabel = lbl || undefined;
+  const opm    = document.getElementById('pe-opmerking')?.value?.trim();
+  a.opmerking  = opm || undefined;
   a.vervallen  = document.getElementById('pe-vervallen')?.checked || false;
   if(a.klassement === '8-Kamp') akZorgVoorInstantie(a);
   planningData[di].acts.sort((x,y)=>tijdNaarMinuten(x.time)-tijdNaarMinuten(y.time));
@@ -2961,6 +3037,10 @@ function planningAdd(di) {
           <input id="pa-label" placeholder="Overschrijft standaard label..." style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
         </div>
       </div>
+      <div>
+        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">OPMERKING <span style="font-weight:400;opacity:.7">(optioneel, zichtbaar onder de activiteit)</span></label>
+        <input id="pa-opmerking" placeholder="bijv. Neem regenjas mee" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+      </div>
     </div>`;
   document.getElementById('modal-footer').innerHTML = `
     <button class="btn btn-outline" onclick="closeModal()">Annuleren</button>
@@ -2979,7 +3059,8 @@ function planningAddSave(di) {
   const duurVal = document.getElementById('pa-duur')?.value;
   const duur = duurVal ? parseInt(duurVal) : undefined;
   const lbl  = document.getElementById('pa-label')?.value?.trim();
-  const act = {name:naam,time,type,klassement:kl||undefined,leiders,duur,customLabel:lbl||undefined,vervallen:false};
+  const opm  = document.getElementById('pa-opmerking')?.value?.trim();
+  const act = {name:naam,time,type,klassement:kl||undefined,leiders,duur,customLabel:lbl||undefined,opmerking:opm||undefined,vervallen:false};
   planningData[di].acts.push(act);
   if(kl === '8-Kamp') akZorgVoorInstantie(act);
   planningData[di].acts.sort((a,b)=>tijdNaarMinuten(a.time)-tijdNaarMinuten(b.time));
