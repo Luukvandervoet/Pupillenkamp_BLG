@@ -303,18 +303,13 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <div class="hero-title">Goedemiddag,<br>Groepsleiders!</div>
     <div class="hero-sub" id="hero-sub">Zorg dat alle scores van vandaag zijn ingevoerd ✅</div>
   </div>
-  <div class="grid-4" style="margin-bottom:16px">
-    <div class="stat-card"><div class="num">8</div><div class="lbl">Teams</div></div>
-    <div class="stat-card"><div class="num">62</div><div class="lbl">Spelers</div></div>
-    <div class="stat-card"><div class="num" id="dash-spellen">4</div><div class="lbl">Spellen</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--yellow)" id="dash-open">2</div><div class="lbl">Open</div></div>
-  </div>
+  <div class="card"><div class="card-title">📅 Vandaag op het programma</div><div id="dash-today"></div></div>
+  <div class="card"><div class="card-title">&#9888;&#65039; Nog af te ronden</div><div id="dash-controle"></div></div>
   <div class="card"><div class="card-title">🏆 Teamklassement — Top 3</div><div id="dash-team-top3"></div></div>
   <div class="grid-2">
     <div class="card"><div class="card-title">⚽ Penalty Bokaal — Top 3</div><div id="dash-pen-top3"></div></div>
     <div class="card"><div class="card-title">🏃 Individueel — Top 3</div><div id="dash-ind-top3"></div></div>
   </div>
-  <div class="card"><div class="card-title">📅 Vandaag op het programma</div><div id="dash-today"></div></div>
 </div>
 
 <!-- TEAMKLASSEMENT -->
@@ -1854,7 +1849,6 @@ function renderDashboard(){
     <div class="lb-row rank-${i+1}"><div class="rank-num">${i+1}</div><div class="rank-medal">${medals[i]}</div>
     <div class="rank-name">${p.name} <span style="color:var(--muted-light);font-size:.75rem">${p.team}</span></div>
     <div class="rank-pts">${p.pts}pt</div></div>`).join('');
-  document.getElementById('dash-spellen').textContent=GAME_HISTORY.length;
   const vandaagIdx = huidigeKampDagIndex();
   const todayDi = vandaagIdx >= 0 ? vandaagIdx : 0;
   const today = planningData[todayDi];
@@ -1870,6 +1864,65 @@ function renderDashboard(){
       ${activiteitExtraHtml(a)}
     </div>`;
   }).join('');
+  renderDashboardControle();
+}
+
+// Bepaalt of een spel-activiteit al een uitslag/afronding heeft — gebruikt door de
+// "Nog af te ronden"-kaart op het dashboard om te zien wat nog administratief moet gebeuren.
+function planningActiviteitAfgerond(a, di) {
+  const kl = a.klassement;
+  if(!kl) return true;
+  if(kl === '8-Kamp') {
+    const inst = a.achtkampId ? akInstantie(a.achtkampId) : null;
+    return !!inst && inst.subspellen.every(sp => sp.scores.every(s => s !== null));
+  }
+  if(kl === 'Individueel') {
+    const dagIdx = IND_DAGEN.indexOf(planningData[di].day);
+    return dagIdx>=0 && indSpellen[dagIdx].spellen.every(s => s.opgeslagen);
+  }
+  if(kl === 'Penalty') return !!penData[di]?.opgeslagen;
+  if(kl === 'Vierkamp') {
+    const rondesVanDag = VK_RONDES.filter(r => r.dag === planningData[di].day || r.dag === KAMP_DAGEN[di]?.weekdag);
+    return rondesVanDag.length > 0 && rondesVanDag.every(r => r.afgesloten);
+  }
+  if(kl === 'Pre-Ontbijt') {
+    const preVanDag = preSpellenData.filter(sp => sp.dag === di);
+    return preVanDag.length > 0 && preVanDag.every(sp => sp.opgeslagen);
+  }
+  // Teamklassement en overige (eigen) labels: uitslag staat onder de spelnaam in GAME_HISTORY.
+  return !!GAME_HISTORY.find(g => g.name === a.name);
+}
+
+// "Nog af te ronden" — alle spellen die volgens de planning al hadden moeten plaatsvinden
+// maar nog geen uitslag/afronding hebben. Zo is in één oogopslag te zien wat er nog
+// administratief moet gebeuren, zonder de hele planning door te hoeven klikken.
+function renderDashboardControle() {
+  const el = document.getElementById('dash-controle');
+  if(!el) return;
+  const nu = new Date();
+  const openstaand = [];
+  planningData.forEach((day, di) => {
+    day.acts.forEach(a => {
+      if(a.vervallen || !a.klassement) return;
+      const mom = planningActiviteitMoment(di, a.time);
+      if(!mom || mom > nu) return;
+      if(planningActiviteitAfgerond(a, di)) return;
+      openstaand.push({a, day});
+    });
+  });
+  if(openstaand.length === 0) {
+    el.innerHTML = '<div class="alert alert-success" style="margin:0">&#10003; Niets openstaand — alles is bijgewerkt.</div>';
+    return;
+  }
+  el.innerHTML = openstaand.map(({a, day}) => `
+    <div class="activity-row type-${a.type}">
+      <div class="activity-row-main">
+        <div class="activity-time">${a.time}</div>
+        <div class="activity-name">${a.name} <span style="color:var(--muted-light);font-weight:400;font-size:.72rem">${day.day}</span></div>
+        ${activiteitTagHtml(a)}
+      </div>
+      ${a.leiders && a.leiders.length ? `<div class="activity-extra">&#128100; ${a.leiders.join(' &amp; ')}</div>` : ''}
+    </div>`).join('');
 }
 
 // ── TEAM KLASSEMENT ──────────────────────────────────────────
@@ -3375,7 +3428,7 @@ function saveScoreModal(spelNaam,tijd,klassement){
   logActie('Score opgeslagen', `${klassement} · ${name}`);
   renderTeamKlassement();
   renderPlanning();
-  document.getElementById('dash-spellen').textContent=GAME_HISTORY.length;
+  renderDashboardControle();
 }
 
 // ── 8-KAMP DATA ──────────────────────────────────────────────
@@ -3573,7 +3626,7 @@ function akNaarTeamklassement() {
   logActie('8-Kamp doorgestuurd', inst.naam);
   renderAchtkamp();
   renderTeamKlassement();
-  document.getElementById('dash-spellen').textContent = GAME_HISTORY.length;
+  renderDashboardControle();
 }
 
 function renderAkStand() {
