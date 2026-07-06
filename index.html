@@ -2691,8 +2691,44 @@ const PLANNING_TYPES = [
   {val:'pauze',   label:'⏸️ Pauze'},
 ];
 
+// Tijden worden altijd als HH:MM vergeleken op basis van minuten-sinds-middernacht (niet
+// als tekst) — anders sorteert bv. "9:00" (ongepadde CSV-invoer) na "10:00" t/m "23:00" en
+// belandt zo'n activiteit onterecht helemaal onderaan de planning.
+function tijdNormaliseren(t) {
+  const m = /^(\d{1,2}):(\d{2})$/.exec((t||'').trim());
+  return m ? `${m[1].padStart(2,'0')}:${m[2]}` : (t||'').trim();
+}
+function tijdNaarMinuten(t) {
+  const m = /^(\d{1,2}):(\d{2})$/.exec((t||'').trim());
+  return m ? parseInt(m[1],10)*60 + parseInt(m[2],10) : 0;
+}
+// Herkent een los doorgegeven voornaam (bv. uit een planning-import) als bestaand kampstaflid
+// en geeft de canonieke schrijfwijze terug zodat leiders overal consistent gekoppeld zijn.
+function kampstafNaamHerkennen(naam) {
+  const zoek = (naam||'').trim().toLowerCase();
+  if(!zoek) return null;
+  return KAMPSTAF.find(k => k.toLowerCase() === zoek) || null;
+}
+
 function labelKleur(naam) {
   return LABELS.find(l => l.naam === naam)?.kleur || '#64748B';
+}
+// Kleurenpalet voor automatisch aangemaakte labels (bijv. bij planning-import met een
+// onbekend label). Pakt de eerste kleur die nog niet in gebruik is; als alle kleuren al
+// gebruikt zijn, wordt een willekeurige maar leesbare HSL-kleur gegenereerd.
+const LABEL_AUTO_PALET = ['#2563EB','#7C3AED','#A21CAF','#059669','#E11D48','#16A34A','#EA580C','#0891B2','#CA8A04','#DB2777','#4F46E5','#0D9488'];
+function labelAutoKleur() {
+  const gebruikt = new Set(LABELS.map(l => l.kleur));
+  const vrij = LABEL_AUTO_PALET.find(k => !gebruikt.has(k));
+  if(vrij) return vrij;
+  return hslNaarHex(Math.floor(Math.random()*360), 65, 42);
+}
+function hslNaarHex(h, s, l) {
+  s/=100; l/=100;
+  const c = (1-Math.abs(2*l-1))*s, x = c*(1-Math.abs((h/60)%2-1)), m = l-c/2;
+  let [r,g,b] = h<60?[c,x,0]: h<120?[x,c,0]: h<180?[0,c,x]: h<240?[0,x,c]: h<300?[x,0,c]:[c,0,x];
+  const naarHex = v => Math.round((v+m)*255).toString(16).padStart(2,'0');
+  return `#${naarHex(r)}${naarHex(g)}${naarHex(b)}`;
 }
 // Gedeelde tag-rendering voor een planning-activiteit — gebruikt door Planning, Dashboard
 // en de Spellen-pagina zodat labels overal consistent en met de juiste kleur verschijnen.
@@ -2793,22 +2829,23 @@ function planningEdit(di, ai) {
           ${LABELS.map(l=>`<option value="${l.naam}" ${a.klassement===l.naam?'selected':''}>${l.naam}</option>`).join('')}
         </select>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LEIDER <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
-          <select id="pe-leider" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
-            <option value="">Geen</option>
-            ${KAMPSTAF.map(l=>`<option value="${l}" ${a.leider===l?'selected':''}>${l}</option>`).join('')}
-          </select>
+      <div>
+        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LEIDERS <span style="font-weight:400;opacity:.7">(optioneel, meerdere mogelijk)</span></label>
+        <div id="pe-leiders" style="display:flex;flex-wrap:wrap;gap:6px;max-height:110px;overflow-y:auto;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px">
+          ${KAMPSTAF.map(l=>`<label style="display:flex;align-items:center;gap:5px;font-size:.8rem;padding:3px 8px;border-radius:14px;background:var(--bg2);cursor:pointer">
+            <input type="checkbox" value="${l}" ${(a.leiders||[]).includes(l)?'checked':''} style="width:14px;height:14px;accent-color:var(--accent)"> ${l}
+          </label>`).join('')}
         </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div>
           <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">DUUR (MIN)</label>
           <input id="pe-duur" type="number" min="0" step="5" value="${a.duur||''}" placeholder="bijv. 45" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
         </div>
-      </div>
-      <div>
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
-        <input id="pe-label" value="${a.customLabel||''}" placeholder="Overschrijft standaard label..." style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
+          <input id="pe-label" value="${a.customLabel||''}" placeholder="Overschrijft standaard label..." style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+        </div>
       </div>
       <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--red-bg);border-radius:8px;border:1px solid #FECACA;cursor:pointer">
         <input type="checkbox" id="pe-vervallen" ${a.vervallen?'checked':''} style="width:18px;height:18px">
@@ -2834,14 +2871,14 @@ function planningEditSave(di, ai) {
   a.time       = document.getElementById('pe-time')?.value || a.time;
   a.type       = document.getElementById('pe-type')?.value || a.type;
   a.klassement = a.type==='spel' ? (document.getElementById('pe-kl')?.value||undefined) : undefined;
-  a.leider     = document.getElementById('pe-leider')?.value || undefined;
+  a.leiders    = [...document.querySelectorAll('#pe-leiders input[type=checkbox]:checked')].map(el=>el.value);
   const duurVal = document.getElementById('pe-duur')?.value;
   a.duur       = duurVal ? parseInt(duurVal) : undefined;
   const lbl    = document.getElementById('pe-label')?.value?.trim();
   a.customLabel = lbl || undefined;
   a.vervallen  = document.getElementById('pe-vervallen')?.checked || false;
   if(a.klassement === '8-Kamp') akZorgVoorInstantie(a);
-  planningData[di].acts.sort((x,y)=>x.time.localeCompare(y.time));
+  planningData[di].acts.sort((x,y)=>tijdNaarMinuten(x.time)-tijdNaarMinuten(y.time));
   closeModal(); renderPlanning(); renderDashboard();
   logActie('Planning bewerkt', `${planningData[di].day} · ${a.name}`);
   showToast('&#10003; Planning bijgewerkt');
@@ -2890,22 +2927,23 @@ function planningAdd(di) {
           ${LABELS.map(l=>`<option value="${l.naam}">${l.naam}</option>`).join('')}
         </select>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LEIDER <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
-          <select id="pa-leider" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
-            <option value="">Geen</option>
-            ${KAMPSTAF.map(l=>`<option value="${l}">${l}</option>`).join('')}
-          </select>
+      <div>
+        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LEIDERS <span style="font-weight:400;opacity:.7">(optioneel, meerdere mogelijk)</span></label>
+        <div id="pa-leiders" style="display:flex;flex-wrap:wrap;gap:6px;max-height:110px;overflow-y:auto;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px">
+          ${KAMPSTAF.map(l=>`<label style="display:flex;align-items:center;gap:5px;font-size:.8rem;padding:3px 8px;border-radius:14px;background:var(--bg2);cursor:pointer">
+            <input type="checkbox" value="${l}" style="width:14px;height:14px;accent-color:var(--accent)"> ${l}
+          </label>`).join('')}
         </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div>
           <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">DUUR (MIN)</label>
           <input id="pa-duur" type="number" min="0" step="5" placeholder="bijv. 45" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
         </div>
-      </div>
-      <div>
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
-        <input id="pa-label" placeholder="Overschrijft standaard label..." style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
+          <input id="pa-label" placeholder="Overschrijft standaard label..." style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+        </div>
       </div>
     </div>`;
   document.getElementById('modal-footer').innerHTML = `
@@ -2920,14 +2958,14 @@ function planningAddSave(di) {
   const type = document.getElementById('pa-type')?.value || 'spel';
   const time = document.getElementById('pa-time')?.value || '12:00';
   const kl   = type==='spel' ? (document.getElementById('pa-kl')?.value||undefined) : undefined;
-  const leider = document.getElementById('pa-leider')?.value || undefined;
+  const leiders = [...document.querySelectorAll('#pa-leiders input[type=checkbox]:checked')].map(el=>el.value);
   const duurVal = document.getElementById('pa-duur')?.value;
   const duur = duurVal ? parseInt(duurVal) : undefined;
   const lbl  = document.getElementById('pa-label')?.value?.trim();
-  const act = {name:naam,time,type,klassement:kl||undefined,leider,duur,customLabel:lbl||undefined,vervallen:false};
+  const act = {name:naam,time,type,klassement:kl||undefined,leiders,duur,customLabel:lbl||undefined,vervallen:false};
   planningData[di].acts.push(act);
   if(kl === '8-Kamp') akZorgVoorInstantie(act);
-  planningData[di].acts.sort((a,b)=>a.time.localeCompare(b.time));
+  planningData[di].acts.sort((a,b)=>tijdNaarMinuten(a.time)-tijdNaarMinuten(b.time));
   closeModal(); renderPlanning(); renderDashboard();
   logActie('Planning toegevoegd', `${planningData[di].day} · ${naam}`);
   showToast(`&#10003; "${naam}" toegevoegd`);
@@ -2946,7 +2984,9 @@ function renderInstPlanningImport() {
       <strong>Formaat</strong> — komma of puntkomma als scheider, één spel per rij, dag moet een bestaande kampdag zijn:<br>
       <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Tijd,Type,Spelnaam,Leider,Duur</code>
       <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: Maandag,10:00,8-Kamp,Ochtendspel,Thomas,60</span><br>
-      <span style="color:var(--muted-light);font-size:.76rem">"Type" moet een bestaand label zijn (zie Kampbeheer → Labels). Bij het label "8-Kamp" wordt automatisch een 8-Kamp aangemaakt.</span>
+      <span style="color:var(--muted-light);font-size:.76rem">Bestaat het label bij "Type" nog niet? Dan wordt het automatisch aangemaakt (met een automatisch gekozen kleur) — zie Kampbeheer → Labels. Bij het label "8-Kamp" wordt ook automatisch een 8-Kamp aangemaakt.</span><br>
+      <span style="color:var(--muted-light);font-size:.76rem">"Leider" mag de voornaam van meerdere kampstafleden bevatten, gescheiden door "&amp;" (bijv. "Thomas &amp; Sven") — elke naam wordt herkend aan de bestaande kampstaf en automatisch gekoppeld.</span><br>
+      <span style="color:var(--muted-light);font-size:.76rem">Tijd wordt automatisch genormaliseerd (bv. "9:00" → "09:00") zodat de volgorde in de planning altijd klopt.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplatePlanning()">&#8681; Download voorbeeld-CSV</button>
@@ -2962,7 +3002,37 @@ function renderInstPlanningImport() {
       <button class="btn btn-primary" style="font-size:.8rem" onclick="planningImportToepassen()">&#10003; Importeren &amp; toevoegen</button>
     </div>
     <div id="plan-csv-preview"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">&#128465;&#65039; Hele planning leegmaken</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px">
+      Verwijdert alle geplande activiteiten op alle kampdagen in één keer — handig als je een
+      volledig nieuwe planning gaat importeren. Labels, teams en leiders blijven staan.
+    </div>
+    <button class="btn btn-outline" style="color:var(--red);border-color:#FECACA" onclick="planningLeegmakenConfirm()">&#128465;&#65039; Hele planning leegmaken</button>
   </div>`;
+}
+
+function planningLeegmakenConfirm() {
+  document.getElementById('modal-title').textContent = 'Hele planning leegmaken?';
+  document.getElementById('modal-sub').textContent = `${planningData.reduce((n,d)=>n+d.acts.length,0)} activiteiten op ${planningData.length} dagen`;
+  document.getElementById('modal-body').innerHTML = `<div class="alert alert-warning">
+    Weet je het zeker? Alle geplande activiteiten op alle kampdagen worden verwijderd. Dit kan
+    niet ongedaan gemaakt worden. Labels, teams en leiders-accounts blijven gewoon staan.
+  </div>`;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">Annuleren</button>
+    <button class="btn" style="background:#DC2626;color:#fff" onclick="planningLeegmakenDoen()">&#10003; Ja, planning leegmaken</button>`;
+  openModal();
+}
+
+function planningLeegmakenDoen() {
+  const aantal = planningData.reduce((n,d)=>n+d.acts.length,0);
+  planningData.forEach(day => { day.acts.length = 0; });
+  closeModal();
+  logActie('Planning leeggemaakt', `${aantal} activiteiten verwijderd`);
+  showToast('&#10003; Planning leeggemaakt');
+  renderPlanning(); renderDashboard(); renderSpellen();
 }
 
 function planningLeesBestand(input) {
@@ -2979,10 +3049,10 @@ function planningLeesBestand(input) {
 function planningParseCsv(tekst) {
   return parseCsvGeneriek(tekst, ['dag','tijd','type','naam','leider','duur']).map(r => ({
     dag: (r.dag||'').trim(),
-    tijd: (r.tijd||'').trim() || '12:00',
+    tijd: tijdNormaliseren((r.tijd||'').trim() || '12:00'),
     typeLabel: (r.type||'').trim(),
     naam: (r.naam||'').trim(),
-    leider: (r.leider||'').trim() || undefined,
+    leiders: (r.leider||'').split('&').map(s=>s.trim()).filter(Boolean),
     duur: r.duur ? (parseInt(r.duur)||undefined) : undefined,
   })).filter(r => r.dag && r.naam);
 }
@@ -3010,12 +3080,15 @@ function planningPreviewCsv() {
       <tbody>${PLANNING_IMPORT.map((r,i) => {
         const dagOk = planningData.some(d => d.day.toLowerCase() === r.dag.toLowerCase());
         const labelOk = !r.typeLabel || LABELS.some(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
+        const leidersHtml = r.leiders.length
+          ? r.leiders.map(n => kampstafNaamHerkennen(n) ? n : `<span style="color:var(--red)">${n} ⚠️</span>`).join(', ')
+          : '—';
         return `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}">
           <td style="padding:5px 8px;${dagOk?'':'color:var(--red);font-weight:700'}">${r.dag}${dagOk?'':' ⚠️ onbekende dag'}</td>
           <td style="padding:5px 8px;font-family:'DM Mono',monospace">${r.tijd}</td>
-          <td style="padding:5px 8px;${labelOk?'':'color:var(--red)'}">${r.typeLabel||'—'}${labelOk?'':' ⚠️'}</td>
+          <td style="padding:5px 8px;${labelOk?'':'color:var(--accent)'}">${r.typeLabel||'—'}${labelOk?'':' &#127912; nieuw label'}</td>
           <td style="padding:5px 8px;font-weight:600">${r.naam}</td>
-          <td style="padding:5px 8px;color:var(--muted)">${r.leider||'—'}</td>
+          <td style="padding:5px 8px;color:var(--muted)">${leidersHtml}</td>
           <td style="padding:5px 8px;text-align:center;color:var(--muted)">${r.duur||'—'}</td>
         </tr>`;
       }).join('')}</tbody>
@@ -3026,21 +3099,29 @@ function planningPreviewCsv() {
 function planningImportToepassen() {
   if(PLANNING_IMPORT.length === 0) { showToast('&#9888; Eerst een geldige CSV laden.'); return; }
   let toegevoegd = 0, overgeslagen = 0;
+  const nieuweLabels = [];
   PLANNING_IMPORT.forEach(r => {
     const dag = planningData.find(d => d.day.toLowerCase() === r.dag.toLowerCase());
     if(!dag) { overgeslagen++; return; }
-    const label = LABELS.find(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
-    const act = {name: r.naam, time: r.tijd, type: 'spel', klassement: label?.naam || undefined, leider: r.leider, duur: r.duur, vervallen: false};
+    let label = LABELS.find(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
+    if(!label && r.typeLabel) {
+      label = {id:'custom_'+(LABELS_NEXT_ID++), naam: r.typeLabel, kleur: labelAutoKleur(), systeem:false};
+      LABELS.push(label);
+      nieuweLabels.push(label.naam);
+    }
+    const leiders = r.leiders.map(n => kampstafNaamHerkennen(n) || n);
+    const act = {name: r.naam, time: r.tijd, type: 'spel', klassement: label?.naam || undefined, leiders, duur: r.duur, vervallen: false};
     dag.acts.push(act);
     if(label?.naam === '8-Kamp') akZorgVoorInstantie(act);
     toegevoegd++;
   });
-  planningData.forEach(d => d.acts.sort((a,b) => a.time.localeCompare(b.time)));
+  planningData.forEach(d => d.acts.sort((a,b) => tijdNaarMinuten(a.time)-tijdNaarMinuten(b.time)));
   PLANNING_IMPORT = [];
   const ta = document.getElementById('plan-csv-tekst'); if(ta) ta.value = '';
   const pv = document.getElementById('plan-csv-preview'); if(pv) pv.innerHTML = '';
-  logActie('Planning geïmporteerd', `${toegevoegd} activiteiten${overgeslagen ? `, ${overgeslagen} overgeslagen (onbekende dag)` : ''}`);
-  showToast(`&#10003; ${toegevoegd} activiteiten geïmporteerd`);
+  logActie('Planning geïmporteerd', `${toegevoegd} activiteiten${nieuweLabels.length ? `, ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''} aangemaakt (${nieuweLabels.join(', ')})` : ''}${overgeslagen ? `, ${overgeslagen} overgeslagen (onbekende dag)` : ''}`);
+  showToast(`&#10003; ${toegevoegd} activiteiten geïmporteerd${nieuweLabels.length ? ` · ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''}` : ''}`);
+  if(nieuweLabels.length) renderInstLabels();
   renderPlanning(); renderDashboard(); renderSpellen();
 }
 
@@ -3057,24 +3138,24 @@ function renderSpellen() {
   planningData.forEach((day, di) => {
     day.acts.forEach((a, ai) => { if(a.type === 'spel') rows.push({dagNaam: day.day, di, ai, a}); });
   });
-  const leiders = [...new Set(rows.map(r => r.a.leider).filter(Boolean))].sort();
+  const leiders = [...new Set(rows.flatMap(r => r.a.leiders||[]))].sort();
 
   let html = `<div class="card" style="margin-bottom:12px">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <label style="font-size:.75rem;font-weight:700;color:var(--muted)">FILTER OP LEIDER</label>
       <select onchange="spellenLeiderFilter=this.value;renderSpellen()" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
         <option value="">Alle leiders (${rows.length})</option>
-        ${leiders.map(l => `<option value="${l}" ${spellenLeiderFilter===l?'selected':''}>${l} (${rows.filter(r=>r.a.leider===l).length})</option>`).join('')}
+        ${leiders.map(l => `<option value="${l}" ${spellenLeiderFilter===l?'selected':''}>${l} (${rows.filter(r=>(r.a.leiders||[]).includes(l)).length})</option>`).join('')}
       </select>
     </div>
   </div>`;
 
-  const gefilterd = spellenLeiderFilter ? rows.filter(r => r.a.leider === spellenLeiderFilter) : rows;
+  const gefilterd = spellenLeiderFilter ? rows.filter(r => (r.a.leiders||[]).includes(spellenLeiderFilter)) : rows;
   if(gefilterd.length === 0) { html += '<div class="alert alert-info">Geen spellen gevonden.</div>'; el.innerHTML = html; return; }
 
   const admin = isAdmin();
   html += `<div class="gh-wrap"><table class="gh-table"><thead><tr>
-    <th>Label</th><th>Spelnaam</th><th>Leider</th><th>Duur</th><th>Dag</th><th>Tijd</th>
+    <th>Label</th><th>Spelnaam</th><th>Leiders</th><th>Duur</th><th>Dag</th><th>Tijd</th>
   </tr></thead><tbody>`;
   gefilterd.forEach(r => {
     const a = r.a;
@@ -3086,7 +3167,7 @@ function renderSpellen() {
     html += `<tr style="cursor:${click?'pointer':'default'}" ${click}>
       <td>${activiteitTagHtml(a)}</td>
       <td><strong>${a.name}</strong>${a.vervallen?' <span style="color:var(--red);font-size:.72rem">(vervallen)</span>':''}</td>
-      <td>${a.leider || '<span style="color:var(--muted-light)">—</span>'}</td>
+      <td>${(a.leiders&&a.leiders.length) ? a.leiders.join(' & ') : '<span style="color:var(--muted-light)">—</span>'}</td>
       <td style="color:var(--muted)">${a.duur ? a.duur+' min' : '—'}</td>
       <td style="color:var(--muted)">${r.dagNaam}</td>
       <td style="font-family:'DM Mono',monospace;color:var(--muted);font-size:.8rem">${a.time}</td>
@@ -3613,7 +3694,7 @@ function downloadTemplatePlanning() {
   const label1 = LABELS.find(l => l.systeem)?.naam || 'Teamklassement';
   downloadCsvTemplate('planning_template.csv', ['Dag','Tijd','Type','Spelnaam','Leider','Duur'], [
     [dag, '10:00', '8-Kamp', 'Ochtendspel', LEADERS[0] || 'Thomas', 60],
-    [dag, '15:00', label1, 'Middagspel', LEADERS[1] || 'Sven', 45],
+    [dag, '15:00', label1, 'Middagspel', `${LEADERS[1] || 'Sven'} & ${LEADERS[2] || 'Rick'}`, 45],
   ]);
 }
 
