@@ -3133,8 +3133,8 @@ function renderInstPlanningImport() {
       <strong>Formaat</strong> — komma of puntkomma als scheider, één spel per rij, dag moet een bestaande kampdag zijn:<br>
       <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Tijd,Type,Spelnaam,Leider,Duur</code>
       <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: Maandag,10:00,8-Kamp,Ochtendspel,Thomas,60</span><br>
-      <span style="color:var(--muted-light);font-size:.76rem">Bestaat het label bij "Type" nog niet? Dan wordt het automatisch aangemaakt (met een automatisch gekozen kleur) — zie Kampbeheer → Labels. Bij het label "8-Kamp" wordt ook automatisch een 8-Kamp aangemaakt.</span><br>
-      <span style="color:var(--muted-light);font-size:.76rem">"Leider" mag de voornaam van meerdere kampstafleden bevatten, gescheiden door "&amp;" (bijv. "Thomas &amp; Sven") — elke naam wordt herkend aan de bestaande kampstaf en automatisch gekoppeld.</span><br>
+      <span style="color:var(--muted-light);font-size:.76rem">"Type" mag een echt activiteitstype zijn (Spel, Maaltijd, Vrij, Info, Pauze, Vierkamp, Penalty Bokaal, Individuele Spellen) — of een label (bestaand of nieuw, bv. "8-Kamp", "Teamklassement" of een eigen label). Een onbekend label wordt automatisch aangemaakt met een automatisch gekozen kleur; bij "8-Kamp" wordt ook automatisch een 8-Kamp aangemaakt.</span><br>
+      <span style="color:var(--muted-light);font-size:.76rem">"Leider" mag de voornaam van meerdere kampstafleden bevatten, gescheiden door "&amp;", een komma of een puntkomma (bijv. "Thomas &amp; Sven") — elke naam wordt herkend aan de bestaande kampstaf en automatisch gekoppeld. Een niet-herkende naam wordt na het importeren duidelijk gemeld.</span><br>
       <span style="color:var(--muted-light);font-size:.76rem">Tijd wordt automatisch genormaliseerd (bv. "9:00" → "09:00") zodat de volgorde in de planning altijd klopt.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
@@ -3193,13 +3193,27 @@ function planningLeesBestand(input) {
   });
 }
 
+// Herkent de "Type"-kolom uit een planning-import tegen de echte TYPE-opties (spel/maaltijd/
+// vrij/info/pauze + de Vierkamp/Penalty/Individueel-sneltoetsen) — op val, klassement-naam of
+// de zichtbare labeltekst (zonder emoji). Geen match? Dan behandelt planningImportToepassen
+// de tekst zoals voorheen als vrij LABEL (bestaand of automatisch aan te maken).
+function planningTypeVanTekst(tekst) {
+  const zoek = (tekst||'').trim().toLowerCase();
+  if(!zoek) return null;
+  return PLANNING_TYPES.find(t => {
+    const labelTekst = t.label.replace(/[^\p{L}\p{N} ]/gu,'').trim().toLowerCase();
+    return t.val === zoek || labelTekst === zoek || (t.klassement && t.klassement.toLowerCase() === zoek);
+  }) || null;
+}
+
 function planningParseCsv(tekst) {
   return parseCsvGeneriek(tekst, ['dag','tijd','type','naam','leider','duur']).map(r => ({
     dag: (r.dag||'').trim(),
     tijd: tijdNormaliseren((r.tijd||'').trim() || '12:00'),
     typeLabel: (r.type||'').trim(),
     naam: (r.naam||'').trim(),
-    leiders: (r.leider||'').split('&').map(s=>s.trim()).filter(Boolean),
+    // Meerdere leiders in één cel mogen met "&", een komma of een puntkomma gescheiden zijn.
+    leiders: (r.leider||'').split(/[,;&]/).map(s=>s.trim()).filter(Boolean),
     duur: r.duur ? (parseInt(r.duur)||undefined) : undefined,
   })).filter(r => r.dag && r.naam);
 }
@@ -3214,7 +3228,11 @@ function planningPreviewCsv() {
     el.innerHTML = '<div class="alert alert-warning" style="margin-top:8px">Geen geldige regels gevonden. Controleer het formaat.</div>';
     return;
   }
-  el.innerHTML = `<div style="margin-top:10px;overflow-x:auto">
+  const onbekendeLeiders = [...new Set(PLANNING_IMPORT.flatMap(r => r.leiders).filter(n => !kampstafNaamHerkennen(n)))];
+  const waarschuwing = onbekendeLeiders.length
+    ? `<div class="alert alert-warning" style="margin-top:8px">&#9888;&#65039; Niet-herkende leider(s), gecontroleerd tegen de kampstaf: <strong>${onbekendeLeiders.join(', ')}</strong>. Ze worden als vrije tekst geïmporteerd — controleer op typefouten of voeg ze toe via Kampbeheer → Kampstaf.</div>`
+    : '';
+  el.innerHTML = `${waarschuwing}<div style="margin-top:10px;overflow-x:auto">
     <table style="width:100%;border-collapse:collapse;font-size:.79rem">
       <thead><tr style="background:var(--bg2)">
         <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Dag</th>
@@ -3226,14 +3244,16 @@ function planningPreviewCsv() {
       </tr></thead>
       <tbody>${PLANNING_IMPORT.map((r,i) => {
         const dagOk = planningData.some(d => d.day.toLowerCase() === r.dag.toLowerCase());
-        const labelOk = !r.typeLabel || LABELS.some(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
+        const typeOptie = planningTypeVanTekst(r.typeLabel);
+        const labelOk = !r.typeLabel || !!typeOptie || LABELS.some(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
+        const typeTekst = typeOptie ? typeOptie.label.replace(/^\S+\s/,'') : (r.typeLabel || '—');
         const leidersHtml = r.leiders.length
           ? r.leiders.map(n => kampstafNaamHerkennen(n) ? n : `<span style="color:var(--red)">${n} ⚠️</span>`).join(', ')
           : '—';
         return `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}">
           <td style="padding:5px 8px;${dagOk?'':'color:var(--red);font-weight:700'}">${r.dag}${dagOk?'':' ⚠️ onbekende dag'}</td>
           <td style="padding:5px 8px;font-family:'DM Mono',monospace">${r.tijd}</td>
-          <td style="padding:5px 8px;${labelOk?'':'color:var(--accent)'}">${r.typeLabel||'—'}${labelOk?'':' &#127912; nieuw label'}</td>
+          <td style="padding:5px 8px;${labelOk?'':'color:var(--accent)'}">${typeTekst}${labelOk?'':' &#127912; nieuw label'}</td>
           <td style="padding:5px 8px;font-weight:600">${r.naam}</td>
           <td style="padding:5px 8px;color:var(--muted)">${leidersHtml}</td>
           <td style="padding:5px 8px;text-align:center;color:var(--muted)">${r.duur||'—'}</td>
@@ -3247,27 +3267,44 @@ function planningImportToepassen() {
   if(PLANNING_IMPORT.length === 0) { showToast('&#9888; Eerst een geldig Excel-bestand laden.'); return; }
   let toegevoegd = 0, overgeslagen = 0;
   const nieuweLabels = [];
+  const onbekendeLeiders = new Set();
   PLANNING_IMPORT.forEach(r => {
     const dag = planningData.find(d => d.day.toLowerCase() === r.dag.toLowerCase());
     if(!dag) { overgeslagen++; return; }
-    let label = LABELS.find(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
-    if(!label && r.typeLabel) {
-      label = {id:'custom_'+(LABELS_NEXT_ID++), naam: r.typeLabel, kleur: labelAutoKleur(), systeem:false};
-      LABELS.push(label);
-      nieuweLabels.push(label.naam);
+    const typeOptie = planningTypeVanTekst(r.typeLabel);
+    let type = 'spel', klassement;
+    if(typeOptie) {
+      type = typeOptie.type;
+      klassement = typeOptie.klassement;
+    } else if(r.typeLabel) {
+      let label = LABELS.find(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
+      if(!label) {
+        label = {id:'custom_'+(LABELS_NEXT_ID++), naam: r.typeLabel, kleur: labelAutoKleur(), systeem:false};
+        LABELS.push(label);
+        nieuweLabels.push(label.naam);
+      }
+      klassement = label.naam;
     }
-    const leiders = r.leiders.map(n => kampstafNaamHerkennen(n) || n);
-    const act = {name: r.naam, time: r.tijd, type: 'spel', klassement: label?.naam || undefined, leiders, duur: r.duur, vervallen: false};
+    const leiders = r.leiders.map(n => {
+      const bekend = kampstafNaamHerkennen(n);
+      if(!bekend) onbekendeLeiders.add(n);
+      return bekend || n;
+    });
+    const act = {name: r.naam, time: r.tijd, type, klassement, leiders, duur: r.duur, vervallen: false};
     dag.acts.push(act);
-    if(label?.naam === '8-Kamp') akZorgVoorInstantie(act);
+    if(klassement === '8-Kamp') akZorgVoorInstantie(act);
     toegevoegd++;
   });
   planningData.forEach(d => d.acts.sort((a,b) => tijdNaarMinuten(a.time)-tijdNaarMinuten(b.time)));
   PLANNING_IMPORT = [];
   const ta = document.getElementById('plan-csv-tekst'); if(ta) ta.value = '';
-  const pv = document.getElementById('plan-csv-preview'); if(pv) pv.innerHTML = '';
-  logActie('Planning geïmporteerd', `${toegevoegd} activiteiten${nieuweLabels.length ? `, ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''} aangemaakt (${nieuweLabels.join(', ')})` : ''}${overgeslagen ? `, ${overgeslagen} overgeslagen (onbekende dag)` : ''}`);
-  showToast(`&#10003; ${toegevoegd} activiteiten geïmporteerd${nieuweLabels.length ? ` · ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''}` : ''}`);
+  const onbekendeLijst = [...onbekendeLeiders];
+  const pv = document.getElementById('plan-csv-preview');
+  if(pv) {
+    pv.innerHTML = `<div class="alert alert-success" style="margin-top:8px">&#10003; ${toegevoegd} activiteiten geïmporteerd${nieuweLabels.length ? ` · ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''} aangemaakt (${nieuweLabels.join(', ')})` : ''}${overgeslagen ? ` · ${overgeslagen} overgeslagen (onbekende dag)` : ''}</div>${onbekendeLijst.length ? `<div class="alert alert-warning" style="margin-top:8px">&#9888;&#65039; Niet-herkende leider(s) als vrije tekst opgeslagen: <strong>${onbekendeLijst.join(', ')}</strong>. Controleer op typefouten of voeg ze toe via Kampbeheer → Kampstaf.</div>` : ''}`;
+  }
+  logActie('Planning geïmporteerd', `${toegevoegd} activiteiten${nieuweLabels.length ? `, ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''} aangemaakt (${nieuweLabels.join(', ')})` : ''}${overgeslagen ? `, ${overgeslagen} overgeslagen (onbekende dag)` : ''}${onbekendeLijst.length ? `, niet-herkende leiders: ${onbekendeLijst.join(', ')}` : ''}`);
+  showToast(`&#10003; ${toegevoegd} activiteiten geïmporteerd${nieuweLabels.length ? ` · ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''}` : ''}${onbekendeLijst.length ? ` &#183; &#9888;&#65039; ${onbekendeLijst.length} onbekende leider${onbekendeLijst.length>1?'s':''}` : ''}`);
   if(nieuweLabels.length) renderInstLabels();
   renderPlanning(); renderDashboard(); renderSpellen();
 }
@@ -3866,7 +3903,9 @@ function xlsxBestandNaarCsv(file, callback) {
   reader.onload = e => {
     const wb = XLSX.read(e.target.result, {type:'array'});
     const sheet = wb.Sheets[wb.SheetNames[0]];
-    callback(XLSX.utils.sheet_to_csv(sheet, {FS:',', blankrows:false}));
+    // Puntkomma als kolomscheider (niet komma!) zodat een cel als "Leider" met "Thomas, Sven"
+    // erin niet per ongeluk als twee losse kolommen wordt gelezen.
+    callback(XLSX.utils.sheet_to_csv(sheet, {FS:';', blankrows:false}));
   };
   reader.readAsArrayBuffer(file);
 }
