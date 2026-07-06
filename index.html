@@ -733,6 +733,40 @@ function penKeeperOpties(huidig) {
   return (huidig && !KAMPSTAF.includes(huidig)) ? [...KAMPSTAF, huidig] : KAMPSTAF;
 }
 
+// Neemt de keepers per dag over uit de Planning: de leider(s) die aan een Penalty-activiteit
+// hangen (bv. meegekomen met de planning-import, kolom "Leider") worden Keeper 1/2 van die
+// dag. Zonder `overschrijf` worden alleen lege keeper-slots gevuld, zodat handmatig
+// ingestelde keepers blijven staan. Geeft het aantal gevulde slots terug.
+function penKeepersUitPlanning(overschrijf = false) {
+  let gezet = 0;
+  KAMPdagen.forEach((_, i) => {
+    const namen = [...new Set((planningData[i]?.acts || [])
+      .filter(a => !a.vervallen && a.klassement === 'Penalty')
+      .flatMap(a => a.leiders || [])
+      .filter(Boolean))];
+    if(!namen.length) return;
+    if(!penKeepersPerDag[i]) penKeepersPerDag[i] = ['',''];
+    [0,1].forEach(slot => {
+      if(namen[slot] && (overschrijf || !penKeepersPerDag[i][slot]) && penKeepersPerDag[i][slot] !== namen[slot]) {
+        penKeepersPerDag[i][slot] = namen[slot];
+        gezet++;
+      }
+    });
+  });
+  return gezet;
+}
+
+function penKeepersOphalen() {
+  const gezet = penKeepersUitPlanning(true);
+  if(gezet) {
+    logActie('Keepers uit planning', `${gezet} keeper-slot${gezet>1?'s':''} overgenomen`);
+    showToast(`&#10003; ${gezet} keeper${gezet>1?'s':''} overgenomen uit de planning`);
+  } else {
+    showToast('&#8505;&#65039; Geen (nieuwe) keepers gevonden bij Penalty-activiteiten in de planning');
+  }
+  renderPenalty();
+}
+
 function penKwalificeerden() {
   if(penFinale.handmatigDeelnemers) return penFinale.handmatigDeelnemers;
   if(penFinale.drempel === null) return [];
@@ -744,6 +778,7 @@ function penKwalificeerden() {
 
 // ── RENDER PENALTY ────────────────────────────────────────────
 function renderPenalty() {
+  penKeepersUitPlanning(); // lege keeper-slots automatisch vullen vanuit de Planning
   renderPenSetup();
   renderPenInvoer();
   renderPenSpelers();
@@ -760,7 +795,12 @@ function renderPenSetup() {
   // Keepers per dag
   let html = `<div class="card" style="margin-bottom:12px">
     <div class="card-title">🧤 Keepers instellen per dag</div>
-    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag 2 keepers in — begin te typen om te zoeken in de kampstaf, of typ zelf een naam (bv. een bestuurslid of bezoeker die eenmalig keept). Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
+    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag 2 keepers in — begin te typen om te zoeken in de kampstaf, of typ zelf een naam (bv. een bestuurslid of bezoeker die eenmalig keept). Zodra ingesteld worden ze automatisch overgenomen in de invoer.<br>
+    Staan er leiders bij de Penalty Bokaal-activiteiten in de <strong>Planning</strong> (bv. via de import)? Lege keeper-slots worden daar automatisch mee gevuld.</div>
+    <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="penKeepersOphalen()">&#129508; Keepers ophalen uit planning</button>
+      <span style="font-size:.75rem;color:var(--muted-light)">Neemt de leiders van de Penalty-activiteiten over en overschrijft de huidige keepers.</span>
+    </div>`;
   KAMPdagen.forEach((dag, i) => {
     const k = penKeepersPerDag[i];
     html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
@@ -3290,6 +3330,7 @@ function planningImportToepassen() {
     toegevoegd++;
   });
   planningData.forEach(d => d.acts.sort((a,b) => tijdNaarMinuten(a.time)-tijdNaarMinuten(b.time)));
+  const keepersGezet = penKeepersUitPlanning(); // leiders bij Penalty-activiteiten → keepers per dag
   PLANNING_IMPORT = [];
   const ta = document.getElementById('plan-csv-tekst'); if(ta) ta.value = '';
   const onbekendeLijst = [...onbekendeLeiders];
@@ -3298,7 +3339,7 @@ function planningImportToepassen() {
     pv.innerHTML = `<div class="alert alert-success" style="margin-top:8px">&#10003; ${toegevoegd} activiteiten geïmporteerd${nieuweLabels.length ? ` · ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''} aangemaakt (${nieuweLabels.join(', ')})` : ''}${overgeslagen ? ` · ${overgeslagen} overgeslagen (onbekende dag)` : ''}</div>${onbekendeLijst.length ? `<div class="alert alert-warning" style="margin-top:8px">&#9888;&#65039; Niet-herkende leider(s) als vrije tekst opgeslagen: <strong>${onbekendeLijst.join(', ')}</strong>. Controleer op typefouten of voeg ze toe via Kampbeheer → Kampstaf.</div>` : ''}`;
   }
   logActie('Planning geïmporteerd', `${toegevoegd} activiteiten${nieuweLabels.length ? `, ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''} aangemaakt (${nieuweLabels.join(', ')})` : ''}${overgeslagen ? `, ${overgeslagen} overgeslagen (onbekende dag)` : ''}${onbekendeLijst.length ? `, niet-herkende leiders: ${onbekendeLijst.join(', ')}` : ''}`);
-  showToast(`&#10003; ${toegevoegd} activiteiten geïmporteerd${nieuweLabels.length ? ` · ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''}` : ''}${onbekendeLijst.length ? ` &#183; &#9888;&#65039; ${onbekendeLijst.length} onbekende leider${onbekendeLijst.length>1?'s':''}` : ''}`);
+  showToast(`&#10003; ${toegevoegd} activiteiten geïmporteerd${nieuweLabels.length ? ` · ${nieuweLabels.length} nieuw label${nieuweLabels.length>1?'s':''}` : ''}${keepersGezet ? ` · &#129508; ${keepersGezet} keeper${keepersGezet>1?'s':''} ingesteld` : ''}${onbekendeLijst.length ? ` &#183; &#9888;&#65039; ${onbekendeLijst.length} onbekende leider${onbekendeLijst.length>1?'s':''}` : ''}`);
   if(nieuweLabels.length) renderInstLabels();
   renderPlanning(); renderDashboard(); renderSpellen();
 }
