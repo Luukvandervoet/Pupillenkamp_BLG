@@ -760,21 +760,13 @@ function renderPenSetup() {
   // Keepers per dag
   let html = `<div class="card" style="margin-bottom:12px">
     <div class="card-title">🧤 Keepers instellen per dag</div>
-    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag 2 keepers in — een kampstaflid, of typ een naam handmatig in (bv. voor een bestuurslid of bezoeker die eenmalig keept). Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
+    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag 2 keepers in — begin te typen om te zoeken in de kampstaf, of typ zelf een naam (bv. een bestuurslid of bezoeker die eenmalig keept). Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
   KAMPdagen.forEach((dag, i) => {
     const k = penKeepersPerDag[i];
     html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
       <div style="font-weight:600;font-size:.85rem;width:110px;flex-shrink:0">${dag}</div>
-      <select onchange="penSetKeeper(${i},0,this.value)" style="flex:1;min-width:120px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
-        <option value="">Keeper 1...</option>
-        ${penKeeperOpties(k[0]).map(l=>`<option value="${l}" ${k[0]===l?'selected':''}>${l}</option>`).join('')}
-      </select>
-      <input type="text" placeholder="of typ een naam..." onchange="penSetKeeper(${i},0,this.value)" style="width:110px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.78rem;color:var(--text)">
-      <select onchange="penSetKeeper(${i},1,this.value)" style="flex:1;min-width:120px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)">
-        <option value="">Keeper 2...</option>
-        ${penKeeperOpties(k[1]).map(l=>`<option value="${l}" ${k[1]===l?'selected':''}>${l}</option>`).join('')}
-      </select>
-      <input type="text" placeholder="of typ een naam..." onchange="penSetKeeper(${i},1,this.value)" style="width:110px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.78rem;color:var(--text)">
+      ${comboVeld(penKeeperOpties(k[0]), {value:k[0], onchange:`penSetKeeper(${i},0,this.value)`, placeholder:'Keeper 1 — kies of typ...', style:'flex:1;min-width:140px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);box-sizing:border-box'})}
+      ${comboVeld(penKeeperOpties(k[1]), {value:k[1], onchange:`penSetKeeper(${i},1,this.value)`, placeholder:'Keeper 2 — kies of typ...', style:'flex:1;min-width:140px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);box-sizing:border-box'})}
       <span style="font-size:.75rem;color:${k[0]&&k[1]?'var(--green)':'var(--muted)'}">
         ${k[0]&&k[1]?`✓ ${k[0]} &amp; ${k[1]}`:'open'}
       </span>
@@ -800,7 +792,7 @@ function renderPenSetup() {
           <option value="">Geen dag gekozen</option>
           ${KAMPdagen.map((dag,i)=>`<option value="${i}" ${vdag===i?'selected':''}>${dag}</option>`).join('')}
         </select>
-        ${vdag!==null?`<span style="font-size:.7rem;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;white-space:nowrap">2× ${KAMPdagen[vdag]}</span>`:''}
+        ${vdag!=null?`<span style="font-size:.7rem;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;white-space:nowrap">2× ${KAMPdagen[vdag]}</span>`:''}
       </div>`;
     });
     html += `</div>`;
@@ -883,7 +875,7 @@ function renderPenInvoer() {
     t.players.forEach(p => {
       const fullName = p.name;
       const verdVandaag = penVerdubbelaar[fullName] === penHuidigeDag;
-      const heeftVerd = penVerdubbelaar[fullName] !== null;
+      const heeftVerd = penVerdubbelaar[fullName] != null; // ook undefined (speler zonder entry na DB-load)
       const bestaand = dagData.pogingen.filter(x => x.spelerNaam === fullName);
       const p1 = bestaand[0] || null;
       const p2 = bestaand[1] || null;
@@ -988,11 +980,7 @@ function penAdminEdit(spelerNaam, dagIdx, shotIdx) {
   document.getElementById('modal-body').innerHTML = `
     <div style="margin-bottom:12px">
       <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Keeper</label>
-      <select id="admin-keeper" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;margin-bottom:6px">
-        <option value="">—</option>
-        ${penKeeperOpties(bestaand?.keeperNaam).map(l=>`<option value="${l}" ${bestaand?.keeperNaam===l?'selected':''}>${l}</option>`).join('')}
-      </select>
-      <input id="admin-keeper-manual" type="text" placeholder="of typ een naam (bv. bezoeker)..." style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text);box-sizing:border-box">
+      ${comboVeld(penKeeperOpties(bestaand?.keeperNaam), {id:'admin-keeper', value:bestaand?.keeperNaam||'', placeholder:'Kies of typ een naam (bv. bezoeker)...', style:'width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text);box-sizing:border-box'})}
     </div>
     <div>
       <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Resultaat</label>
@@ -1008,7 +996,7 @@ function penAdminEdit(spelerNaam, dagIdx, shotIdx) {
 }
 
 function penAdminSave(spelerNaam, dagIdx, shotIdx) {
-  const keeper = document.getElementById('admin-keeper-manual')?.value?.trim() || document.getElementById('admin-keeper').value;
+  const keeper = document.getElementById('admin-keeper')?.value?.trim() || '';
   const goalBtn = document.getElementById('admin-goal');
   const isGoal = goalBtn.className.includes('btn-green') ? true : false;
   const existing = penData[dagIdx].pogingen.filter(p => p.spelerNaam === spelerNaam);
@@ -1053,7 +1041,7 @@ function renderPenSpelers() {
       <div class="rank-name">
         <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:6px"></span>
         ${p.name} <span style="color:var(--muted-light);font-size:.75rem;margin-left:4px">${p.team}</span>
-        ${vdag!==null?`<span style="font-size:.65rem;padding:1px 5px;border-radius:20px;background:#FDF4FF;color:#A21CAF;margin-left:4px">2× ${KAMPdagen[vdag].slice(0,2)}</span>`:''}
+        ${vdag!=null?`<span style="font-size:.65rem;padding:1px 5px;border-radius:20px;background:#FDF4FF;color:#A21CAF;margin-left:4px">2× ${KAMPdagen[vdag].slice(0,2)}</span>`:''}
       </div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(p.pts/max*100)}%"></div></div>
       <div class="rank-pts">${p.pts}pt</div>
@@ -1619,15 +1607,11 @@ function renderPreSpellen(){
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
           <div>
             <label style="font-size:.65rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">LEIDER 1</label>
-            <select style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)" ${!admin?'disabled':''} onchange="preSpellenData[${si}].leider1=this.value;renderPreSchema()">
-              <option value="">Kies leider...</option>${KAMPSTAF.map(l=>`<option value="${l}" ${spel.leider1===l?'selected':''}>${l}</option>`).join('')}
-            </select>
+            ${comboVeld(KAMPSTAF, {value:spel.leider1, disabled:!admin, onchange:`preSpellenData[${si}].leider1=this.value;renderPreSchema()`, placeholder:'Kies of typ leider...', style:'width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);box-sizing:border-box'})}
           </div>
           <div>
             <label style="font-size:.65rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">LEIDER 2</label>
-            <select style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)" ${!admin?'disabled':''} onchange="preSpellenData[${si}].leider2=this.value;renderPreSchema()">
-              <option value="">Kies leider...</option>${KAMPSTAF.map(l=>`<option value="${l}" ${spel.leider2===l?'selected':''}>${l}</option>`).join('')}
-            </select>
+            ${comboVeld(KAMPSTAF, {value:spel.leider2, disabled:!admin, onchange:`preSpellenData[${si}].leider2=this.value;renderPreSchema()`, placeholder:'Kies of typ leider...', style:'width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);box-sizing:border-box'})}
           </div>
         </div>
         <div style="margin-bottom:10px">
@@ -1766,6 +1750,16 @@ function getTeamTotals(){
   return TEAMS.map((t,i)=>{let pts=0;GAME_HISTORY.forEach(g=>{if(g.klassement==='Teamklassement')pts+=g.scores[i];});return{...t,pts};}).sort((a,b)=>b.pts-a.pts);
 }
 const medals=['🥇','🥈','🥉'];
+
+// Typebaar keuzeveld (combobox): tekstveld + <datalist>-suggesties, zodat je kunt zoeken
+// door te typen én kunt kiezen uit de lijst. Vrije namen blijven toegestaan (bv. een
+// bezoeker die eenmalig keept). Gebruikt voor keepers, spelleiders en makers.
+let comboVeldSeq = 0;
+function comboVeld(opties, {value='', onchange='', placeholder='Kies of typ een naam...', style='', disabled=false, id=''} = {}) {
+  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const dlId = `combo-dl-${++comboVeldSeq}`;
+  return `<input type="text" ${id?`id="${id}" `:''}list="${dlId}" value="${esc(value)}" placeholder="${esc(placeholder)}" ${disabled?'disabled ':''}autocomplete="off" style="${style}" onchange="${onchange}"><datalist id="${dlId}">${opties.map(o=>`<option value="${esc(o)}"></option>`).join('')}</datalist>`;
+}
 
 // ── NAV ──────────────────────────────────────────────────────
 function showSection(id,btn){
@@ -2547,14 +2541,11 @@ function renderIndSpellen() {
               <option value="tijd" ${spel.scoreType==='tijd'?'selected':''}>⏱ Tijd (MM:SS.ms)</option>
             </select></div>
           <div><label style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">MAKER</label>
-            <select style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)" onchange="indSpellen[${di}].spellen[${si}].maker=this.value">
-              <option value="">Kies...</option>${KAMPSTAF.map(s=>`<option value="${s}" ${spel.maker===s?'selected':''}>${s}</option>`).join('')}</select></div>
+            ${comboVeld(KAMPSTAF, {value:spel.maker, onchange:`indSpellen[${di}].spellen[${si}].maker=this.value`, placeholder:'Kies of typ...', style:'width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);box-sizing:border-box'})}</div>
           <div><label style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">LEIDER 1 (uitvoering)</label>
-            <select style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)" onchange="indSpellen[${di}].spellen[${si}].leider1=this.value">
-              <option value="">Kies...</option>${KAMPSTAF.map(s=>`<option value="${s}" ${spel.leider1===s?'selected':''}>${s}</option>`).join('')}</select></div>
+            ${comboVeld(KAMPSTAF, {value:spel.leider1, onchange:`indSpellen[${di}].spellen[${si}].leider1=this.value`, placeholder:'Kies of typ...', style:'width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);box-sizing:border-box'})}</div>
           <div><label style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">LEIDER 2 (uitvoering)</label>
-            <select style="width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text)" onchange="indSpellen[${di}].spellen[${si}].leider2=this.value">
-              <option value="">Kies...</option>${KAMPSTAF.map(s=>`<option value="${s}" ${spel.leider2===s?'selected':''}>${s}</option>`).join('')}</select></div>
+            ${comboVeld(KAMPSTAF, {value:spel.leider2, onchange:`indSpellen[${di}].spellen[${si}].leider2=this.value`, placeholder:'Kies of typ...', style:'width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);box-sizing:border-box'})}</div>
         </div>
         <div><label style="font-size:.68rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px">UITLEG (zichtbaar voor leider)</label>
           <textarea placeholder="Regels, benodigdheden, duur..." style="width:100%;padding:7px 9px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);resize:vertical;min-height:52px" onchange="indSpellen[${di}].spellen[${si}].uitleg=this.value">${spel.uitleg}</textarea></div>
@@ -2714,7 +2705,8 @@ function teamSetVeld(i, veld, waarde) {
   const oud = t[veld];
   if(oud === waarde) return;
   t[veld] = waarde;
-  if(veld === 'leader') LEADERS[i] = waarde; // LEADERS is afgeleid — in sync houden
+  if(veld === 'leader') { LEADERS[i] = waarde; herbouwKampstaf(); } // LEADERS/KAMPSTAF zijn afgeleid — in sync houden
+  koppelSpelersAanTeams(); // teamnaam/kleur ook doorvoeren in de spelerslijsten
   logActie('Team aangepast', `${veld}: "${oud}" → "${waarde}"`);
   renderTeams(); renderInstTeams(); renderDashboard(); renderTeamKlassement();
 }
@@ -2739,6 +2731,8 @@ function teamsCsvToepassen() {
     if(r.kleur) t.color = r.kleur;
     aangepast++;
   });
+  herbouwKampstaf();
+  koppelSpelersAanTeams();
   logActie('Teams geïmporteerd', `${aangepast} teams bijgewerkt`);
   showToast(`&#10003; ${aangepast} teams bijgewerkt`);
   renderTeams(); renderInstTeams(); renderDashboard(); renderTeamKlassement();
@@ -4047,6 +4041,23 @@ function instSyncTeams(kampteams, kleurMap) {
     team.players = PLAYERS_ALL.filter(p => p.teamId === teamId).map(p => ({ num: p.num, name: p.name }));
   });
   LEADERS.splice(0, LEADERS.length, ...TEAMS.map(t => t.leader));
+  herbouwKampstaf();
+}
+
+// Houdt de teamkaarten (Teamklassement → Teams) en de speler-afgeleide velden in sync met
+// Kampbeheer: elke speler krijgt de actuele teamnaam/kleur uit TEAMS (op teamId), en
+// TEAMS[i].players wordt herbouwd uit PLAYERS_ALL. Nodig na hydratie uit de database —
+// spelers en teams-meta worden daar los van elkaar geladen, waardoor anders de hardcoded
+// voorbeeldnamen zichtbaar bleven in het Teamklassement.
+function koppelSpelersAanTeams() {
+  PLAYERS_ALL.forEach(p => {
+    const t = TEAMS.find(t => t.id === p.teamId);
+    if(t) { p.team = t.name; p.color = t.color; }
+  });
+  if(PLAYERS_ALL.length === 0) return; // nog geen spelers geladen → teamlijsten laten staan
+  TEAMS.forEach(t => {
+    t.players = PLAYERS_ALL.filter(p => p.teamId === t.id).map(p => ({ num: p.num, name: p.name }));
+  });
 }
 
 function instHuidigeSpelersHtml() {
@@ -4855,7 +4866,8 @@ function _vulObject(obj, v) {
 }
 
 const SYNC_MODULES = {
-  players:          { get: () => PLAYERS_ALL,        set: v => _vulArray(PLAYERS_ALL, v) },
+  players:          { get: () => PLAYERS_ALL,
+                      set: v => { _vulArray(PLAYERS_ALL, v); koppelSpelersAanTeams(); } },
   game_history:     { get: () => GAME_HISTORY,       set: v => _vulArray(GAME_HISTORY, v) },
   vierkamp:         { get: () => VK_RONDES,          set: v => _vulArray(VK_RONDES, v) },
   pen_keepers:      { get: () => penKeepersPerDag,   set: v => _vulObject(penKeepersPerDag, v) },
@@ -4891,6 +4903,8 @@ const SYNC_MODULES = {
                           if(t) { t.name = m.name; t.leader = m.leader; t.color = m.color; }
                         });
                         TEAMS.forEach((t,i) => { LEADERS[i] = t.leader; });
+                        herbouwKampstaf(); // keeper-/leiderslijsten volgen de actuele groepsleiders
+                        koppelSpelersAanTeams();
                       } },
 };
 
