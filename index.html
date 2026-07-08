@@ -350,7 +350,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <!-- PENALTY -->
 <div class="section" id="section-penalty">
   <div class="page-title">Penalty Bokaal</div>
-  <div class="page-sub">Elke dag 2 penalty's per speler op 2 verschillende keepers</div>
+  <div class="page-sub">Per moment 2 penalty's per speler op 2 verschillende keepers — het aantal momenten volgt de planning</div>
   <div class="tab-row" style="margin-bottom:4px">
     <button class="tab spellen-sub-btn" data-sub="spellen" onclick="showSpellenSub('spellen')">&#127918; Overzicht</button>
     <button class="tab spellen-sub-btn" data-sub="preontbijt" onclick="showSpellenSub('preontbijt')">&#9728;&#65039; Pre-ontbijt</button>
@@ -669,20 +669,92 @@ let KAMP_DAGEN = genereerKampDagenLijst(KAMP_META.startDatum, KAMP_META.eindDatu
 const KAMPdagen = KAMP_DAGEN.map(d => d.label);
 const LEADERS = TEAMS.map(t => t.leader);
 
-// Keepers per dag: dagIndex → [keeper1, keeper2]. Elke keeper mag een bestaand kampstaflid
-// zijn óf een vrij ingetypte naam (bv. een bestuurslid of bezoeker die eenmalig keept).
+// Keepers per moment: momentIndex → [keeper1, keeper2]. Elke keeper mag een bestaand
+// kampstaflid zijn óf een vrij ingetypte naam (bv. een bestuurslid die eenmalig keept).
 const penKeepersPerDag = {};
 KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = ['','']; });
 
-// Verdubbelaar: spelerNaam → dagIndex (0-4) | null
+// Verdubbelaar: spelerNaam → momentIndex | null
 const penVerdubbelaar = {};
 PLAYERS_ALL.forEach(p => { penVerdubbelaar[p.name] = null; });
 
-// Pogingen: dagIndex → [ {spelerNaam, keeperNaam, goal:bool|null, verdubbelaar:bool} ]
+// Pogingen: momentIndex → [ {spelerNaam, keeperNaam, goal:bool|null, verdubbelaar:bool} ]
 const penData = KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: false }));
 
-// Huidige dag voor invoer
+// Huidig moment voor invoer
 let penHuidigeDag = 0;
+
+// ── PENALTY MOMENTEN (gekoppeld aan de planning) ──────────────
+// Elke niet-vervallen planning-activiteit met label 'Penalty' (behalve de finale — die
+// heeft een eigen tabblad met eigen keeperkeuze) is één Penalty Bokaal-moment. Het aantal
+// momenten — en dus het aantal in te stellen keeperparen en invoertabs — beweegt
+// automatisch mee wanneer je momenten aan de planning toevoegt of eruit haalt.
+let penMomentenLijst = [];   // [{di, ai, dag, time, naam, label}]
+let penDagHandmatig = false; // gebruiker koos zelf een moment-tab (dan niet meer auto-volgen)
+
+function penIsFinaleActiviteit(a) { return /finale/i.test(a.name || ''); }
+
+function penBerekenMomenten() {
+  const momenten = [];
+  planningData.forEach((day, di) => {
+    day.acts.forEach((a, ai) => {
+      if(a.vervallen || a.klassement !== 'Penalty' || penIsFinaleActiviteit(a)) return;
+      momenten.push({ di, ai, dag: day.day, time: a.time, naam: a.name });
+    });
+  });
+  // Bij meerdere momenten op dezelfde dag onderscheidt de tijd de tabbladen.
+  momenten.forEach(m => {
+    m.label = momenten.filter(x => x.dag === m.dag).length > 1 ? `${m.dag} · ${m.time}` : m.dag;
+  });
+  return momenten;
+}
+
+// Brengt penData/penKeepersPerDag in lijn met de planning-momenten. Bestaande invoer wordt
+// per daglabel hergebruikt zodat scores/keepers netjes meeschuiven als er een moment bij
+// komt of af gaat; verdubbelaar-keuzes verhuizen mee (of vervallen als hun moment weg is).
+// Zonder Penalty-momenten in de planning blijft de bestaande data onaangeroerd bewaard
+// (zodat "planning leegmaken" vóór een her-import geen scores wist).
+function penSyncMetPlanning() {
+  const momenten = penBerekenMomenten();
+  penMomentenLijst = momenten;
+  if(momenten.length === 0) return;
+
+  const zelfde = momenten.length === penData.length && momenten.every((m, i) => penData[i]?.dag === m.dag);
+  if(!zelfde) {
+    const oudData = penData.slice();
+    const oudKeepers = {...penKeepersPerDag};
+    const gebruikt = new Set();
+    const oudNaarNieuw = {};
+    const nieuwData = [], nieuwKeepers = {};
+    momenten.forEach((mom, i) => {
+      const oudIdx = oudData.findIndex((d, j) => !gebruikt.has(j) && d && d.dag === mom.dag);
+      if(oudIdx >= 0) {
+        gebruikt.add(oudIdx);
+        oudNaarNieuw[oudIdx] = i;
+        nieuwData.push(oudData[oudIdx]);
+        nieuwKeepers[i] = oudKeepers[oudIdx] || ['',''];
+      } else {
+        nieuwData.push({ dag: mom.dag, pogingen: [], opgeslagen: false });
+        nieuwKeepers[i] = ['',''];
+      }
+    });
+    penData.splice(0, penData.length, ...nieuwData);
+    Object.keys(penKeepersPerDag).forEach(k => delete penKeepersPerDag[k]);
+    Object.assign(penKeepersPerDag, nieuwKeepers);
+    Object.keys(penVerdubbelaar).forEach(naam => {
+      const v = penVerdubbelaar[naam];
+      if(v != null) penVerdubbelaar[naam] = oudNaarNieuw[v] !== undefined ? oudNaarNieuw[v] : null;
+    });
+  }
+  if(penHuidigeDag >= momenten.length) penHuidigeDag = momenten.length - 1;
+  if(!penDagHandmatig) {
+    const stdLabel = KAMP_DAGEN[standaardKampDagIndex()]?.label;
+    const idx = momenten.findIndex(m => m.dag === stdLabel);
+    if(idx >= 0) penHuidigeDag = idx;
+  }
+}
+
+function penMomentLabel(i) { return penMomentenLijst[i]?.label || penData[i]?.dag || `Moment ${i+1}`; }
 
 // Finale config
 const penFinale = {
@@ -744,6 +816,7 @@ function penKwalificeerden() {
 
 // ── RENDER PENALTY ────────────────────────────────────────────
 function renderPenalty() {
+  penSyncMetPlanning();
   renderPenSetup();
   renderPenInvoer();
   renderPenSpelers();
@@ -757,12 +830,20 @@ function renderPenSetup() {
   const el = document.getElementById('pen-setup');
   if(!el) return;
 
-  // Keepers per dag
+  if(penMomentenLijst.length === 0) {
+    el.innerHTML = `<div class="alert alert-warning">⚠️ Geen Penalty Bokaal-momenten gevonden in de planning.
+      Voeg activiteiten met het label <strong>Penalty</strong> toe aan de planning — elk moment krijgt hier
+      automatisch een eigen keeperinstelling en invoertab. Eerder ingevoerde penalty-data blijft bewaard.</div>`;
+    return;
+  }
+
+  // Keepers per moment (aantal volgt de planning)
   let html = `<div class="card" style="margin-bottom:12px">
-    <div class="card-title">🧤 Keepers instellen per dag</div>
-    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag 2 keepers in — begin te typen om te zoeken in de kampstaf, of typ zelf een naam (bv. een bestuurslid of bezoeker die eenmalig keept). Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
-  KAMPdagen.forEach((dag, i) => {
-    const k = penKeepersPerDag[i];
+    <div class="card-title">🧤 Keepers instellen per moment</div>
+    <div class="alert alert-info" style="margin-bottom:12px">De planning bevat <strong>${penMomentenLijst.length} Penalty Bokaal-moment${penMomentenLijst.length===1?'':'en'}</strong> — dit aantal beweegt automatisch mee met de planning. Stel per moment 2 keepers in — begin te typen om te zoeken in de kampstaf, of typ zelf een naam (bv. een bestuurslid of bezoeker die eenmalig keept). Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
+  penData.forEach((dagData, i) => {
+    const dag = penMomentLabel(i);
+    const k = penKeepersPerDag[i] || (penKeepersPerDag[i] = ['','']);
     html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
       <div style="font-weight:600;font-size:.85rem;width:110px;flex-shrink:0">${dag}</div>
       ${comboVeld(penKeeperOpties(k[0]), {value:k[0], onchange:`penSetKeeper(${i},0,this.value)`, placeholder:'Keeper 1 — kies of typ...', style:'flex:1;min-width:140px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);box-sizing:border-box'})}
@@ -777,7 +858,7 @@ function renderPenSetup() {
   // Verdubbelaar per speler
   html += `<div class="card" style="margin-bottom:12px">
     <div class="card-title">🎯 Verdubbelaar instellen — begin van de week</div>
-    <div class="alert alert-warning" style="margin-bottom:12px">Elke speler kiest 1 dag waarop zijn goals dubbel tellen. Stel dit aan het begin van de week in.</div>`;
+    <div class="alert alert-warning" style="margin-bottom:12px">Elke speler kiest 1 moment waarop zijn goals dubbel tellen. Stel dit aan het begin van de week in.</div>`;
   TEAMS.forEach(t => {
     html += `<div style="margin-bottom:10px">
       <div style="font-weight:700;font-size:.85rem;color:${t.color};margin-bottom:6px">
@@ -789,10 +870,10 @@ function renderPenSetup() {
         <span style="font-family:'DM Mono',monospace;color:var(--accent);font-size:.78rem;width:24px">#${p.num}</span>
         <span style="font-weight:600;font-size:.85rem;flex:1">${p.name}</span>
         <select onchange="penSetVerdubbelaarSetup('${p.name}',this.value)" style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.8rem;color:var(--text)">
-          <option value="">Geen dag gekozen</option>
-          ${KAMPdagen.map((dag,i)=>`<option value="${i}" ${vdag===i?'selected':''}>${dag}</option>`).join('')}
+          <option value="">Geen moment gekozen</option>
+          ${penData.map((_,i)=>`<option value="${i}" ${vdag===i?'selected':''}>${penMomentLabel(i)}</option>`).join('')}
         </select>
-        ${vdag!=null?`<span style="font-size:.7rem;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;white-space:nowrap">2× ${KAMPdagen[vdag]}</span>`:''}
+        ${vdag!=null?`<span style="font-size:.7rem;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;white-space:nowrap">2× ${penMomentLabel(vdag)}</span>`:''}
       </div>`;
     });
     html += `</div>`;
@@ -819,13 +900,13 @@ function renderPenSetup() {
 function penSetKeeper(dagIdx, slot, val) {
   penKeepersPerDag[dagIdx][slot] = val;
   const k = penKeepersPerDag[dagIdx];
-  if(k[0] && k[1]) showToast(`✓ Keepers ${KAMPdagen[dagIdx]}: ${k[0]} & ${k[1]}`);
+  if(k[0] && k[1]) showToast(`✓ Keepers ${penMomentLabel(dagIdx)}: ${k[0]} & ${k[1]}`);
   renderPenSetup();
 }
 
 function penSetVerdubbelaarSetup(naam, val) {
   penVerdubbelaar[naam] = val === '' ? null : parseInt(val);
-  if(val !== '') showToast(`✓ ${naam}: verdubbelaar op ${KAMPdagen[parseInt(val)]}`);
+  if(val !== '') showToast(`✓ ${naam}: verdubbelaar op ${penMomentLabel(parseInt(val))}`);
   else showToast(`✓ ${naam}: verdubbelaar verwijderd`);
   // Update bestaande pogingen
   penData.forEach((dag, i) => {
@@ -840,26 +921,30 @@ function penSetVerdubbelaarSetup(naam, val) {
 function renderPenInvoer() {
   const el = document.getElementById('pen-invoer');
   if(!el) return;
+  if(penMomentenLijst.length === 0) {
+    el.innerHTML = `<div class="alert alert-warning">⚠️ Geen Penalty Bokaal-momenten in de planning — voeg activiteiten met het label <strong>Penalty</strong> toe.</div>`;
+    return;
+  }
 
   let html = `<div class="card" style="margin-bottom:12px">
-    <div class="card-title">Dag selecteren</div>
+    <div class="card-title">Moment selecteren</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">`;
-  KAMPdagen.forEach((dag, i) => {
-    const done = penData[i].opgeslagen;
+  penData.forEach((d, i) => {
+    const done = d.opgeslagen;
     const active = i === penHuidigeDag;
-    html += `<button class="btn ${active?'btn-primary':'btn-outline'}" style="font-size:.78rem;padding:6px 12px" onclick="penSetDag(${i})">${dag}${done?' ✓':''}</button>`;
+    html += `<button class="btn ${active?'btn-primary':'btn-outline'}" style="font-size:.78rem;padding:6px 12px" onclick="penSetDag(${i})">${penMomentLabel(i)}${done?' ✓':''}</button>`;
   });
   html += `</div></div>`;
 
   const dagData = penData[penHuidigeDag];
-  const keepers = penKeepersPerDag[penHuidigeDag];
+  const keepers = penKeepersPerDag[penHuidigeDag] || (penKeepersPerDag[penHuidigeDag] = ['','']);
   const keeper1 = keepers[0] || '?';
   const keeper2 = keepers[1] || '?';
   const keepersOk = keepers[0] && keepers[1];
   const opgeslagen = dagData.opgeslagen;
 
   html += `<div class="alert ${keepersOk?'alert-info':'alert-warning'}">
-    📅 <strong>${KAMPdagen[penHuidigeDag]}</strong> —
+    📅 <strong>${penMomentLabel(penHuidigeDag)}</strong> —
     Keeper 1: <strong>${keeper1}</strong> · Keeper 2: <strong>${keeper2}</strong>
     ${!keepersOk?'<br>⚠️ Stel eerst de keepers in via het ⚙️ Instellen tabblad.':''}
   </div>`;
@@ -887,7 +972,7 @@ function renderPenInvoer() {
           <span style="font-family:'DM Mono',monospace;color:var(--accent);font-size:.8rem">#${p.num}</span>
           <span style="font-weight:700;font-size:.88rem;flex:1">${fullName}</span>
           ${verdVandaag?`<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;border:1px solid #F0ABFC">2× vandaag</span>`:''}
-          ${heeftVerd&&!verdVandaag?`<span style="font-size:.7rem;color:var(--muted-light)">2× op ${KAMPdagen[penVerdubbelaar[fullName]]}</span>`:''}
+          ${heeftVerd&&!verdVandaag?`<span style="font-size:.7rem;color:var(--muted-light)">2× op ${penMomentLabel(penVerdubbelaar[fullName])}</span>`:''}
           <span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700">${dagPts}pt · ${totPts}pt tot</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -906,7 +991,7 @@ function renderPenInvoer() {
     </div>`;
   } else {
     html += `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <div class="alert alert-success" style="margin:0;flex:1">✓ ${KAMPdagen[penHuidigeDag]} opgeslagen.</div>
+      <div class="alert alert-success" style="margin:0;flex:1">✓ ${penMomentLabel(penHuidigeDag)} opgeslagen.</div>
       <button class="btn btn-outline" style="font-size:.78rem" onclick="penHeropen(${penHuidigeDag})">🔓 Heropenen (admin)</button>
     </div>`;
   }
@@ -976,7 +1061,7 @@ function penAdminEdit(spelerNaam, dagIdx, shotIdx) {
   const keepers = penKeepersPerDag[dagIdx];
 
   document.getElementById('modal-title').textContent = `Aanpassen: ${spelerNaam}`;
-  document.getElementById('modal-sub').textContent = `Penalty ${shotIdx+1} · ${KAMPdagen[dagIdx]}`;
+  document.getElementById('modal-sub').textContent = `Penalty ${shotIdx+1} · ${penMomentLabel(dagIdx)}`;
   document.getElementById('modal-body').innerHTML = `
     <div style="margin-bottom:12px">
       <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Keeper</label>
@@ -1006,22 +1091,22 @@ function penAdminSave(spelerNaam, dagIdx, shotIdx) {
   }
   closeModal();
   showToast('✓ Penalty aangepast!');
-  logActie('Penalty aangepast', `${spelerNaam} · ${KAMPdagen[dagIdx]}`);
+  logActie('Penalty aangepast', `${spelerNaam} · ${penMomentLabel(dagIdx)}`);
   renderPenalty();
 }
 
-function penSetDag(idx) { penHuidigeDag = idx; renderPenInvoer(); }
+function penSetDag(idx) { penHuidigeDag = idx; penDagHandmatig = true; renderPenInvoer(); }
 
 function penOpslaanDag(blijftBewerkbaar) {
   if(!blijftBewerkbaar) penData[penHuidigeDag].opgeslagen = true;
-  showToast(`✓ ${KAMPdagen[penHuidigeDag]} opgeslagen!`);
-  logActie('Penalty dag opgeslagen', KAMPdagen[penHuidigeDag]);
+  showToast(`✓ ${penMomentLabel(penHuidigeDag)} opgeslagen!`);
+  logActie('Penalty moment opgeslagen', penMomentLabel(penHuidigeDag));
   renderPenalty();
 }
 
 function penHeropen(dagIdx) {
   penData[dagIdx].opgeslagen = false;
-  showToast(`🔓 ${KAMPdagen[dagIdx]} heropend`);
+  showToast(`🔓 ${penMomentLabel(dagIdx)} heropend`);
   renderPenInvoer();
 }
 
@@ -1041,7 +1126,7 @@ function renderPenSpelers() {
       <div class="rank-name">
         <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:6px"></span>
         ${p.name} <span style="color:var(--muted-light);font-size:.75rem;margin-left:4px">${p.team}</span>
-        ${vdag!=null?`<span style="font-size:.65rem;padding:1px 5px;border-radius:20px;background:#FDF4FF;color:#A21CAF;margin-left:4px">2× ${KAMPdagen[vdag].slice(0,2)}</span>`:''}
+        ${vdag!=null?`<span style="font-size:.65rem;padding:1px 5px;border-radius:20px;background:#FDF4FF;color:#A21CAF;margin-left:4px">2× ${penMomentLabel(vdag).slice(0,2)}</span>`:''}
       </div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(p.pts/max*100)}%"></div></div>
       <div class="rank-pts">${p.pts}pt</div>
@@ -1057,10 +1142,10 @@ function renderPenKeepers() {
   const alleKeeperNamen = [...new Set([...KAMPSTAF, ...penData.flatMap(d => d.pogingen.map(p => p.keeperNaam)).filter(Boolean)])];
   const keeperStats = alleKeeperNamen.map(naam => {
     let totGoals=0, totPogingen=0;
-    const perDag = KAMPdagen.map((dag,i)=>{
+    const perDag = penData.map((_,i)=>{
       const {goals,total}=penDagTegengoalsKeeper(naam,i);
       totGoals+=goals; totPogingen+=total;
-      return {dag,goals,total};
+      return {dag:penMomentLabel(i),goals,total};
     });
     return {naam,totGoals,totPogingen,perDag};
   }).sort((a,b)=>a.totGoals-b.totGoals);
@@ -1076,7 +1161,7 @@ function renderPenKeepers() {
         <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--red)">${k.totGoals} tegen</span>
         <span style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--green)">${pct}% gestopt</span>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px">
+      <div style="display:grid;grid-template-columns:repeat(${Math.max(k.perDag.length,1)},1fr);gap:4px">
         ${k.perDag.map(d=>`<div style="text-align:center;background:var(--bg3);border-radius:5px;padding:5px 2px;font-size:.72rem">
           <div style="color:var(--muted);margin-bottom:2px">${d.dag.slice(0,2)}</div>
           <div style="font-weight:700;color:${d.total===0?'var(--muted-light)':d.goals===0?'var(--green)':'var(--red)'}">${d.total===0?'—':`${d.goals}/${d.total}`}</div>
@@ -1092,11 +1177,11 @@ function renderPenHistorie() {
   const el = document.getElementById('pen-historie');
   if(!el) return;
   let html = '';
-  KAMPdagen.forEach((dag,dagIdx)=>{
-    const dagData=penData[dagIdx];
+  penData.forEach((dagData,dagIdx)=>{
+    const dag=penMomentLabel(dagIdx);
     const goals=dagData.pogingen.filter(p=>p.goal).length;
     const n=dagData.pogingen.length;
-    const keepers=penKeepersPerDag[dagIdx];
+    const keepers=penKeepersPerDag[dagIdx]||['',''];
     html += `<div class="day-header">📅 ${dag} <span style="font-size:.75rem;font-weight:400;color:var(--muted);letter-spacing:0">${dagData.opgeslagen?'✓':'open'} · ${goals}/${n} goals · 🧤 ${keepers[0]||'?'} &amp; ${keepers[1]||'?'}</span></div>`;
     if(n===0){
       html+=`<div style="font-size:.83rem;color:var(--muted);padding:8px 12px">Nog geen pogingen.</div>`;
@@ -1821,6 +1906,7 @@ function heroGradientVoorThema(thema) {
 }
 
 function renderDashboard(){
+  penSyncMetPlanning(); // penData in lijn met de planning (nodig voor "Nog af te ronden")
   const heroDay = document.getElementById('hero-day');
   if(heroDay) heroDay.textContent = KAMP_META.naam.toUpperCase();
   const heroSub = document.getElementById('hero-sub');
@@ -1907,7 +1993,11 @@ function planningActiviteitAfgerond(a, di) {
     const dagIdx = IND_DAGEN.indexOf(planningData[di].day);
     return dagIdx>=0 && indSpellen[dagIdx].spellen.every(s => s.opgeslagen);
   }
-  if(kl === 'Penalty') return !!penData[di]?.opgeslagen;
+  if(kl === 'Penalty') {
+    if(penIsFinaleActiviteit(a)) return true; // finale wordt via het Finale-tabblad afgehandeld
+    const idx = penMomentenLijst.findIndex(m => m.di === di && planningData[di]?.acts[m.ai] === a);
+    return idx >= 0 ? !!penData[idx]?.opgeslagen : true;
+  }
   if(kl === 'Vierkamp') {
     const rondesVanDag = VK_RONDES.filter(r => r.dag === planningData[di].day || r.dag === KAMP_DAGEN[di]?.weekdag);
     return rondesVanDag.length > 0 && rondesVanDag.every(r => r.afgesloten);
@@ -4475,10 +4565,12 @@ function toepassenKampDagen(start, eind) {
   // IND_DAGEN === KAMPdagen (zelfde array) — automatisch mee bijgewerkt.
 
   planningData.splice(0, planningData.length, ...genereerPlanningData());
+  // Penalty-momenten volgen de (zojuist herbouwde) planning
   Object.keys(penKeepersPerDag).forEach(k => delete penKeepersPerDag[k]);
-  KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = ['','']; });
-  penData.splice(0, penData.length, ...KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: false })));
+  penData.splice(0, penData.length);
   penHuidigeDag = 0;
+  penDagHandmatig = false;
+  penSyncMetPlanning();
   preSpellenData.splice(0, preSpellenData.length, ...genereerPreSpellenData());
   preHuidigeDag = standaardKampDagIndex();
   indSpellen.splice(0, indSpellen.length, ...genereerIndSpellen());
@@ -4863,9 +4955,10 @@ function exportExcel(type) {
   }
   else if(type === 'penalty') {
     filename = 'penalty_bokaal.xlsx';
-    rows = [['Speler','Team', ...KAMPdagen, 'Totaal']];
+    penSyncMetPlanning();
+    rows = [['Speler','Team', ...penData.map((_,i) => penMomentLabel(i)), 'Totaal']];
     PLAYERS_ALL.forEach(p => {
-      const dagPts = KAMPdagen.map((_,i) => penDagTotaalSpeler(p.name, i));
+      const dagPts = penData.map((_,i) => penDagTotaalSpeler(p.name, i));
       rows.push([p.name, p.team, ...dagPts, penTotaalSpeler(p.name)]);
     });
   }
