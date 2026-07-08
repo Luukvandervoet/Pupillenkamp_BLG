@@ -608,6 +608,7 @@ async function doLogin() {
     return;
   }
   huidigeGebruiker = user;
+  sessieBewaren(user);
   document.getElementById('login-overlay').style.display = 'none';
   document.getElementById('login-err').style.display = 'none';
   updateGebruikerDisplay();
@@ -617,11 +618,40 @@ async function doLogin() {
 
 function doLogout() {
   huidigeGebruiker = null;
+  sessieWissen();
   document.getElementById('login-email').value = '';
   document.getElementById('login-pass').value = '';
   document.getElementById('login-overlay').style.display = 'flex';
   document.getElementById('gebruiker-info').innerHTML = '';
   document.title = 'Pupillenkamp';
+}
+
+// ── SESSIE ONTHOUDEN (blijf ingelogd na F5/herladen) ──────────
+// We bewaren alleen de login-naam in localStorage, nooit het wachtwoord of de hash. Bij het
+// herladen zoeken we die login weer op in LEIDERS en loggen we automatisch in. Dit is bewust
+// licht beveiligd (net als de rest van de app): iedereen met toegang tot dit apparaat blijft
+// ingelogd. Op een gedeeld/openbaar apparaat kun je beter op "Uitloggen" klikken.
+const SESSIE_SLEUTEL = 'pk_sessie';
+function sessieBewaren(user) {
+  try { localStorage.setItem(SESSIE_SLEUTEL, JSON.stringify({ login: user.login })); } catch(e) {}
+}
+function sessieWissen() {
+  try { localStorage.removeItem(SESSIE_SLEUTEL); } catch(e) {}
+}
+// Probeert een bewaarde sessie te herstellen tegen de huidige LEIDERS-lijst. Een inactief of
+// verwijderd account wordt genegeerd (en de bewaarde sessie opgeruimd). Geeft true bij succes.
+function herstelSessie() {
+  let data;
+  try { data = JSON.parse(localStorage.getItem(SESSIE_SLEUTEL) || 'null'); } catch(e) { data = null; }
+  if(!data || !data.login) return false;
+  const user = LEIDERS.find(u => u.login === data.login);
+  if(!user || user.actief === false) { sessieWissen(); return false; }
+  huidigeGebruiker = user;
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('login-err').style.display = 'none';
+  updateGebruikerDisplay();
+  renderDashboard();
+  return true;
 }
 
 function updateGebruikerDisplay() {
@@ -5366,6 +5396,9 @@ preHuidigeDag = standaardKampDagIndex();
 indHuidigeDag = standaardKampDagIndex();
 // Keuzelijsten meteen filteren op actieve leiders/kampstaf.
 herbouwKampstaf();
+// Bewaarde sessie herstellen zodat je na F5/herladen ingelogd blijft (tegen de vaste
+// LEIDERS-lijst; na het laden uit Supabase wordt dit nog eens tegen de DB gecontroleerd).
+herstelSessie();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -5557,6 +5590,14 @@ async function syncHydrate() {
   toonSyncStatus('ok');
   // Modules die nog niet in de DB stonden: eerste snapshot wegschrijven
   syncDiffSave();
+  // Bewaarde sessie herbevestigen tegen de zojuist geladen LEIDERS-lijst uit de DB: het
+  // account kan intussen op afstand gewijzigd (rol/team) of op inactief gezet zijn.
+  if (huidigeGebruiker) {
+    const vers = LEIDERS.find(u => u.login === huidigeGebruiker.login);
+    if (!vers || vers.actief === false) { doLogout(); return; }
+    huidigeGebruiker = vers;
+    updateGebruikerDisplay();
+  }
   // UI verversen met de geladen data
   if (huidigeGebruiker) herRenderActieveSectie();
 
