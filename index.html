@@ -539,7 +539,17 @@ async function doLogin() {
   const pass = document.getElementById('login-pass').value;
   const hash = await hashWachtwoord(pass);
   const user = LEIDERS.find(u => u.login === login && u.wachtwoordHash === hash);
-  if(!user) { document.getElementById('login-err').style.display = 'block'; return; }
+  const errEl = document.getElementById('login-err');
+  if(!user) {
+    errEl.textContent = '⚠️ Ongeldige gebruikersnaam of wachtwoord';
+    errEl.style.display = 'block';
+    return;
+  }
+  if(user.actief === false) {
+    errEl.textContent = '⚠️ Dit account staat op inactief — vraag de admin om het te heractiveren';
+    errEl.style.display = 'block';
+    return;
+  }
   huidigeGebruiker = user;
   document.getElementById('login-overlay').style.display = 'none';
   document.getElementById('login-err').style.display = 'none';
@@ -2395,6 +2405,18 @@ function setInactief(naam, val) {
 const EXTRA_STAF = ['Kampleiding']; // ← pas aan naar echte namen, of beheer via Teams → Kampstaf
 const KAMPSTAF = [...LEADERS, ...EXTRA_STAF]; // wordt dynamisch bijgehouden
 
+// Inactieve kampstaf-namen: blijven in EXTRA_STAF/LEADERS staan (historische koppelingen aan
+// spellen/planning blijven intact) maar verschijnen niet meer in keuzelijsten. Leider-accounts
+// die op inactief staan (Kampbeheer → Leiders) worden op naam ook uit de lijsten gefilterd.
+const INACTIEVE_STAF = new Set();
+function stafNaamActief(naam) {
+  if(!naam) return false;
+  if(INACTIEVE_STAF.has(naam)) return false;
+  const zoek = String(naam).trim().toLowerCase();
+  return !LEIDERS.some(l => l.actief === false &&
+    (leiderNaam(l).toLowerCase() === zoek || (l.voornaam||'').toLowerCase() === zoek));
+}
+
 // ── INDIVIDUEEL DATA ──────────────────────────────────────────
 const IND_GROEPEN = [
   { id:1, naam:'Groep A', spelers:[] },
@@ -2867,10 +2889,12 @@ function renderTeamsStaf(){
     <div style="display:flex;flex-wrap:wrap;gap:6px">`;
   LEADERS.forEach((l,i) => {
     const t = TEAMS[i];
-    html += `<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.83rem">
+    const inactief = !stafNaamActief(l);
+    html += `<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.83rem;${inactief?'opacity:.5':''}">
       <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.color}"></span>
-      <span style="font-weight:600">${l}</span>
+      <span style="font-weight:600;${inactief?'text-decoration:line-through':''}">${l}</span>
       <span style="color:var(--muted-light);font-size:.75rem">${t.name}</span>
+      ${inactief?'<span style="font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--red-bg);color:var(--red)">inactief</span>':''}
     </div>`;
   });
   html += `</div></div>
@@ -2880,8 +2904,10 @@ function renderTeamsStaf(){
     <div style="margin-bottom:10px" id="extra-staf-lijst">`;
 
   EXTRA_STAF.forEach((naam, i) => {
-    html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
-      <span style="flex:1;font-weight:600;font-size:.88rem">&#128100; ${naam}</span>
+    const inactief = INACTIEVE_STAF.has(naam);
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);${inactief?'opacity:.55':''}">
+      <span style="flex:1;font-weight:600;font-size:.88rem;${inactief?'text-decoration:line-through':''}">&#128100; ${naam}</span>
+      <button onclick="stafZetInactief('${naam.replace(/'/g,"\\'")}',${inactief?'false':'true'})" style="padding:3px 10px;border-radius:20px;border:1px solid ${inactief?'#FECACA':'#A7F3D0'};background:${inactief?'var(--red-bg)':'var(--green-bg)'};color:${inactief?'var(--red)':'var(--green)'};font-size:.72rem;font-weight:700;cursor:pointer">${inactief?'Inactief':'Actief'}</button>
       <button onclick="stafVerwijder(${i})" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;font-size:.75rem;color:var(--red);cursor:pointer">Verwijder</button>
     </div>`;
   });
@@ -2912,9 +2938,20 @@ function stafToevoegen() {
 }
 
 function stafVerwijder(idx) {
+  INACTIEVE_STAF.delete(EXTRA_STAF[idx]);
   EXTRA_STAF.splice(idx, 1);
   herbouwKampstaf();
   renderTeamsStaf();
+}
+
+// Kampstaflid op inactief zetten: naam blijft bestaan (historische koppelingen intact) maar
+// verdwijnt uit alle keuzelijsten (keepers, spelleiders, planning-leiders).
+function stafZetInactief(naam, inactief) {
+  if(inactief) INACTIEVE_STAF.add(naam); else INACTIEVE_STAF.delete(naam);
+  herbouwKampstaf();
+  logActie(inactief ? 'Kampstaflid op inactief gezet' : 'Kampstaflid geheractiveerd', naam);
+  showToast(`&#10003; ${naam} is nu ${inactief?'inactief':'actief'}`);
+  renderTeamsStaf(); renderInstKampstaf();
 }
 
 function showTeamModal(id){
@@ -4489,27 +4526,37 @@ function labelVerwijder(i) {
 function renderInstLeiders() {
   const el = document.getElementById('inst-leiders');
   if(!el) return;
+  LEIDERS.forEach(l => { if(l.actief === undefined) l.actief = true; }); // migratie oudere data
+  const nInactief = LEIDERS.filter(l => l.actief === false).length;
   let html = `<div class="alert alert-info" style="margin-bottom:12px">
     Elke kampleider heeft een eigen account. Gebruikersnaam = voornaam+achternaam aan elkaar
     (automatisch bepaald). Wachtwoorden worden alleen als hash opgeslagen, nooit in platte tekst.
+    Een <strong>inactieve</strong> leider hoeft niet verwijderd te worden: het account kan niet
+    meer inloggen en de naam verdwijnt uit keuzelijsten (spellen, keepers, planning), maar alle
+    bestaande koppelingen aan eerdere spellen en scores blijven gewoon staan.
   </div>
   <div class="card" style="margin-bottom:12px">
-    <div class="card-title">Leiders (${LEIDERS.length})</div>
+    <div class="card-title">Leiders (${LEIDERS.length}${nInactief?` · ${nInactief} inactief`:''})</div>
     <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.82rem">
       <thead><tr style="background:var(--bg2)">
         <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Naam</th>
         <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Login</th>
         <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Rol</th>
         <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Team</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Status</th>
         <th style="padding:6px 8px"></th>
       </tr></thead><tbody>`;
   LEIDERS.forEach((l,i) => {
     const teamNaam = l.teamId ? (TEAMS.find(t=>t.id===l.teamId)?.name || '—') : '—';
-    html += `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}">
-      <td style="padding:6px 8px;font-weight:600">${leiderNaam(l)}</td>
+    const inactief = l.actief === false;
+    html += `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}${inactief?';opacity:.55':''}">
+      <td style="padding:6px 8px;font-weight:600;${inactief?'text-decoration:line-through':''}">${leiderNaam(l)}</td>
       <td style="padding:6px 8px;font-family:'DM Mono',monospace;color:var(--muted)">${l.login}</td>
       <td style="padding:6px 8px"><span class="rol-badge rol-${l.rol}">${l.rol==='admin'?'Admin':l.rol==='groepsleider'?'Groepsleider':'Kampstaf'}</span></td>
       <td style="padding:6px 8px;color:var(--muted)">${teamNaam}</td>
+      <td style="padding:6px 8px">
+        <button onclick="leiderToggleActief(${i})" style="padding:3px 10px;border-radius:20px;border:1px solid ${inactief?'#FECACA':'#A7F3D0'};background:${inactief?'var(--red-bg)':'var(--green-bg)'};color:${inactief?'var(--red)':'var(--green)'};font-size:.72rem;font-weight:700;cursor:pointer">${inactief?'Inactief':'Actief'}</button>
+      </td>
       <td style="padding:6px 8px;text-align:right"><button onclick="leiderBewerken(${i})" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;font-size:.75rem;color:var(--muted);cursor:pointer">Bewerken</button></td>
     </tr>`;
   });
@@ -4517,6 +4564,20 @@ function renderInstLeiders() {
     <div style="margin-top:10px"><button class="btn btn-primary" style="font-size:.82rem" onclick="leiderNieuw()">&#43; Nieuwe leider</button></div>
   </div>`;
   el.innerHTML = html;
+}
+
+function leiderToggleActief(i) {
+  const l = LEIDERS[i];
+  const naarInactief = l.actief !== false;
+  if(naarInactief && l.rol === 'admin' && LEIDERS.filter(x => x.rol === 'admin' && x.actief !== false).length <= 1) {
+    showToast('&#9888; Je kunt de laatste actieve admin niet op inactief zetten');
+    return;
+  }
+  l.actief = !naarInactief;
+  herbouwKampstaf();
+  logActie(naarInactief ? 'Leider op inactief gezet' : 'Leider geheractiveerd', leiderNaam(l));
+  showToast(`&#10003; ${leiderNaam(l)} is nu ${naarInactief?'inactief':'actief'}`);
+  renderInstLeiders(); renderTeamsStaf();
 }
 
 function leiderNieuw() {
@@ -4560,7 +4621,7 @@ async function leiderNieuwOpslaan() {
   const login = leiderLogin(voornaam, achternaam);
   if(LEIDERS.some(l => l.login === login)) { showToast('&#9888; Deze gebruikersnaam bestaat al'); return; }
   const wachtwoordHash = await hashWachtwoord(wachtwoord);
-  LEIDERS.push({id: LEIDERS_NEXT_ID++, voornaam, achternaam, login, wachtwoordHash, rol, teamId});
+  LEIDERS.push({id: LEIDERS_NEXT_ID++, voornaam, achternaam, login, wachtwoordHash, rol, teamId, actief: true});
   closeModal();
   logActie('Leider aangemaakt', `${voornaam} ${achternaam}`.trim());
   showToast(`&#10003; ${voornaam} toegevoegd als leider`);
@@ -4603,7 +4664,7 @@ function leiderBewerken(i) {
 async function leiderBewerkenOpslaan(i) {
   const l = LEIDERS[i];
   const nieuweRol = document.getElementById('ln-rol')?.value || l.rol;
-  const isLaatsteAdmin = l.rol === 'admin' && nieuweRol !== 'admin' && LEIDERS.filter(x => x.rol === 'admin').length <= 1;
+  const isLaatsteAdmin = l.rol === 'admin' && nieuweRol !== 'admin' && LEIDERS.filter(x => x.rol === 'admin' && x.actief !== false).length <= 1;
   if(isLaatsteAdmin) { showToast('&#9888; Je kunt de rol van het laatste admin-account niet wijzigen — maak eerst een ander admin-account aan'); return; }
   l.voornaam = document.getElementById('ln-voornaam')?.value?.trim() || l.voornaam;
   l.achternaam = document.getElementById('ln-achternaam')?.value?.trim() || '';
@@ -4620,7 +4681,7 @@ async function leiderBewerkenOpslaan(i) {
 
 function leiderVerwijderen(i) {
   if(LEIDERS.length <= 1) { showToast('&#9888; Je kunt niet de laatste leider verwijderen'); return; }
-  const isLaatsteAdmin = LEIDERS[i].rol === 'admin' && LEIDERS.filter(l => l.rol === 'admin').length <= 1;
+  const isLaatsteAdmin = LEIDERS[i].rol === 'admin' && LEIDERS.filter(l => l.rol === 'admin' && l.actief !== false).length <= 1;
   if(isLaatsteAdmin) { showToast('&#9888; Je kunt niet het laatste admin-account verwijderen — maak eerst een ander admin-account aan'); return; }
   const naam = leiderNaam(LEIDERS[i]);
   LEIDERS.splice(i,1);
@@ -4850,8 +4911,8 @@ function renderInstLog() {
 // nieuwste lijst ziet zonder dat de array-referentie verandert.
 function herbouwKampstaf() {
   KAMPSTAF.length = 0;
-  LEADERS.forEach(l => KAMPSTAF.push(l));
-  EXTRA_STAF.forEach(l => KAMPSTAF.push(l));
+  LEADERS.forEach(l => { if(stafNaamActief(l)) KAMPSTAF.push(l); });
+  EXTRA_STAF.forEach(l => { if(stafNaamActief(l)) KAMPSTAF.push(l); });
 }
 
 function renderInstKampstaf() {
@@ -5214,6 +5275,8 @@ function exportExcel(type) {
 // Dag-tabbladen starten op de huidige datum (Europe/Amsterdam), geklemd op de kampperiode.
 preHuidigeDag = standaardKampDagIndex();
 indHuidigeDag = standaardKampDagIndex();
+// Keuzelijsten meteen filteren op actieve leiders/kampstaf.
+herbouwKampstaf();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -5259,8 +5322,14 @@ const SYNC_MODULES = {
                       set: v => { inactiefSpelers.clear(); (v || []).forEach(n => inactiefSpelers.add(n)); } },
   extra_staf:       { get: () => EXTRA_STAF,
                       set: v => { _vulArray(EXTRA_STAF, v); herbouwKampstaf(); } },
+  inactieve_staf:   { get: () => [...INACTIEVE_STAF],
+                      set: v => { INACTIEVE_STAF.clear(); (v || []).forEach(n => INACTIEVE_STAF.add(n)); herbouwKampstaf(); } },
   labels:           { get: () => LABELS,             set: v => { _vulArray(LABELS, v); labelsMigreer(); } },
-  leiders:          { get: () => LEIDERS,            set: v => _vulArray(LEIDERS, v) },
+  leiders:          { get: () => LEIDERS,            set: v => {
+                        _vulArray(LEIDERS, v);
+                        LEIDERS.forEach(l => { if(l.actief === undefined) l.actief = true; });
+                        herbouwKampstaf(); // inactieve accounts filteren op naam mee uit de keuzelijsten
+                      } },
   kamp_meta:        { get: () => KAMP_META,
                       set: v => {
                         const nieuw = v || {};
