@@ -1843,22 +1843,55 @@ function renderDashboard(){
     <div class="lb-row rank-${i+1}"><div class="rank-num">${i+1}</div><div class="rank-medal">${medals[i]}</div>
     <div class="rank-name">${p.name} <span style="color:var(--muted-light);font-size:.75rem">${p.team}</span></div>
     <div class="rank-pts">${p.pts}pt</div></div>`).join('');
-  const vandaagIdx = huidigeKampDagIndex();
-  const todayDi = vandaagIdx >= 0 ? vandaagIdx : 0;
+  renderDashboardVandaag();
+  renderDashboardControle();
+}
+
+// ── Dashboard: dagprogramma met bladeren ──────────────────────
+// Standaard wordt de echte huidige dag getoond (Europe/Amsterdam, geklemd op de kampperiode);
+// met ‹ › kan iedereen handmatig naar andere dagen bladeren. null = automatisch vandaag volgen.
+let dashDagIndex = null;
+function dashSetDag(i) {
+  dashDagIndex = Math.max(0, Math.min(planningData.length - 1, i));
+  if(dashDagIndex === standaardKampDagIndex()) dashDagIndex = null; // terug op vandaag → weer volgen
+  renderDashboard();
+}
+function renderDashboardVandaag() {
+  const el = document.getElementById('dash-today');
+  if(!el) return;
+  if(planningData.length === 0) { el.innerHTML = '<div class="alert alert-info">Nog geen kampdagen ingesteld.</div>'; return; }
+  const todayDi = dashDagIndex ?? standaardKampDagIndex();
   const today = planningData[todayDi];
   const huidig = planningHuidigeActiviteit();
-  document.getElementById('dash-today').innerHTML=today.acts.map((a,ai)=>{
-    const isHuidig = !a.vervallen && huidig && huidig.di===todayDi && huidig.ai===ai;
-    const mom = a.vervallen ? null : planningActiviteitMoment(todayDi, a.time);
-    const isVoorbij = !a.vervallen && !isHuidig && mom && mom <= new Date();
-    return `<div class="activity-row type-${a.type}${a.vervallen?' act-vervallen':''}${isHuidig?' act-huidig':''}${isVoorbij?' act-voorbij':''}">
-      <div class="activity-row-main">
-        <div class="activity-time">${a.time}</div><div class="activity-name">${a.name}</div>${activiteitTagHtml(a)}
-      </div>
-      ${activiteitExtraHtml(a)}
-    </div>`;
-  }).join('');
-  renderDashboardControle();
+  const isEchtVandaag = todayDi === huidigeKampDagIndex();
+  const melding = dashDagIndex === null ? kampPeriodeMelding() : '';
+
+  let html = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <button class="btn btn-outline" style="font-size:.75rem;padding:4px 10px" ${todayDi<=0?'disabled':''} onclick="dashSetDag(${todayDi-1})">‹</button>
+    <div style="flex:1;text-align:center;font-weight:700;font-size:.9rem">${today.icon} ${today.day}
+      ${isEchtVandaag?'<span style="font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--green-bg);color:var(--green);margin-left:6px">vandaag</span>':''}
+    </div>
+    <button class="btn btn-outline" style="font-size:.75rem;padding:4px 10px" ${todayDi>=planningData.length-1?'disabled':''} onclick="dashSetDag(${todayDi+1})">›</button>
+    ${!isEchtVandaag && dashDagIndex!==null?`<button class="btn btn-outline" style="font-size:.72rem;padding:4px 10px" onclick="dashDagIndex=null;renderDashboard()">↩ vandaag</button>`:''}
+  </div>`;
+  if(melding) html += `<div class="alert alert-info" style="margin-bottom:10px">📅 ${melding}</div>`;
+
+  if(today.acts.length === 0) {
+    html += '<div style="font-size:.83rem;color:var(--muted);padding:8px 12px">Geen activiteiten gepland op deze dag.</div>';
+  } else {
+    html += today.acts.map((a,ai)=>{
+      const isHuidig = !a.vervallen && huidig && huidig.di===todayDi && huidig.ai===ai;
+      const mom = a.vervallen ? null : planningActiviteitMoment(todayDi, a.time);
+      const isVoorbij = !a.vervallen && !isHuidig && mom && mom <= new Date();
+      return `<div class="activity-row type-${a.type}${a.vervallen?' act-vervallen':''}${isHuidig?' act-huidig':''}${isVoorbij?' act-voorbij':''}">
+        <div class="activity-row-main">
+          <div class="activity-time">${a.time}</div><div class="activity-name">${a.name}</div>${activiteitTagHtml(a)}
+        </div>
+        ${activiteitExtraHtml(a)}
+      </div>`;
+    }).join('');
+  }
+  el.innerHTML = html;
 }
 
 // Bepaalt of een spel-activiteit al een uitslag/afronding heeft — gebruikt door de
@@ -2835,9 +2868,32 @@ function activiteitExtraHtml(a) {
 // Vergelijkt elke activiteit (dag + tijd, gekoppeld aan de echte kalenderdatum via
 // KAMP_DAGEN) met het huidige moment, zodat Planning en dashboard consistent kunnen tonen
 // welke activiteit nu bezig is (lichtgroen) en welke al voorbij zijn (lichtgrijs).
+// Vandaag als YYYY-MM-DD in Europe/Amsterdam. De kampdag-keys zijn lokale datums, dus
+// vergelijken via toISOString() (UTC) zou 's avonds/nachts de verkeerde dag aanwijzen.
+function vandaagIso() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date());
+}
 function huidigeKampDagIndex() {
-  const vandaag = new Date().toISOString().slice(0,10);
+  const vandaag = vandaagIso();
   return KAMP_DAGEN.findIndex(d => d.key === vandaag);
+}
+// De dag die de app standaard toont: vandaag als die binnen de kampperiode valt, anders
+// vastgeklemd op de eerste (vóór het kamp) of laatste (na het kamp) kampdag.
+function standaardKampDagIndex() {
+  const idx = huidigeKampDagIndex();
+  if(idx >= 0) return idx;
+  if(KAMP_DAGEN.length === 0) return 0;
+  return vandaagIso() < KAMP_DAGEN[0].key ? 0 : KAMP_DAGEN.length - 1;
+}
+// Melding wanneer vandaag buiten de kampperiode valt (leeg = we zitten in de kampweek).
+function kampPeriodeMelding() {
+  if(KAMP_DAGEN.length === 0 || huidigeKampDagIndex() >= 0) return '';
+  const vandaag = vandaagIso();
+  if(vandaag < KAMP_DAGEN[0].key) {
+    const dagen = Math.round((new Date(KAMP_DAGEN[0].key+'T00:00:00') - new Date(vandaag+'T00:00:00')) / 86400000);
+    return `Het kamp begint ${dagen===1?'morgen':`over ${dagen} dagen`} — je kijkt naar ${KAMP_DAGEN[0].label}.`;
+  }
+  return `Het kamp is afgelopen — je kijkt naar de laatste dag (${KAMP_DAGEN[KAMP_DAGEN.length-1].label}).`;
 }
 function planningActiviteitMoment(dagIdx, tijd) {
   const dagKey = KAMP_DAGEN[dagIdx]?.key;
@@ -4424,9 +4480,9 @@ function toepassenKampDagen(start, eind) {
   penData.splice(0, penData.length, ...KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: false })));
   penHuidigeDag = 0;
   preSpellenData.splice(0, preSpellenData.length, ...genereerPreSpellenData());
-  preHuidigeDag = 0;
+  preHuidigeDag = standaardKampDagIndex();
   indSpellen.splice(0, indSpellen.length, ...genereerIndSpellen());
-  indHuidigeDag = 0;
+  indHuidigeDag = standaardKampDagIndex();
   return true;
 }
 
@@ -4839,6 +4895,9 @@ function exportExcel(type) {
 
 // ── INIT ─────────────────────────────────────────────────────
 // Login overlay is standaard zichtbaar — renderDashboard() wordt aangeroepen na inloggen
+// Dag-tabbladen starten op de huidige datum (Europe/Amsterdam), geklemd op de kampperiode.
+preHuidigeDag = standaardKampDagIndex();
+indHuidigeDag = standaardKampDagIndex();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
