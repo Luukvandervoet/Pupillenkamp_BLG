@@ -3020,14 +3020,20 @@ function teamsCsvToepassen() {
 // hebben echte scoring-logica erachter (Teamklassement/Vierkamp/etc.) en zijn daarom niet
 // verwijderbaar — alleen hun kleur is aanpasbaar. Custom labels zijn puur organisatorisch
 // (geen scoring) en vrij toe te voegen/verwijderen door de admin (Kampbeheer → Labels).
+// Elk label heeft een `type` — exact dezelfde lijst als de TYPE-keuze in de planning (zie
+// LABEL_TYPES, afgeleid van PLANNING_TYPES — één gedeelde bron). Het type bepaalt of een
+// activiteit met dat label terugkomt op de Spellen-pagina (alleen type 'spel' verschijnt daar).
 let LABELS = [
-  {id:'Teamklassement', naam:'Teamklassement', kleur:'#2563EB', systeem:true},
-  {id:'Vierkamp',       naam:'Vierkamp',       kleur:'#7C3AED', systeem:true},
-  {id:'Penalty',        naam:'Penalty',        kleur:'#A21CAF', systeem:true},
-  {id:'Individueel',    naam:'Individueel',    kleur:'#059669', systeem:true},
-  {id:'8-Kamp',         naam:'8-Kamp',         kleur:'#E11D48', systeem:true},
-  {id:'Pre-Ontbijt',    naam:'Pre-Ontbijt',    kleur:'#16A34A', systeem:true},
+  {id:'Teamklassement', naam:'Teamklassement', kleur:'#2563EB', systeem:true, type:'spel'},
+  {id:'Vierkamp',       naam:'Vierkamp',       kleur:'#7C3AED', systeem:true, type:'spel'},
+  {id:'Penalty',        naam:'Penalty',        kleur:'#A21CAF', systeem:true, type:'spel'},
+  {id:'Individueel',    naam:'Individueel',    kleur:'#059669', systeem:true, type:'spel'},
+  {id:'8-Kamp',         naam:'8-Kamp',         kleur:'#E11D48', systeem:true, type:'spel'},
+  {id:'Pre-Ontbijt',    naam:'Pre-Ontbijt',    kleur:'#16A34A', systeem:true, type:'spel'},
 ];
+// Migratie: labels van vóór het type-veld krijgen 'spel' (het oude gedrag).
+function labelsMigreer() { LABELS.forEach(l => { if(!l.type) l.type = 'spel'; }); }
+function labelType(naam) { return LABELS.find(l => l.naam === naam)?.type || 'spel'; }
 let LABELS_NEXT_ID = 1;
 const TYPE_KLEUREN = { maaltijd:'#EA580C', vrij:'#64748B', info:'#2563EB', pauze:'#64748B' };
 // "Vierkamp"/"Penalty Bokaal"/"Individuele Spellen" zijn sneltoetsen in de TYPE-keuze: ze
@@ -3045,6 +3051,10 @@ const PLANNING_TYPES = [
   {val:'info',        label:'💬 Info / Aankondiging', type:'info'},
   {val:'pauze',       label:'⏸️ Pauze',               type:'pauze'},
 ];
+// De types die een label kan hebben = exact de basis-types uit de planning (de Vierkamp/
+// Penalty/Individueel-sneltoetsen zijn zelf al labels en horen hier dus niet bij).
+// Eén gedeelde bron: wijzigt PLANNING_TYPES, dan wijzigen de labeltypes automatisch mee.
+const LABEL_TYPES = PLANNING_TYPES.filter(t => !t.klassement);
 // Geeft de te selecteren TYPE-optie voor een bestaande activiteit terug — herkent een
 // sneltoets (Vierkamp/Penalty/Individueel) aan het klassement, anders het gewone type.
 function planningTypeWaarde(a) {
@@ -3306,6 +3316,8 @@ function planningEditSave(di, ai) {
   const typeOptie = PLANNING_TYPES.find(t => t.val === document.getElementById('pe-type')?.value) || PLANNING_TYPES[0];
   a.type       = typeOptie.type;
   a.klassement = typeOptie.klassement || (typeOptie.val==='spel' ? (document.getElementById('pe-kl')?.value||undefined) : undefined);
+  // Het gekozen label kan zelf een ander type meegeven (bv. een eigen label met type maaltijd)
+  if(!typeOptie.klassement && a.klassement) a.type = labelType(a.klassement);
   a.leiders    = [...document.querySelectorAll('#pe-leiders input[type=checkbox]:checked')].map(el=>el.value);
   const duurVal = document.getElementById('pe-duur')?.value;
   a.duur       = duurVal ? parseInt(duurVal) : undefined;
@@ -3397,9 +3409,10 @@ function planningAddSave(di) {
   const naam = document.getElementById('pa-naam')?.value?.trim();
   if(!naam){ showToast('&#9888;&#65039; Vul een naam in'); return; }
   const typeOptie = PLANNING_TYPES.find(t => t.val === document.getElementById('pa-type')?.value) || PLANNING_TYPES[0];
-  const type = typeOptie.type;
   const time = document.getElementById('pa-time')?.value || '12:00';
   const kl   = typeOptie.klassement || (typeOptie.val==='spel' ? (document.getElementById('pa-kl')?.value||undefined) : undefined);
+  // Het gekozen label kan zelf een ander type meegeven (bv. een eigen label met type maaltijd)
+  const type = (!typeOptie.klassement && kl) ? labelType(kl) : typeOptie.type;
   const leiders = [...document.querySelectorAll('#pa-leiders input[type=checkbox]:checked')].map(el=>el.value);
   const duurVal = document.getElementById('pa-duur')?.value;
   const duur = duurVal ? parseInt(duurVal) : undefined;
@@ -3573,11 +3586,12 @@ function planningImportToepassen() {
     } else if(r.typeLabel) {
       let label = LABELS.find(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
       if(!label) {
-        label = {id:'custom_'+(LABELS_NEXT_ID++), naam: r.typeLabel, kleur: labelAutoKleur(), systeem:false};
+        label = {id:'custom_'+(LABELS_NEXT_ID++), naam: r.typeLabel, kleur: labelAutoKleur(), systeem:false, type:'spel'};
         LABELS.push(label);
         nieuweLabels.push(label.naam);
       }
       klassement = label.naam;
+      type = label.type || 'spel'; // labeltype bepaalt o.a. of de activiteit op de Spellen-pagina komt
     }
     const leiders = r.leiders.map(n => {
       const bekend = kampstafNaamHerkennen(n);
@@ -4395,18 +4409,24 @@ function instHuidigeSpelersHtml() {
 function renderInstLabels() {
   const el = document.getElementById('inst-labels');
   if(!el) return;
+  labelsMigreer();
+  const typeSelect = (huidig, onchange, disabled) => `<select ${disabled?'disabled ':''}onchange="${onchange}" style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.78rem;color:var(--text);${disabled?'opacity:.55;':''}">
+      ${LABEL_TYPES.map(t=>`<option value="${t.val}" ${huidig===t.val?'selected':''}>${t.label}</option>`).join('')}
+    </select>`;
   let html = `<div class="alert alert-info" style="margin-bottom:12px">
-    Labels bepalen de gekleurde tag op een activiteit in Planning/Spellen. De 6 systeemlabels
-    (Teamklassement, Vierkamp, Penalty, Individueel, 8-Kamp, Pre-Ontbijt) horen bij een werkend
-    onderdeel van de app en zijn niet verwijderbaar — wel van kleur te wisselen. Eigen labels
-    zijn puur organisatorisch (geen score-logica erachter) en vrij toe te voegen/verwijderen.
+    Labels bepalen de gekleurde tag op een activiteit in Planning/Spellen. Elk label heeft een
+    <strong>type</strong> — dezelfde lijst als de TYPE-keuze in de planning. Het type bepaalt of
+    activiteiten met dat label terugkomen op de Spellen-pagina (alleen type "Spel" verschijnt
+    daar). De 6 systeemlabels horen bij een werkend spelonderdeel en zijn altijd type "Spel" en
+    niet verwijderbaar — wel van kleur te wisselen. Eigen labels zijn vrij toe te voegen/verwijderen.
   </div>
   <div class="card" style="margin-bottom:12px">
     <div class="card-title">Labels</div>`;
   LABELS.forEach((l,i) => {
-    html += `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
       <input type="color" value="${l.kleur}" onchange="labelSetKleur(${i},this.value)" style="width:36px;height:28px;border:1px solid var(--border-dark);border-radius:5px;padding:0;cursor:pointer">
       <span class="activity-tag" style="background:${l.kleur}1a;color:${l.kleur}">${l.naam}</span>
+      ${typeSelect(l.type, `labelSetType(${i},this.value)`, l.systeem)}
       <span style="flex:1;font-size:.8rem;color:var(--muted-light)">${l.systeem?'Systeemlabel':'Eigen label'}</span>
       ${!l.systeem?`<button onclick="labelVerwijder(${i})" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;font-size:.75rem;color:var(--red);cursor:pointer">Verwijder</button>`:''}
     </div>`;
@@ -4416,11 +4436,26 @@ function renderInstLabels() {
     <div class="card-title">Nieuw label toevoegen</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <input id="nieuw-label-naam" placeholder="Naam label..." style="flex:1;min-width:160px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+      <select id="nieuw-label-type" style="padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.82rem;color:var(--text)">
+        ${LABEL_TYPES.map(t=>`<option value="${t.val}">${t.label}</option>`).join('')}
+      </select>
       <input id="nieuw-label-kleur" type="color" value="#2563EB" style="width:44px;height:36px;border:1px solid var(--border-dark);border-radius:6px;padding:0;cursor:pointer">
       <button class="btn btn-primary" onclick="labelToevoegen()">+ Toevoegen</button>
     </div>
   </div>`;
   el.innerHTML = html;
+}
+
+// Type van een label wijzigen — bestaande planning-activiteiten met dit label krijgen
+// meteen het nieuwe type, zodat "terugkomen in de spellen" direct klopt met de instelling.
+function labelSetType(i, type) {
+  const l = LABELS[i];
+  if(l.systeem) return;
+  l.type = type;
+  const optie = LABEL_TYPES.find(t => t.val === type) || LABEL_TYPES[0];
+  planningData.forEach(day => day.acts.forEach(a => { if(a.klassement === l.naam) a.type = optie.type; }));
+  logActie('Label type aangepast', `${l.naam} → ${optie.label.replace(/^\S+\s/,'')}`);
+  renderInstLabels(); renderPlanning(); renderDashboard(); renderSpellen();
 }
 
 function labelSetKleur(i, kleur) {
@@ -4435,8 +4470,9 @@ function labelToevoegen() {
   if(!naam) { showToast('&#9888; Vul een naam in'); return; }
   if(LABELS.some(l => l.naam.toLowerCase() === naam.toLowerCase())) { showToast('&#9888; Dit label bestaat al'); return; }
   const kleur = document.getElementById('nieuw-label-kleur')?.value || '#2563EB';
-  LABELS.push({id:'custom_'+(LABELS_NEXT_ID++), naam, kleur, systeem:false});
-  logActie('Label toegevoegd', naam);
+  const type = document.getElementById('nieuw-label-type')?.value || 'spel';
+  LABELS.push({id:'custom_'+(LABELS_NEXT_ID++), naam, kleur, systeem:false, type});
+  logActie('Label toegevoegd', `${naam} (type: ${type})`);
   showToast(`&#10003; Label "${naam}" toegevoegd`);
   renderInstLabels();
 }
@@ -5223,7 +5259,7 @@ const SYNC_MODULES = {
                       set: v => { inactiefSpelers.clear(); (v || []).forEach(n => inactiefSpelers.add(n)); } },
   extra_staf:       { get: () => EXTRA_STAF,
                       set: v => { _vulArray(EXTRA_STAF, v); herbouwKampstaf(); } },
-  labels:           { get: () => LABELS,             set: v => _vulArray(LABELS, v) },
+  labels:           { get: () => LABELS,             set: v => { _vulArray(LABELS, v); labelsMigreer(); } },
   leiders:          { get: () => LEIDERS,            set: v => _vulArray(LEIDERS, v) },
   kamp_meta:        { get: () => KAMP_META,
                       set: v => {
