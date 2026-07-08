@@ -287,7 +287,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="nav-wrap">
   <nav>
     <button class="nav-btn active" onclick="showSection('dashboard',this)">&#127968; Dashboard</button>
-    <button class="nav-btn" onclick="showSection('teamklassement',this)">&#127942; Teamklassement</button>
+    <button class="nav-btn" onclick="showSection('teamklassement',this)">&#127942; Klassement</button>
     <button class="nav-btn" onclick="showSection('planning',this)">&#128197; Planning</button>
     <button class="nav-btn" onclick="showSection('spellen',this)">&#127918; Spellen</button>
     <button class="nav-btn" id="nav-instellingen" onclick="showSection('instellingen',this)">&#9881;&#65039; Kampbeheer</button>
@@ -312,20 +312,63 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
   </div>
 </div>
 
-<!-- TEAMKLASSEMENT -->
+<!-- KLASSEMENT → TEAMKLASSEMENT -->
 <div class="section" id="section-teamklassement">
   <div class="page-title">Teamklassement</div>
   <div class="page-sub">Totaalstand, teams &amp; kampstaf op één plek</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab active klassement-sub-btn" data-sub="teamklassement" onclick="showKlassementSub('teamklassement')">&#127942; Teamklassement</button>
+    <button class="tab klassement-sub-btn" data-sub="klpenalty" onclick="showKlassementSub('klpenalty')">&#9917; Penalty Bokaal</button>
+    <button class="tab klassement-sub-btn" data-sub="klindividueel" onclick="showKlassementSub('klindividueel')">&#127939; Individueel</button>
+    <button class="tab klassement-sub-btn" data-sub="klvierkamp" onclick="showKlassementSub('klvierkamp')">&#9876;&#65039; Vierkamp</button>
+  </div>
   <div class="tab-row">
     <button class="tab active" onclick="setTab('tk','stand',this)">Stand</button>
-    <button class="tab" onclick="setTab('tk','historie',this)">Spelhistorie</button>
     <button class="tab" onclick="setTab('tk','teams',this)">&#128085; Teams</button>
     <button class="tab" onclick="setTab('tk','staf',this)">&#128101; Kampstaf</button>
   </div>
   <div id="tk-stand"></div>
-  <div id="tk-historie" style="display:none"></div>
   <div id="tk-teams" style="display:none"></div>
   <div id="tk-staf" style="display:none"></div>
+</div>
+
+<!-- KLASSEMENT → STAND PENALTY BOKAAL -->
+<div class="section" id="section-klpenalty">
+  <div class="page-title">Stand Penalty Bokaal</div>
+  <div class="page-sub">Tussenstand per speler — invoer via Spellen → Penaltybokaal</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab klassement-sub-btn" data-sub="teamklassement" onclick="showKlassementSub('teamklassement')">&#127942; Teamklassement</button>
+    <button class="tab active klassement-sub-btn" data-sub="klpenalty" onclick="showKlassementSub('klpenalty')">&#9917; Penalty Bokaal</button>
+    <button class="tab klassement-sub-btn" data-sub="klindividueel" onclick="showKlassementSub('klindividueel')">&#127939; Individueel</button>
+    <button class="tab klassement-sub-btn" data-sub="klvierkamp" onclick="showKlassementSub('klvierkamp')">&#9876;&#65039; Vierkamp</button>
+  </div>
+  <div id="klpen-stand"></div>
+</div>
+
+<!-- KLASSEMENT → STAND INDIVIDUELE SPELLEN -->
+<div class="section" id="section-klindividueel">
+  <div class="page-title">Stand Individuele Spellen</div>
+  <div class="page-sub">Tussenstand per speler — invoer via Spellen → Individueel</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab klassement-sub-btn" data-sub="teamklassement" onclick="showKlassementSub('teamklassement')">&#127942; Teamklassement</button>
+    <button class="tab klassement-sub-btn" data-sub="klpenalty" onclick="showKlassementSub('klpenalty')">&#9917; Penalty Bokaal</button>
+    <button class="tab active klassement-sub-btn" data-sub="klindividueel" onclick="showKlassementSub('klindividueel')">&#127939; Individueel</button>
+    <button class="tab klassement-sub-btn" data-sub="klvierkamp" onclick="showKlassementSub('klvierkamp')">&#9876;&#65039; Vierkamp</button>
+  </div>
+  <div id="klind-stand"></div>
+</div>
+
+<!-- KLASSEMENT → STAND VIERKAMP -->
+<div class="section" id="section-klvierkamp">
+  <div class="page-title">Stand Vierkamp</div>
+  <div class="page-sub">Tussenstand per team — invoer via Spellen → Vierkamp</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab klassement-sub-btn" data-sub="teamklassement" onclick="showKlassementSub('teamklassement')">&#127942; Teamklassement</button>
+    <button class="tab klassement-sub-btn" data-sub="klpenalty" onclick="showKlassementSub('klpenalty')">&#9917; Penalty Bokaal</button>
+    <button class="tab klassement-sub-btn" data-sub="klindividueel" onclick="showKlassementSub('klindividueel')">&#127939; Individueel</button>
+    <button class="tab active klassement-sub-btn" data-sub="klvierkamp" onclick="showKlassementSub('klvierkamp')">&#9876;&#65039; Vierkamp</button>
+  </div>
+  <div id="klvk-stand"></div>
 </div>
 
 <!-- VIERKAMP -->
@@ -453,7 +496,12 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <button class="tab spellen-sub-btn" data-sub="penalty" onclick="showSpellenSub('penalty')">&#9917; Penaltybokaal</button>
     <button class="tab spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
   </div>
-  <div id="spellen-content"></div>
+  <div class="tab-row">
+    <button class="tab active" onclick="setTab('sp','overzicht',this)">&#128203; Overzicht</button>
+    <button class="tab" onclick="setTab('sp','historie',this)">&#128220; Spelhistorie</button>
+  </div>
+  <div id="sp-overzicht"></div>
+  <div id="sp-historie" style="display:none"></div>
 </div>
 
 <!-- INSTELLINGEN -->
@@ -1121,9 +1169,9 @@ function penHeropen(dagIdx) {
 }
 
 // ── SPELERS TAB ───────────────────────────────────────────────
-function renderPenSpelers() {
-  const el = document.getElementById('pen-spelers');
-  if(!el) return;
+// De stand-HTML staat los van het doel-element zodat dezelfde stand ook onder
+// Klassement → Penalty Bokaal getoond kan worden.
+function penSpelersHtml() {
   const sorted = [...PLAYERS_ALL].map(p=>({...p,pts:penTotaalSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
   const max = sorted[0]?.pts || 1;
   let html = '';
@@ -1142,7 +1190,13 @@ function renderPenSpelers() {
       <div class="rank-pts">${p.pts}pt</div>
     </div>`;
   });
-  el.innerHTML = html || '<div class="alert alert-info">Nog geen scores.</div>';
+  return html || '<div class="alert alert-info">Nog geen scores.</div>';
+}
+
+function renderPenSpelers() {
+  const el = document.getElementById('pen-spelers');
+  if(!el) return;
+  el.innerHTML = penSpelersHtml();
 }
 
 // ── KEEPERS TAB ───────────────────────────────────────────────
@@ -2016,8 +2070,33 @@ function showSection(id,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('section-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
-  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,instellingen:renderInstellingen})[id]?.();
+  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,instellingen:renderInstellingen,klpenalty:renderKlPenalty,klindividueel:renderKlIndividueel,klvierkamp:renderKlVierkamp})[id]?.();
   if(id === 'planning') planningScrollNaarVandaag();
+}
+
+// "Klassement" is het hoofdmenu-item dat alle tussenstanden verzamelt (Teamklassement,
+// Penalty Bokaal, Individueel, Vierkamp) — elk als eigen subonderdeel, zelfde patroon als
+// het Spellen-submenu. De standen zelf zijn ongewijzigd; ze worden hier alleen gebundeld.
+function showKlassementSub(id) {
+  const btn = document.querySelector('.nav-btn[onclick*="teamklassement"]');
+  showSection(id, btn);
+  document.querySelectorAll('.klassement-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id));
+}
+function renderKlPenalty() {
+  const el = document.getElementById('klpen-stand');
+  if(!el) return;
+  penSyncMetPlanning();
+  el.innerHTML = penSpelersHtml();
+}
+function renderKlIndividueel() {
+  const el = document.getElementById('klind-stand');
+  if(!el) return;
+  el.innerHTML = indStandHtml();
+}
+function renderKlVierkamp() {
+  const el = document.getElementById('klvk-stand');
+  if(!el) return;
+  el.innerHTML = vkStandHtml();
 }
 
 // Bij het openen van Planning meteen naar de huidige kampdag scrollen (indien vandaag
@@ -2043,17 +2122,17 @@ function showSpellenSub(id) {
 
 // ── TAB SWITCHER ─────────────────────────────────────────────
 function setTab(prefix,tab,btn){
-  const sectionMap={tk:'teamklassement',vk:'vierkamp',pen:'penalty',ak:'achtkamp',ind:'individueel',pre:'preontbijt',inst:'instellingen'};
+  const sectionMap={tk:'teamklassement',vk:'vierkamp',pen:'penalty',ak:'achtkamp',ind:'individueel',pre:'preontbijt',inst:'instellingen',sp:'spellen'};
   const section=document.getElementById('section-'+sectionMap[prefix]);
   if(!section) return;
-  section.querySelectorAll('.tab:not(.spellen-sub-btn)').forEach(t=>t.classList.remove('active'));
+  section.querySelectorAll('.tab:not(.spellen-sub-btn):not(.klassement-sub-btn)').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   // hide all sub-panels
   ['stand','historie','duels','invoer','detail','spelers','keepers','setup','finale','groepen','spellen','schema','staf','overzicht','leeftijd','teams','kampstaf','labels','leiders','planningimport','preimport','atletiekimport','datums','exporteren','kamp','log'].forEach(p=>{const el=document.getElementById(prefix+'-'+p);if(el)el.style.display='none';});
   const target=document.getElementById(prefix+'-'+tab);
   if(target)target.style.display='block';
   // re-render
-  ({tk:renderTeamKlassement,vk:renderVierkamp,pen:renderPenalty,ak:renderAchtkamp,ind:renderInd,pre:renderPreOntbijt,inst:renderInstellingen})[prefix]?.();
+  ({tk:renderTeamKlassement,vk:renderVierkamp,pen:renderPenalty,ak:renderAchtkamp,ind:renderInd,pre:renderPreOntbijt,inst:renderInstellingen,sp:renderSpellen})[prefix]?.();
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────
@@ -2218,12 +2297,13 @@ function renderTeamKlassement(){
         <span style="color:var(--muted-light);font-size:.75rem;font-weight:400;margin-left:4px">${t.leader}</span></div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(t.pts/max*100)}%;background:${t.color}"></div></div>
       <div class="rank-pts">${t.pts}pt</div></div>`).join('');
+}
 
-  // HISTORIE
+// Spelhistorie (alle Teamklassement-uitslagen) — staat als tab onder Spellen.
+function spelHistorieHtml(){
   const games=GAME_HISTORY.filter(g=>g.klassement==='Teamklassement');
   if(!games.length){
-    document.getElementById('tk-historie').innerHTML=`<div class="alert alert-info">ℹ️ Nog geen spellen ingevoerd.</div><button class="btn btn-primary" onclick="openScoreModal(null,null,'Teamklassement')">+ Eerste spel invoeren</button>`;
-    return;
+    return `<div class="alert alert-info">ℹ️ Nog geen spellen ingevoerd.</div><button class="btn btn-primary" onclick="openScoreModal(null,null,'Teamklassement')">+ Eerste spel invoeren</button>`;
   }
   let html=`<div class="gh-wrap"><table class="gh-table"><thead><tr>
     <th>Spel</th><th>Dag</th><th>Tijd</th>`;
@@ -2244,7 +2324,7 @@ function renderTeamKlassement(){
   TEAMS.forEach((t,i)=>{html+=`<td class="pts-cell">${games.reduce((s,g)=>s+g.scores[i],0)}pt</td>`;});
   html+=`</tr></tbody></table></div>`;
   html+=`<div style="margin-top:12px"><button class="btn btn-primary" onclick="openScoreModal(null,null,'Teamklassement')">+ Nieuw spel invoeren</button></div>`;
-  document.getElementById('tk-historie').innerHTML=html;
+  return html;
 }
 
 // ── VIERKAMP ─────────────────────────────────────────────────
@@ -2271,9 +2351,9 @@ function renderVierkamp() {
   renderVkDuels();
 }
 
-function renderVkStand() {
-  const el = document.getElementById('vk-stand');
-  if(!el) return;
+// De stand-HTML staat los van het doel-element zodat dezelfde stand ook onder
+// Klassement → Vierkamp getoond kan worden.
+function vkStandHtml() {
   const stand = vkStand();
   const maxR = Math.max(stand[0]?.rondesGewonnen || 0, 1);
   // Vrijdag finale opzet
@@ -2295,7 +2375,13 @@ function renderVkStand() {
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(t.rondesGewonnen/maxR*100)}%;background:${t.color}"></div></div>
       <div class="rank-pts">${t.rondesGewonnen} <span style="font-size:.72rem;color:var(--muted)">rondes</span></div>
     </div>`).join('');
-  el.innerHTML = html || '<div class="alert alert-info">Nog geen rondes afgesloten.</div>';
+  return html || '<div class="alert alert-info">Nog geen rondes afgesloten.</div>';
+}
+
+function renderVkStand() {
+  const el = document.getElementById('vk-stand');
+  if(!el) return;
+  el.innerHTML = vkStandHtml();
 }
 
 function renderVkDuels() {
@@ -2507,9 +2593,9 @@ function renderInd() {
   renderIndStand(); renderIndLeeftijd(); renderIndInvoer(); renderIndGroepen(); renderIndSpellen();
 }
 
-function renderIndStand() {
-  const el = document.getElementById('ind-stand');
-  if(!el) return;
+// De stand-HTML staat los van het doel-element zodat dezelfde stand ook onder
+// Klassement → Individueel getoond kan worden.
+function indStandHtml() {
   const sorted = PLAYERS_ALL.filter(p=>isActief(p.name)).map(p=>({...p, pts:indPuntenSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
   const max = sorted[0]?.pts || 1;
   let html = '';
@@ -2522,7 +2608,13 @@ function renderIndStand() {
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(p.pts/max*100)}%"></div></div>
       <div class="rank-pts">${p.pts}pt</div></div>`;
   });
-  el.innerHTML = html || '<div class="alert alert-info">Nog geen scores ingevoerd.</div>';
+  return html || '<div class="alert alert-info">Nog geen scores ingevoerd.</div>';
+}
+
+function renderIndStand() {
+  const el = document.getElementById('ind-stand');
+  if(!el) return;
+  el.innerHTML = indStandHtml();
 }
 
 function renderIndLeeftijd() {
@@ -3660,7 +3752,9 @@ function planningImportToepassen() {
 let spellenLeiderFilter = '';
 
 function renderSpellen() {
-  const el = document.getElementById('spellen-content');
+  const historieEl = document.getElementById('sp-historie');
+  if(historieEl) historieEl.innerHTML = spelHistorieHtml();
+  const el = document.getElementById('sp-overzicht');
   if(!el) return;
 
   const rows = [];
@@ -5290,7 +5384,9 @@ herbouwKampstaf();
 const SUPABASE_URL = 'https://trkomvzrkqjfoxnnpvly.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Pd_nwMN-LfAGAO-PZgfSjw_lhzatePy'; // Supabase → Settings → API Keys → anon/public
 
-const sbActief = SUPABASE_KEY !== 'PLAK_HIER_JE_ANON_KEY';
+// window.supabase ontbreekt als de CDN-script niet kon laden (geen internet) — dan draait
+// de app gewoon lokaal zonder sync in plaats van dat de hele sync-engine stukloopt.
+const sbActief = SUPABASE_KEY !== 'PLAK_HIER_JE_ANON_KEY' && !!window.supabase;
 const sb = sbActief ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 const SYNC_CLIENT_ID = 'c_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
 
@@ -5413,7 +5509,8 @@ setInterval(syncDiffSave, 5000);
 [
   'renderDashboard','renderTeamKlassement','renderVierkamp','renderPenalty','renderInd',
   'renderTeams','renderPlanning','renderSpellen','renderAchtkamp','renderPreOntbijt','renderExport',
-  'renderInstellingen','renderTeamsStaf','renderPenSpelers','renderIndStand'
+  'renderInstellingen','renderTeamsStaf','renderPenSpelers','renderIndStand',
+  'renderKlPenalty','renderKlIndividueel','renderKlVierkamp'
 ].forEach(fn => {
   const orig = window[fn];
   if (typeof orig !== 'function') return;
@@ -5433,7 +5530,8 @@ function herRenderActieveSectie() {
     dashboard: renderDashboard, teamklassement: renderTeamKlassement, vierkamp: renderVierkamp,
     penalty: renderPenalty, individueel: renderInd, planning: renderPlanning,
     spellen: renderSpellen, achtkamp: renderAchtkamp, preontbijt: renderPreOntbijt, exporteren: renderExport,
-    instellingen: renderInstellingen
+    instellingen: renderInstellingen,
+    klpenalty: renderKlPenalty, klindividueel: renderKlIndividueel, klvierkamp: renderKlVierkamp
   };
   map[id]?.();
   // Na een remote update is de lokale staat gelijk aan de DB → niets opnieuw opslaan
