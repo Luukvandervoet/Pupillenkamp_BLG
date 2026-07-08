@@ -287,7 +287,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="nav-wrap">
   <nav>
     <button class="nav-btn active" onclick="showSection('dashboard',this)">&#127968; Dashboard</button>
-    <button class="nav-btn" onclick="showSection('teamklassement',this)">&#127942; Teamklassement</button>
+    <button class="nav-btn" onclick="showSection('teamklassement',this)">&#127942; Klassement</button>
     <button class="nav-btn" onclick="showSection('planning',this)">&#128197; Planning</button>
     <button class="nav-btn" onclick="showSection('spellen',this)">&#127918; Spellen</button>
     <button class="nav-btn" id="nav-instellingen" onclick="showSection('instellingen',this)">&#9881;&#65039; Kampbeheer</button>
@@ -312,20 +312,63 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
   </div>
 </div>
 
-<!-- TEAMKLASSEMENT -->
+<!-- KLASSEMENT → TEAMKLASSEMENT -->
 <div class="section" id="section-teamklassement">
   <div class="page-title">Teamklassement</div>
   <div class="page-sub">Totaalstand, teams &amp; kampstaf op één plek</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab active klassement-sub-btn" data-sub="teamklassement" onclick="showKlassementSub('teamklassement')">&#127942; Teamklassement</button>
+    <button class="tab klassement-sub-btn" data-sub="klpenalty" onclick="showKlassementSub('klpenalty')">&#9917; Penalty Bokaal</button>
+    <button class="tab klassement-sub-btn" data-sub="klindividueel" onclick="showKlassementSub('klindividueel')">&#127939; Individueel</button>
+    <button class="tab klassement-sub-btn" data-sub="klvierkamp" onclick="showKlassementSub('klvierkamp')">&#9876;&#65039; Vierkamp</button>
+  </div>
   <div class="tab-row">
     <button class="tab active" onclick="setTab('tk','stand',this)">Stand</button>
-    <button class="tab" onclick="setTab('tk','historie',this)">Spelhistorie</button>
     <button class="tab" onclick="setTab('tk','teams',this)">&#128085; Teams</button>
     <button class="tab" onclick="setTab('tk','staf',this)">&#128101; Kampstaf</button>
   </div>
   <div id="tk-stand"></div>
-  <div id="tk-historie" style="display:none"></div>
   <div id="tk-teams" style="display:none"></div>
   <div id="tk-staf" style="display:none"></div>
+</div>
+
+<!-- KLASSEMENT → STAND PENALTY BOKAAL -->
+<div class="section" id="section-klpenalty">
+  <div class="page-title">Stand Penalty Bokaal</div>
+  <div class="page-sub">Tussenstand per speler — invoer via Spellen → Penaltybokaal</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab klassement-sub-btn" data-sub="teamklassement" onclick="showKlassementSub('teamklassement')">&#127942; Teamklassement</button>
+    <button class="tab active klassement-sub-btn" data-sub="klpenalty" onclick="showKlassementSub('klpenalty')">&#9917; Penalty Bokaal</button>
+    <button class="tab klassement-sub-btn" data-sub="klindividueel" onclick="showKlassementSub('klindividueel')">&#127939; Individueel</button>
+    <button class="tab klassement-sub-btn" data-sub="klvierkamp" onclick="showKlassementSub('klvierkamp')">&#9876;&#65039; Vierkamp</button>
+  </div>
+  <div id="klpen-stand"></div>
+</div>
+
+<!-- KLASSEMENT → STAND INDIVIDUELE SPELLEN -->
+<div class="section" id="section-klindividueel">
+  <div class="page-title">Stand Individuele Spellen</div>
+  <div class="page-sub">Tussenstand per speler — invoer via Spellen → Individueel</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab klassement-sub-btn" data-sub="teamklassement" onclick="showKlassementSub('teamklassement')">&#127942; Teamklassement</button>
+    <button class="tab klassement-sub-btn" data-sub="klpenalty" onclick="showKlassementSub('klpenalty')">&#9917; Penalty Bokaal</button>
+    <button class="tab active klassement-sub-btn" data-sub="klindividueel" onclick="showKlassementSub('klindividueel')">&#127939; Individueel</button>
+    <button class="tab klassement-sub-btn" data-sub="klvierkamp" onclick="showKlassementSub('klvierkamp')">&#9876;&#65039; Vierkamp</button>
+  </div>
+  <div id="klind-stand"></div>
+</div>
+
+<!-- KLASSEMENT → STAND VIERKAMP -->
+<div class="section" id="section-klvierkamp">
+  <div class="page-title">Stand Vierkamp</div>
+  <div class="page-sub">Tussenstand per team — invoer via Spellen → Vierkamp</div>
+  <div class="tab-row" style="margin-bottom:4px">
+    <button class="tab klassement-sub-btn" data-sub="teamklassement" onclick="showKlassementSub('teamklassement')">&#127942; Teamklassement</button>
+    <button class="tab klassement-sub-btn" data-sub="klpenalty" onclick="showKlassementSub('klpenalty')">&#9917; Penalty Bokaal</button>
+    <button class="tab klassement-sub-btn" data-sub="klindividueel" onclick="showKlassementSub('klindividueel')">&#127939; Individueel</button>
+    <button class="tab active klassement-sub-btn" data-sub="klvierkamp" onclick="showKlassementSub('klvierkamp')">&#9876;&#65039; Vierkamp</button>
+  </div>
+  <div id="klvk-stand"></div>
 </div>
 
 <!-- VIERKAMP -->
@@ -350,7 +393,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <!-- PENALTY -->
 <div class="section" id="section-penalty">
   <div class="page-title">Penalty Bokaal</div>
-  <div class="page-sub">Elke dag 2 penalty's per speler op 2 verschillende keepers</div>
+  <div class="page-sub">Per moment 2 penalty's per speler op 2 verschillende keepers — het aantal momenten volgt de planning</div>
   <div class="tab-row" style="margin-bottom:4px">
     <button class="tab spellen-sub-btn" data-sub="spellen" onclick="showSpellenSub('spellen')">&#127918; Overzicht</button>
     <button class="tab spellen-sub-btn" data-sub="preontbijt" onclick="showSpellenSub('preontbijt')">&#9728;&#65039; Pre-ontbijt</button>
@@ -402,7 +445,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <!-- PRE-ONTBIJTSPEL -->
 <div class="section" id="section-preontbijt">
   <div class="page-title">Pre-Ontbijtspel</div>
-  <div class="page-sub">Elke ochtend — 10 spellen · 5 dagen × 2 per dag · alle 8 teams · Win=3pt · Gelijk=1pt</div>
+  <div class="page-sub">Elke ochtend 2 spellen · 4 velden · 2 rondes per veld · Win=3pt · Gelijk=1pt (4-teams-spel: 3-2-1-0)</div>
   <div class="tab-row" style="margin-bottom:4px">
     <button class="tab spellen-sub-btn" data-sub="spellen" onclick="showSpellenSub('spellen')">&#127918; Overzicht</button>
     <button class="tab active spellen-sub-btn" data-sub="preontbijt" onclick="showSpellenSub('preontbijt')">&#9728;&#65039; Pre-ontbijt</button>
@@ -439,6 +482,15 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-planning">
   <div class="page-title">Weekplanning</div>
   <div class="page-sub" id="planning-sub">Klik op een spel om direct de score in te voeren</div>
+  <div class="card" style="padding:10px 14px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <input id="planning-zoek" type="search" placeholder="&#128269; Zoek in de planning — naam, label, leider, dag of tijd..."
+        oninput="planningZoek(this.value)"
+        style="flex:1;padding:9px 12px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:8px;font-size:.88rem;color:var(--text);font-family:'Barlow',sans-serif">
+      <button class="btn btn-outline" style="font-size:.75rem;padding:7px 12px" onclick="planningZoekWissen()">&#10005; Wissen</button>
+    </div>
+    <div id="planning-zoek-teller" style="font-size:.75rem;color:var(--muted);margin-top:6px;display:none"></div>
+  </div>
   <div id="planning-content"></div>
 </div>
 
@@ -453,7 +505,12 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <button class="tab spellen-sub-btn" data-sub="penalty" onclick="showSpellenSub('penalty')">&#9917; Penaltybokaal</button>
     <button class="tab spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
   </div>
-  <div id="spellen-content"></div>
+  <div class="tab-row">
+    <button class="tab active" onclick="setTab('sp','overzicht',this)">&#128203; Overzicht</button>
+    <button class="tab" onclick="setTab('sp','historie',this)">&#128220; Spelhistorie</button>
+  </div>
+  <div id="sp-overzicht"></div>
+  <div id="sp-historie" style="display:none"></div>
 </div>
 
 <!-- INSTELLINGEN -->
@@ -539,7 +596,17 @@ async function doLogin() {
   const pass = document.getElementById('login-pass').value;
   const hash = await hashWachtwoord(pass);
   const user = LEIDERS.find(u => u.login === login && u.wachtwoordHash === hash);
-  if(!user) { document.getElementById('login-err').style.display = 'block'; return; }
+  const errEl = document.getElementById('login-err');
+  if(!user) {
+    errEl.textContent = '⚠️ Ongeldige gebruikersnaam of wachtwoord';
+    errEl.style.display = 'block';
+    return;
+  }
+  if(user.actief === false) {
+    errEl.textContent = '⚠️ Dit account staat op inactief — vraag de admin om het te heractiveren';
+    errEl.style.display = 'block';
+    return;
+  }
   huidigeGebruiker = user;
   document.getElementById('login-overlay').style.display = 'none';
   document.getElementById('login-err').style.display = 'none';
@@ -669,20 +736,92 @@ let KAMP_DAGEN = genereerKampDagenLijst(KAMP_META.startDatum, KAMP_META.eindDatu
 const KAMPdagen = KAMP_DAGEN.map(d => d.label);
 const LEADERS = TEAMS.map(t => t.leader);
 
-// Keepers per dag: dagIndex → [keeper1, keeper2]. Elke keeper mag een bestaand kampstaflid
-// zijn óf een vrij ingetypte naam (bv. een bestuurslid of bezoeker die eenmalig keept).
+// Keepers per moment: momentIndex → [keeper1, keeper2]. Elke keeper mag een bestaand
+// kampstaflid zijn óf een vrij ingetypte naam (bv. een bestuurslid die eenmalig keept).
 const penKeepersPerDag = {};
 KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = ['','']; });
 
-// Verdubbelaar: spelerNaam → dagIndex (0-4) | null
+// Verdubbelaar: spelerNaam → momentIndex | null
 const penVerdubbelaar = {};
 PLAYERS_ALL.forEach(p => { penVerdubbelaar[p.name] = null; });
 
-// Pogingen: dagIndex → [ {spelerNaam, keeperNaam, goal:bool|null, verdubbelaar:bool} ]
+// Pogingen: momentIndex → [ {spelerNaam, keeperNaam, goal:bool|null, verdubbelaar:bool} ]
 const penData = KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: false }));
 
-// Huidige dag voor invoer
+// Huidig moment voor invoer
 let penHuidigeDag = 0;
+
+// ── PENALTY MOMENTEN (gekoppeld aan de planning) ──────────────
+// Elke niet-vervallen planning-activiteit met label 'Penalty' (behalve de finale — die
+// heeft een eigen tabblad met eigen keeperkeuze) is één Penalty Bokaal-moment. Het aantal
+// momenten — en dus het aantal in te stellen keeperparen en invoertabs — beweegt
+// automatisch mee wanneer je momenten aan de planning toevoegt of eruit haalt.
+let penMomentenLijst = [];   // [{di, ai, dag, time, naam, label}]
+let penDagHandmatig = false; // gebruiker koos zelf een moment-tab (dan niet meer auto-volgen)
+
+function penIsFinaleActiviteit(a) { return /finale/i.test(a.name || ''); }
+
+function penBerekenMomenten() {
+  const momenten = [];
+  planningData.forEach((day, di) => {
+    day.acts.forEach((a, ai) => {
+      if(a.vervallen || a.klassement !== 'Penalty' || penIsFinaleActiviteit(a)) return;
+      momenten.push({ di, ai, dag: day.day, time: a.time, naam: a.name });
+    });
+  });
+  // Bij meerdere momenten op dezelfde dag onderscheidt de tijd de tabbladen.
+  momenten.forEach(m => {
+    m.label = momenten.filter(x => x.dag === m.dag).length > 1 ? `${m.dag} · ${m.time}` : m.dag;
+  });
+  return momenten;
+}
+
+// Brengt penData/penKeepersPerDag in lijn met de planning-momenten. Bestaande invoer wordt
+// per daglabel hergebruikt zodat scores/keepers netjes meeschuiven als er een moment bij
+// komt of af gaat; verdubbelaar-keuzes verhuizen mee (of vervallen als hun moment weg is).
+// Zonder Penalty-momenten in de planning blijft de bestaande data onaangeroerd bewaard
+// (zodat "planning leegmaken" vóór een her-import geen scores wist).
+function penSyncMetPlanning() {
+  const momenten = penBerekenMomenten();
+  penMomentenLijst = momenten;
+  if(momenten.length === 0) return;
+
+  const zelfde = momenten.length === penData.length && momenten.every((m, i) => penData[i]?.dag === m.dag);
+  if(!zelfde) {
+    const oudData = penData.slice();
+    const oudKeepers = {...penKeepersPerDag};
+    const gebruikt = new Set();
+    const oudNaarNieuw = {};
+    const nieuwData = [], nieuwKeepers = {};
+    momenten.forEach((mom, i) => {
+      const oudIdx = oudData.findIndex((d, j) => !gebruikt.has(j) && d && d.dag === mom.dag);
+      if(oudIdx >= 0) {
+        gebruikt.add(oudIdx);
+        oudNaarNieuw[oudIdx] = i;
+        nieuwData.push(oudData[oudIdx]);
+        nieuwKeepers[i] = oudKeepers[oudIdx] || ['',''];
+      } else {
+        nieuwData.push({ dag: mom.dag, pogingen: [], opgeslagen: false });
+        nieuwKeepers[i] = ['',''];
+      }
+    });
+    penData.splice(0, penData.length, ...nieuwData);
+    Object.keys(penKeepersPerDag).forEach(k => delete penKeepersPerDag[k]);
+    Object.assign(penKeepersPerDag, nieuwKeepers);
+    Object.keys(penVerdubbelaar).forEach(naam => {
+      const v = penVerdubbelaar[naam];
+      if(v != null) penVerdubbelaar[naam] = oudNaarNieuw[v] !== undefined ? oudNaarNieuw[v] : null;
+    });
+  }
+  if(penHuidigeDag >= momenten.length) penHuidigeDag = momenten.length - 1;
+  if(!penDagHandmatig) {
+    const stdLabel = KAMP_DAGEN[standaardKampDagIndex()]?.label;
+    const idx = momenten.findIndex(m => m.dag === stdLabel);
+    if(idx >= 0) penHuidigeDag = idx;
+  }
+}
+
+function penMomentLabel(i) { return penMomentenLijst[i]?.label || penData[i]?.dag || `Moment ${i+1}`; }
 
 // Finale config
 const penFinale = {
@@ -744,6 +883,7 @@ function penKwalificeerden() {
 
 // ── RENDER PENALTY ────────────────────────────────────────────
 function renderPenalty() {
+  penSyncMetPlanning();
   renderPenSetup();
   renderPenInvoer();
   renderPenSpelers();
@@ -757,12 +897,20 @@ function renderPenSetup() {
   const el = document.getElementById('pen-setup');
   if(!el) return;
 
-  // Keepers per dag
+  if(penMomentenLijst.length === 0) {
+    el.innerHTML = `<div class="alert alert-warning">⚠️ Geen Penalty Bokaal-momenten gevonden in de planning.
+      Voeg activiteiten met het label <strong>Penalty</strong> toe aan de planning — elk moment krijgt hier
+      automatisch een eigen keeperinstelling en invoertab. Eerder ingevoerde penalty-data blijft bewaard.</div>`;
+    return;
+  }
+
+  // Keepers per moment (aantal volgt de planning)
   let html = `<div class="card" style="margin-bottom:12px">
-    <div class="card-title">🧤 Keepers instellen per dag</div>
-    <div class="alert alert-info" style="margin-bottom:12px">Stel per dag 2 keepers in — begin te typen om te zoeken in de kampstaf, of typ zelf een naam (bv. een bestuurslid of bezoeker die eenmalig keept). Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
-  KAMPdagen.forEach((dag, i) => {
-    const k = penKeepersPerDag[i];
+    <div class="card-title">🧤 Keepers instellen per moment</div>
+    <div class="alert alert-info" style="margin-bottom:12px">De planning bevat <strong>${penMomentenLijst.length} Penalty Bokaal-moment${penMomentenLijst.length===1?'':'en'}</strong> — dit aantal beweegt automatisch mee met de planning. Stel per moment 2 keepers in — begin te typen om te zoeken in de kampstaf, of typ zelf een naam (bv. een bestuurslid of bezoeker die eenmalig keept). Zodra ingesteld worden ze automatisch overgenomen in de invoer.</div>`;
+  penData.forEach((dagData, i) => {
+    const dag = penMomentLabel(i);
+    const k = penKeepersPerDag[i] || (penKeepersPerDag[i] = ['','']);
     html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
       <div style="font-weight:600;font-size:.85rem;width:110px;flex-shrink:0">${dag}</div>
       ${comboVeld(penKeeperOpties(k[0]), {value:k[0], onchange:`penSetKeeper(${i},0,this.value)`, placeholder:'Keeper 1 — kies of typ...', style:'flex:1;min-width:140px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.82rem;color:var(--text);box-sizing:border-box'})}
@@ -777,7 +925,7 @@ function renderPenSetup() {
   // Verdubbelaar per speler
   html += `<div class="card" style="margin-bottom:12px">
     <div class="card-title">🎯 Verdubbelaar instellen — begin van de week</div>
-    <div class="alert alert-warning" style="margin-bottom:12px">Elke speler kiest 1 dag waarop zijn goals dubbel tellen. Stel dit aan het begin van de week in.</div>`;
+    <div class="alert alert-warning" style="margin-bottom:12px">Elke speler kiest 1 moment waarop zijn goals dubbel tellen. Stel dit aan het begin van de week in.</div>`;
   TEAMS.forEach(t => {
     html += `<div style="margin-bottom:10px">
       <div style="font-weight:700;font-size:.85rem;color:${t.color};margin-bottom:6px">
@@ -789,10 +937,10 @@ function renderPenSetup() {
         <span style="font-family:'DM Mono',monospace;color:var(--accent);font-size:.78rem;width:24px">#${p.num}</span>
         <span style="font-weight:600;font-size:.85rem;flex:1">${p.name}</span>
         <select onchange="penSetVerdubbelaarSetup('${p.name}',this.value)" style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.8rem;color:var(--text)">
-          <option value="">Geen dag gekozen</option>
-          ${KAMPdagen.map((dag,i)=>`<option value="${i}" ${vdag===i?'selected':''}>${dag}</option>`).join('')}
+          <option value="">Geen moment gekozen</option>
+          ${penData.map((_,i)=>`<option value="${i}" ${vdag===i?'selected':''}>${penMomentLabel(i)}</option>`).join('')}
         </select>
-        ${vdag!=null?`<span style="font-size:.7rem;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;white-space:nowrap">2× ${KAMPdagen[vdag]}</span>`:''}
+        ${vdag!=null?`<span style="font-size:.7rem;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;white-space:nowrap">2× ${penMomentLabel(vdag)}</span>`:''}
       </div>`;
     });
     html += `</div>`;
@@ -819,13 +967,13 @@ function renderPenSetup() {
 function penSetKeeper(dagIdx, slot, val) {
   penKeepersPerDag[dagIdx][slot] = val;
   const k = penKeepersPerDag[dagIdx];
-  if(k[0] && k[1]) showToast(`✓ Keepers ${KAMPdagen[dagIdx]}: ${k[0]} & ${k[1]}`);
+  if(k[0] && k[1]) showToast(`✓ Keepers ${penMomentLabel(dagIdx)}: ${k[0]} & ${k[1]}`);
   renderPenSetup();
 }
 
 function penSetVerdubbelaarSetup(naam, val) {
   penVerdubbelaar[naam] = val === '' ? null : parseInt(val);
-  if(val !== '') showToast(`✓ ${naam}: verdubbelaar op ${KAMPdagen[parseInt(val)]}`);
+  if(val !== '') showToast(`✓ ${naam}: verdubbelaar op ${penMomentLabel(parseInt(val))}`);
   else showToast(`✓ ${naam}: verdubbelaar verwijderd`);
   // Update bestaande pogingen
   penData.forEach((dag, i) => {
@@ -840,26 +988,30 @@ function penSetVerdubbelaarSetup(naam, val) {
 function renderPenInvoer() {
   const el = document.getElementById('pen-invoer');
   if(!el) return;
+  if(penMomentenLijst.length === 0) {
+    el.innerHTML = `<div class="alert alert-warning">⚠️ Geen Penalty Bokaal-momenten in de planning — voeg activiteiten met het label <strong>Penalty</strong> toe.</div>`;
+    return;
+  }
 
   let html = `<div class="card" style="margin-bottom:12px">
-    <div class="card-title">Dag selecteren</div>
+    <div class="card-title">Moment selecteren</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">`;
-  KAMPdagen.forEach((dag, i) => {
-    const done = penData[i].opgeslagen;
+  penData.forEach((d, i) => {
+    const done = d.opgeslagen;
     const active = i === penHuidigeDag;
-    html += `<button class="btn ${active?'btn-primary':'btn-outline'}" style="font-size:.78rem;padding:6px 12px" onclick="penSetDag(${i})">${dag}${done?' ✓':''}</button>`;
+    html += `<button class="btn ${active?'btn-primary':'btn-outline'}" style="font-size:.78rem;padding:6px 12px" onclick="penSetDag(${i})">${penMomentLabel(i)}${done?' ✓':''}</button>`;
   });
   html += `</div></div>`;
 
   const dagData = penData[penHuidigeDag];
-  const keepers = penKeepersPerDag[penHuidigeDag];
+  const keepers = penKeepersPerDag[penHuidigeDag] || (penKeepersPerDag[penHuidigeDag] = ['','']);
   const keeper1 = keepers[0] || '?';
   const keeper2 = keepers[1] || '?';
   const keepersOk = keepers[0] && keepers[1];
   const opgeslagen = dagData.opgeslagen;
 
   html += `<div class="alert ${keepersOk?'alert-info':'alert-warning'}">
-    📅 <strong>${KAMPdagen[penHuidigeDag]}</strong> —
+    📅 <strong>${penMomentLabel(penHuidigeDag)}</strong> —
     Keeper 1: <strong>${keeper1}</strong> · Keeper 2: <strong>${keeper2}</strong>
     ${!keepersOk?'<br>⚠️ Stel eerst de keepers in via het ⚙️ Instellen tabblad.':''}
   </div>`;
@@ -887,7 +1039,7 @@ function renderPenInvoer() {
           <span style="font-family:'DM Mono',monospace;color:var(--accent);font-size:.8rem">#${p.num}</span>
           <span style="font-weight:700;font-size:.88rem;flex:1">${fullName}</span>
           ${verdVandaag?`<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;background:#FDF4FF;color:#A21CAF;border:1px solid #F0ABFC">2× vandaag</span>`:''}
-          ${heeftVerd&&!verdVandaag?`<span style="font-size:.7rem;color:var(--muted-light)">2× op ${KAMPdagen[penVerdubbelaar[fullName]]}</span>`:''}
+          ${heeftVerd&&!verdVandaag?`<span style="font-size:.7rem;color:var(--muted-light)">2× op ${penMomentLabel(penVerdubbelaar[fullName])}</span>`:''}
           <span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700">${dagPts}pt · ${totPts}pt tot</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -906,7 +1058,7 @@ function renderPenInvoer() {
     </div>`;
   } else {
     html += `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <div class="alert alert-success" style="margin:0;flex:1">✓ ${KAMPdagen[penHuidigeDag]} opgeslagen.</div>
+      <div class="alert alert-success" style="margin:0;flex:1">✓ ${penMomentLabel(penHuidigeDag)} opgeslagen.</div>
       <button class="btn btn-outline" style="font-size:.78rem" onclick="penHeropen(${penHuidigeDag})">🔓 Heropenen (admin)</button>
     </div>`;
   }
@@ -976,7 +1128,7 @@ function penAdminEdit(spelerNaam, dagIdx, shotIdx) {
   const keepers = penKeepersPerDag[dagIdx];
 
   document.getElementById('modal-title').textContent = `Aanpassen: ${spelerNaam}`;
-  document.getElementById('modal-sub').textContent = `Penalty ${shotIdx+1} · ${KAMPdagen[dagIdx]}`;
+  document.getElementById('modal-sub').textContent = `Penalty ${shotIdx+1} · ${penMomentLabel(dagIdx)}`;
   document.getElementById('modal-body').innerHTML = `
     <div style="margin-bottom:12px">
       <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Keeper</label>
@@ -1006,29 +1158,29 @@ function penAdminSave(spelerNaam, dagIdx, shotIdx) {
   }
   closeModal();
   showToast('✓ Penalty aangepast!');
-  logActie('Penalty aangepast', `${spelerNaam} · ${KAMPdagen[dagIdx]}`);
+  logActie('Penalty aangepast', `${spelerNaam} · ${penMomentLabel(dagIdx)}`);
   renderPenalty();
 }
 
-function penSetDag(idx) { penHuidigeDag = idx; renderPenInvoer(); }
+function penSetDag(idx) { penHuidigeDag = idx; penDagHandmatig = true; renderPenInvoer(); }
 
 function penOpslaanDag(blijftBewerkbaar) {
   if(!blijftBewerkbaar) penData[penHuidigeDag].opgeslagen = true;
-  showToast(`✓ ${KAMPdagen[penHuidigeDag]} opgeslagen!`);
-  logActie('Penalty dag opgeslagen', KAMPdagen[penHuidigeDag]);
+  showToast(`✓ ${penMomentLabel(penHuidigeDag)} opgeslagen!`);
+  logActie('Penalty moment opgeslagen', penMomentLabel(penHuidigeDag));
   renderPenalty();
 }
 
 function penHeropen(dagIdx) {
   penData[dagIdx].opgeslagen = false;
-  showToast(`🔓 ${KAMPdagen[dagIdx]} heropend`);
+  showToast(`🔓 ${penMomentLabel(dagIdx)} heropend`);
   renderPenInvoer();
 }
 
 // ── SPELERS TAB ───────────────────────────────────────────────
-function renderPenSpelers() {
-  const el = document.getElementById('pen-spelers');
-  if(!el) return;
+// De stand-HTML staat los van het doel-element zodat dezelfde stand ook onder
+// Klassement → Penalty Bokaal getoond kan worden.
+function penSpelersHtml() {
   const sorted = [...PLAYERS_ALL].map(p=>({...p,pts:penTotaalSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
   const max = sorted[0]?.pts || 1;
   let html = '';
@@ -1041,13 +1193,19 @@ function renderPenSpelers() {
       <div class="rank-name">
         <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:6px"></span>
         ${p.name} <span style="color:var(--muted-light);font-size:.75rem;margin-left:4px">${p.team}</span>
-        ${vdag!=null?`<span style="font-size:.65rem;padding:1px 5px;border-radius:20px;background:#FDF4FF;color:#A21CAF;margin-left:4px">2× ${KAMPdagen[vdag].slice(0,2)}</span>`:''}
+        ${vdag!=null?`<span style="font-size:.65rem;padding:1px 5px;border-radius:20px;background:#FDF4FF;color:#A21CAF;margin-left:4px">2× ${penMomentLabel(vdag).slice(0,2)}</span>`:''}
       </div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(p.pts/max*100)}%"></div></div>
       <div class="rank-pts">${p.pts}pt</div>
     </div>`;
   });
-  el.innerHTML = html || '<div class="alert alert-info">Nog geen scores.</div>';
+  return html || '<div class="alert alert-info">Nog geen scores.</div>';
+}
+
+function renderPenSpelers() {
+  const el = document.getElementById('pen-spelers');
+  if(!el) return;
+  el.innerHTML = penSpelersHtml();
 }
 
 // ── KEEPERS TAB ───────────────────────────────────────────────
@@ -1057,10 +1215,10 @@ function renderPenKeepers() {
   const alleKeeperNamen = [...new Set([...KAMPSTAF, ...penData.flatMap(d => d.pogingen.map(p => p.keeperNaam)).filter(Boolean)])];
   const keeperStats = alleKeeperNamen.map(naam => {
     let totGoals=0, totPogingen=0;
-    const perDag = KAMPdagen.map((dag,i)=>{
+    const perDag = penData.map((_,i)=>{
       const {goals,total}=penDagTegengoalsKeeper(naam,i);
       totGoals+=goals; totPogingen+=total;
-      return {dag,goals,total};
+      return {dag:penMomentLabel(i),goals,total};
     });
     return {naam,totGoals,totPogingen,perDag};
   }).sort((a,b)=>a.totGoals-b.totGoals);
@@ -1076,7 +1234,7 @@ function renderPenKeepers() {
         <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--red)">${k.totGoals} tegen</span>
         <span style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--green)">${pct}% gestopt</span>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px">
+      <div style="display:grid;grid-template-columns:repeat(${Math.max(k.perDag.length,1)},1fr);gap:4px">
         ${k.perDag.map(d=>`<div style="text-align:center;background:var(--bg3);border-radius:5px;padding:5px 2px;font-size:.72rem">
           <div style="color:var(--muted);margin-bottom:2px">${d.dag.slice(0,2)}</div>
           <div style="font-weight:700;color:${d.total===0?'var(--muted-light)':d.goals===0?'var(--green)':'var(--red)'}">${d.total===0?'—':`${d.goals}/${d.total}`}</div>
@@ -1092,11 +1250,11 @@ function renderPenHistorie() {
   const el = document.getElementById('pen-historie');
   if(!el) return;
   let html = '';
-  KAMPdagen.forEach((dag,dagIdx)=>{
-    const dagData=penData[dagIdx];
+  penData.forEach((dagData,dagIdx)=>{
+    const dag=penMomentLabel(dagIdx);
     const goals=dagData.pogingen.filter(p=>p.goal).length;
     const n=dagData.pogingen.length;
-    const keepers=penKeepersPerDag[dagIdx];
+    const keepers=penKeepersPerDag[dagIdx]||['',''];
     html += `<div class="day-header">📅 ${dag} <span style="font-size:.75rem;font-weight:400;color:var(--muted);letter-spacing:0">${dagData.opgeslagen?'✓':'open'} · ${goals}/${n} goals · 🧤 ${keepers[0]||'?'} &amp; ${keepers[1]||'?'}</span></div>`;
     if(n===0){
       html+=`<div style="font-size:.83rem;color:var(--muted);padding:8px 12px">Nog geen pogingen.</div>`;
@@ -1392,50 +1550,141 @@ function penRondeBeslissen(rondeIdx){
 }
 
 // ── PRE-ONTBIJTSPEL DATA ──────────────────────────────────────
-// 2 spellen per kampdag. Elk spel: 4 duels (alle 8 teams, 1 duel per team per spel = 4 velden).
-// Win=3pt · Gelijk=1pt · Verlies=0pt. Eindklassement: 1e=8pt … 8e=1pt.
+// Per kampdag 2 spellen op 4 velden. Standaard: spel A op veld 1+2, spel B op veld 3+4;
+// per veld 2 rondes (elk veld/ronde = 1 duel van 2 teams). Win=3pt · Gelijk=1pt · Verlies=0pt.
+// Uitzondering (per spel instelbaar, niet de standaard): een 4-teams-spel — 4 teams spelen
+// tegelijk op 1 veld; het andere spel gebruikt dan 2 velden (3 velden totaal). Punten bij
+// 4 teams: rangschikking 3-2-1-0 (gelijke scores delen de hoogste punten van hun plek).
+// Eindklassement: 1e=8pt … 8e=1pt.
+const PRE_RONDES_PER_VELD = 2;
+function preStandaardVelden(slot) { return slot === 0 ? [1,2] : [3,4]; }
+function preMaakDuels(velden, vierTeams) {
+  const duels = [];
+  for(let ronde = 1; ronde <= PRE_RONDES_PER_VELD; ronde++) {
+    velden.forEach(veld => duels.push(vierTeams
+      ? {ronde, veld, team1:'', team2:'', team3:'', team4:'', score1:null, score2:null, score3:null, score4:null}
+      : {ronde, veld, team1:'', team2:'', score1:null, score2:null}));
+  }
+  return duels;
+}
 function genereerPreSpellenData() {
-  return Array.from({length: KAMPdagen.length * 2}, (_, i) => ({
-    naam: `Spel ${i+1}`,
-    dag: Math.floor(i / 2),   // index KAMPdagen
-    slot: i % 2,              // 0 of 1 (volgorde binnen dag)
-    uitleg: '',
-    leider1: '',
-    leider2: '',
-    duels: Array.from({length:4}, () => ({team1:'', team2:'', score1:null, score2:null})),
-    opgeslagen: false,
-    puntenGewicht: 1          // admin: win=3×gw · gelijk=1×gw · verlies=0
-  }));
+  return Array.from({length: KAMPdagen.length * 2}, (_, i) => {
+    const slot = i % 2;
+    const velden = preStandaardVelden(slot);
+    return {
+      naam: `Spel ${i+1}`,
+      dag: Math.floor(i / 2),   // index KAMPdagen
+      slot,                     // 0 of 1 (volgorde binnen dag)
+      uitleg: '',
+      leider1: '',
+      leider2: '',
+      vierTeams: false,         // uitzondering: 4 teams tegelijk op 1 veld
+      velden: [...velden],
+      duels: preMaakDuels(velden, false),
+      opgeslagen: false,
+      puntenGewicht: 1          // admin: win=3×gw · gelijk=1×gw · verlies=0
+    };
+  });
 }
 let preSpellenData = genereerPreSpellenData();
 let preHuidigeDag = 0;
 
-function renderPreOntbijt(){renderPreSchema();renderPreInvoer();renderPreSpellen();}
+// Migratie: data van vóór de velden/rondes-opzet had 4 duels zonder ronde/veld en kende
+// geen vierTeams/velden — vul die velden aan zonder ingevoerde teams/scores te verliezen.
+function preMigreerData() {
+  preSpellenData.forEach(spel => {
+    if(spel.vierTeams === undefined) spel.vierTeams = false;
+    if(!Array.isArray(spel.velden) || spel.velden.length === 0) {
+      spel.velden = spel.vierTeams ? [preStandaardVelden(spel.slot)[0]] : preStandaardVelden(spel.slot);
+    }
+    if(!Array.isArray(spel.duels)) spel.duels = preMaakDuels(spel.velden, spel.vierTeams);
+    spel.duels.forEach((d, i) => {
+      if(d.ronde === undefined) d.ronde = Math.floor(i / spel.velden.length) + 1;
+      if(d.veld === undefined) d.veld = spel.velden[i % spel.velden.length];
+    });
+  });
+}
 
-function preDuelPts(s1,s2,gw){
-  if(s1===null||s2===null)return[null,null];
-  gw=gw||1;
-  return s1>s2?[3*gw,0]:s1<s2?[0,3*gw]:[gw,gw];
+// Velden per dag opnieuw nummeren: een 4-teams-spel gebruikt 1 veld, een gewoon spel 2 —
+// in slot-volgorde doornummeren (standaard 1+2 / 3+4; met een 4-teams-spel bv. veld 1 / 2+3).
+function preHerverdeelVelden(dagIdx) {
+  let volgend = 1;
+  preSpellenData.filter(s => s.dag === dagIdx).forEach(s => {
+    const aantal = s.vierTeams ? 1 : 2;
+    s.velden = Array.from({length: aantal}, () => volgend++);
+    if(s.duels.length !== aantal * PRE_RONDES_PER_VELD) {
+      s.duels = preMaakDuels(s.velden, s.vierTeams);
+    } else {
+      s.duels.forEach((d, i) => { d.veld = s.velden[i % aantal]; d.ronde = Math.floor(i / aantal) + 1; });
+    }
+  });
+}
+
+function preZetVierTeams(si, aan) {
+  const spel = preSpellenData[si];
+  spel.vierTeams = aan;
+  spel.duels = preMaakDuels([0], aan); // veldnummers worden hieronder toegekend
+  preHerverdeelVelden(spel.dag);
+  logActie('Pre-ontbijt spelvorm gewijzigd', `${spel.naam}: ${aan?'4 teams op 1 veld':'2 velden, 2 teams per duel'}`);
+  showToast(aan ? '✓ 4-teams-spel — stel de teams opnieuw in' : '✓ Terug naar 2 velden — stel de teams opnieuw in');
+  renderPreOntbijt();
+}
+
+function renderPreOntbijt(){preMigreerData();renderPreSchema();renderPreInvoer();renderPreSpellen();}
+
+function preDuelTeamsLijst(spel, d) {
+  return spel.vierTeams ? [d.team1, d.team2, d.team3, d.team4] : [d.team1, d.team2];
+}
+function preDuelScoresLijst(spel, d) {
+  return spel.vierTeams ? [d.score1, d.score2, d.score3, d.score4] : [d.score1, d.score2];
+}
+function preDuelTeamsIngesteld(spel, d) {
+  return preDuelTeamsLijst(spel, d).every(t => !!t);
+}
+// Punten per duel (zelfde volgorde als de teams). 2 teams: win=3·gw / gelijk=1·gw.
+// 4 teams: rangschikking 3-2-1-0 ·gw — gelijke scores delen de hoogste punten van hun plek.
+function preDuelPunten(spel, d) {
+  const gw = spel.puntenGewicht || 1;
+  const scores = preDuelScoresLijst(spel, d);
+  if(scores.some(s => s === null || s === undefined)) return scores.map(() => null);
+  if(!spel.vierTeams) {
+    const [s1, s2] = scores;
+    return s1 > s2 ? [3*gw, 0] : s1 < s2 ? [0, 3*gw] : [gw, gw];
+  }
+  return scores.map(s => {
+    const rang = scores.filter(x => x > s).length + 1;
+    return [3, 2, 1, 0][rang - 1] * gw;
+  });
 }
 function preTotaalTeam(naam){
-  return preSpellenData.filter(s=>s.opgeslagen).reduce((tot,spel)=>{
+  let tot = 0;
+  preSpellenData.filter(s=>s.opgeslagen).forEach(spel=>{
     spel.duels.forEach(d=>{
-      const[p1,p2]=preDuelPts(d.score1,d.score2,spel.puntenGewicht);
-      if(d.team1===naam&&p1!==null)tot+=p1;
-      if(d.team2===naam&&p2!==null)tot+=p2;
+      const teams = preDuelTeamsLijst(spel, d);
+      const pts = preDuelPunten(spel, d);
+      teams.forEach((t, i) => { if(t === naam && pts[i] !== null) tot += pts[i]; });
     });
-    return tot;
-  },0);
+  });
+  return tot;
 }
 function preWDL(naam){
   const r={w:0,d:0,l:0};
   preSpellenData.filter(s=>s.opgeslagen).forEach(spel=>{
     spel.duels.forEach(d=>{
-      if(d.score1===null)return;
-      const isT1=d.team1===naam,isT2=d.team2===naam;
-      if(!isT1&&!isT2)return;
-      const gs=isT1?d.score1:d.score2,gc=isT1?d.score2:d.score1;
-      if(gs>gc)r.w++;else if(gs===gc)r.d++;else r.l++;
+      const teams = preDuelTeamsLijst(spel, d);
+      const idx = teams.indexOf(naam);
+      if(idx < 0) return;
+      const scores = preDuelScoresLijst(spel, d);
+      if(scores.some(s => s === null || s === undefined)) return;
+      if(!spel.vierTeams) {
+        const gs = scores[idx], gc = scores[1 - idx];
+        if(gs>gc)r.w++;else if(gs===gc)r.d++;else r.l++;
+      } else {
+        // 4 teams: 1e plek telt als winst, laatste als verlies, de plekken ertussen als gelijk
+        const rang = scores.filter(x => x > scores[idx]).length + 1;
+        const laatste = scores.filter(x => x < scores[idx]).length === 0;
+        if(rang === 1) r.w++; else if(laatste) r.l++; else r.d++;
+      }
     });
   });
   return r;
@@ -1473,25 +1722,31 @@ function renderPreSchema(){
     html+=`<div class="day-header">&#9728;&#65039; ${dag}</div>`;
     dagSpellen.forEach(spel=>{
       const si=preSpellenData.indexOf(spel);
-      const nDuels=spel.duels.filter(d=>d.team1&&d.team2).length;
+      const nDuels=spel.duels.filter(d=>preDuelTeamsIngesteld(spel,d)).length;
+      const totDuels=spel.duels.length;
+      const veldenTekst=spel.vierTeams?`4 teams · veld ${spel.velden.join('')}`:`veld ${spel.velden.join(' & ')}`;
       html+=`<div class="activity-row">
         <div style="flex:1">
-          <div style="font-weight:700;font-size:.88rem">${spel.naam}</div>
+          <div style="font-weight:700;font-size:.88rem">${spel.naam} <span style="font-size:.7rem;font-weight:600;color:var(--muted);padding:1px 7px;border-radius:20px;background:var(--bg3);margin-left:4px">${veldenTekst}</span></div>
           <div style="font-size:.75rem;color:var(--muted);margin-top:2px">
             ${spel.leider1||spel.leider2?`Leiders: ${[spel.leider1,spel.leider2].filter(Boolean).join(' &amp; ')}`:'Leiders nog niet ingesteld'}
-            &middot; ${nDuels}/4 duels ingesteld
+            &middot; ${nDuels}/${totDuels} rondes ingesteld
           </div>
           ${spel.opgeslagen?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">
-            ${spel.duels.filter(d=>d.team1&&d.team2).map(d=>{
-              const[p1,p2]=preDuelPts(d.score1,d.score2,spel.puntenGewicht);
-              return `<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--bg3);border:1px solid var(--border)">${d.team1} <strong>${d.score1??'–'}–${d.score2??'–'}</strong> ${d.team2}</span>`;
+            ${spel.duels.filter(d=>preDuelTeamsIngesteld(spel,d)).map(d=>{
+              const teams=preDuelTeamsLijst(spel,d);
+              const scores=preDuelScoresLijst(spel,d);
+              const inhoud=spel.vierTeams
+                ? teams.map((t,i)=>`${t} <strong>${scores[i]??'–'}</strong>`).join(' · ')
+                : `${teams[0]} <strong>${scores[0]??'–'}–${scores[1]??'–'}</strong> ${teams[1]}`;
+              return `<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--bg3);border:1px solid var(--border)">R${d.ronde} V${d.veld}: ${inhoud}</span>`;
             }).join('')}
           </div>`:''}
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
           ${spel.opgeslagen
             ?`<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--green-bg);color:var(--green);font-weight:700">&#10003;</span>`
-            :`<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--bg3);color:var(--muted)">${nDuels<4?'Open':'Klaar'}</span>`}
+            :`<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--bg3);color:var(--muted)">${nDuels<totDuels?'Open':'Klaar'}</span>`}
           ${spel.uitleg?`<button onclick="preUitlegModal(${si})" style="font-size:.7rem;padding:2px 7px;border-radius:4px;border:1px solid var(--border-dark);background:transparent;cursor:pointer;color:var(--accent)">&#128218; uitleg</button>`:''}
         </div>
       </div>`;
@@ -1503,13 +1758,19 @@ function renderPreSchema(){
 function preUitlegModal(si){
   const s=preSpellenData[si];
   document.getElementById('modal-title').textContent=s.naam;
-  document.getElementById('modal-sub').textContent=`${KAMPdagen[s.dag]} · slot ${s.slot+1} · Leiders: ${[s.leider1,s.leider2].filter(Boolean).join(' & ')||'—'}`;
+  document.getElementById('modal-sub').textContent=`${KAMPdagen[s.dag]} · spel ${s.slot===0?'A':'B'} · Leiders: ${[s.leider1,s.leider2].filter(Boolean).join(' & ')||'—'}`;
   document.getElementById('modal-body').innerHTML=`<div style="font-size:.85rem;white-space:pre-wrap;line-height:1.6">${s.uitleg||'Geen uitleg ingevoerd.'}</div>`;
   document.getElementById('modal-footer').innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Sluiten</button>`;
   openModal();
 }
 
 // ── INVOER TAB ────────────────────────────────────────────────
+function preZetScore(si, di, idx, val) {
+  const d = preSpellenData[si].duels[di];
+  d['score' + (idx + 1)] = val === '' ? null : parseInt(val);
+  renderPreInvoer();
+}
+
 function renderPreInvoer(){
   const el=document.getElementById('pre-invoer');
   if(!el)return;
@@ -1523,58 +1784,91 @@ function renderPreInvoer(){
 
   preSpellenData.filter(s=>s.dag===preHuidigeDag).forEach(spel=>{
     const si=preSpellenData.indexOf(spel);
-    const nDuels=spel.duels.filter(d=>d.team1&&d.team2).length;
+    const speelbaar=spel.duels.filter(d=>preDuelTeamsIngesteld(spel,d));
     html+=`<div class="ak-subgame" style="margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
         <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent)">${spel.naam}</div>
+        <span style="font-size:.7rem;font-weight:600;color:var(--muted);padding:1px 7px;border-radius:20px;background:var(--bg3)">${spel.vierTeams?`4 teams · veld ${spel.velden.join('')}`:`veld ${spel.velden.join(' & ')}`}</span>
         ${[spel.leider1,spel.leider2].filter(Boolean).length?`<span style="font-size:.75rem;color:var(--muted)">Leiders: ${[spel.leider1,spel.leider2].filter(Boolean).join(' &amp; ')}</span>`:''}
         ${spel.opgeslagen?`<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--green-bg);color:var(--green);font-weight:700">&#10003; Opgeslagen</span>`:''}
       </div>`;
-    if(nDuels===0){
-      html+=`<div class="alert alert-warning">&#9888;&#65039; Geen duels ingesteld. Ga naar &#9881;&#65039; Instellen.</div>`;
+    if(speelbaar.length===0){
+      html+=`<div class="alert alert-warning">&#9888;&#65039; Geen teams ingesteld. Ga naar &#9881;&#65039; Instellen.</div>`;
     } else if(spel.opgeslagen){
       html+=`<div style="display:grid;gap:6px;margin-bottom:8px">`;
-      spel.duels.filter(d=>d.team1&&d.team2).forEach(d=>{
-        const[p1,p2]=preDuelPts(d.score1,d.score2,spel.puntenGewicht);
-        const uitslag=p1===null?'—':p1>p2?`${d.team1} wint`:p1===p2?'Gelijk':`${d.team2} wint`;
-        const kleur=p1===null?'var(--muted)':p1===p2?'var(--muted)':'var(--green)';
-        html+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg2);border-radius:6px">
-          <span style="flex:1;font-weight:600;font-size:.83rem">${d.team1}</span>
-          <span style="font-family:'DM Mono',monospace;font-weight:800;font-size:1rem">${d.score1??'–'}–${d.score2??'–'}</span>
-          <span style="flex:1;font-weight:600;font-size:.83rem;text-align:right">${d.team2}</span>
-          <span style="font-size:.7rem;min-width:70px;text-align:center;padding:2px 6px;border-radius:20px;background:var(--bg3);color:${kleur}">${uitslag}${p1!==null?` (${p1}–${p2}pt)`:''}</span>
-        </div>`;
+      speelbaar.forEach(d=>{
+        const teams=preDuelTeamsLijst(spel,d);
+        const scores=preDuelScoresLijst(spel,d);
+        const pts=preDuelPunten(spel,d);
+        if(!spel.vierTeams){
+          const [p1,p2]=pts;
+          const uitslag=p1===null?'—':p1>p2?`${teams[0]} wint`:p1===p2?'Gelijk':`${teams[1]} wint`;
+          const kleur=p1===null?'var(--muted)':p1===p2?'var(--muted)':'var(--green)';
+          html+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg2);border-radius:6px">
+            <span style="font-size:.68rem;font-weight:700;color:var(--muted);width:56px;flex-shrink:0">R${d.ronde} · V${d.veld}</span>
+            <span style="flex:1;font-weight:600;font-size:.83rem">${teams[0]}</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:800;font-size:1rem">${scores[0]??'–'}–${scores[1]??'–'}</span>
+            <span style="flex:1;font-weight:600;font-size:.83rem;text-align:right">${teams[1]}</span>
+            <span style="font-size:.7rem;min-width:70px;text-align:center;padding:2px 6px;border-radius:20px;background:var(--bg3);color:${kleur}">${uitslag}${p1!==null?` (${p1}–${p2}pt)`:''}</span>
+          </div>`;
+        } else {
+          html+=`<div style="padding:8px;background:var(--bg2);border-radius:6px">
+            <div style="font-size:.68rem;font-weight:700;color:var(--muted);margin-bottom:6px">R${d.ronde} · V${d.veld} — 4 teams</div>
+            ${teams.map((t,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--border);font-size:.83rem">
+              <span style="flex:1;font-weight:600">${t}</span>
+              <span style="font-family:'DM Mono',monospace;font-weight:800">${scores[i]??'–'}</span>
+              <span style="font-size:.7rem;min-width:44px;text-align:right;color:var(--accent);font-family:'DM Mono',monospace">${pts[i]!==null?pts[i]+'pt':''}</span>
+            </div>`).join('')}
+          </div>`;
+        }
       });
       html+=`</div>`;
       if(kanInv) html+=`<button class="btn btn-outline" style="font-size:.75rem" onclick="preHeropen(${si})">&#128275; Heropenen</button>`;
     } else {
       html+=`<div style="display:grid;gap:8px;margin-bottom:10px">`;
       spel.duels.forEach((d,di)=>{
-        if(!d.team1||!d.team2)return;
-        const[p1,p2]=preDuelPts(d.score1,d.score2,spel.puntenGewicht);
-        html+=`<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
-          <div style="font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:8px">Duel ${di+1}</div>
-          <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:8px">
-            <div>
-              <div style="font-weight:700;font-size:.82rem;margin-bottom:4px">${d.team1}</div>
-              <input type="number" min="0" value="${d.score1??''}" placeholder="0"
-                style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-family:'DM Mono',monospace;font-size:1.1rem;text-align:center"
+        if(!preDuelTeamsIngesteld(spel,d))return;
+        const teams=preDuelTeamsLijst(spel,d);
+        const scores=preDuelScoresLijst(spel,d);
+        const pts=preDuelPunten(spel,d);
+        if(!spel.vierTeams){
+          const [p1,p2]=pts;
+          html+=`<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+            <div style="font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:8px">Ronde ${d.ronde} · Veld ${d.veld}</div>
+            <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:8px">
+              <div>
+                <div style="font-weight:700;font-size:.82rem;margin-bottom:4px">${teams[0]}</div>
+                <input type="number" min="0" value="${scores[0]??''}" placeholder="0"
+                  style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-family:'DM Mono',monospace;font-size:1.1rem;text-align:center"
+                  ${!kanInv?'disabled':''}
+                  onchange="preZetScore(${si},${di},0,this.value)">
+              </div>
+              <div style="text-align:center;padding-bottom:6px">
+                <div style="font-weight:800;color:var(--muted);font-size:1.2rem">–</div>
+                ${p1!==null?`<div style="font-size:.68rem;color:${p1>p2?'var(--green)':p1===p2?'var(--muted)':'var(--red)'}">${p1>p2?'W–V':p1===p2?'Gelijk':'V–W'}</div>`:''}
+              </div>
+              <div>
+                <div style="font-weight:700;font-size:.82rem;margin-bottom:4px;text-align:right">${teams[1]}</div>
+                <input type="number" min="0" value="${scores[1]??''}" placeholder="0"
+                  style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-family:'DM Mono',monospace;font-size:1.1rem;text-align:center"
+                  ${!kanInv?'disabled':''}
+                  onchange="preZetScore(${si},${di},1,this.value)">
+              </div>
+            </div>
+          </div>`;
+        } else {
+          html+=`<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+            <div style="font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:8px">Ronde ${d.ronde} · Veld ${d.veld} — 4 teams tegelijk (1e=3pt · 2e=2pt · 3e=1pt · 4e=0pt)</div>
+            ${teams.map((t,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)">
+              <span style="flex:1;font-weight:600;font-size:.85rem">${t}</span>
+              <input type="number" min="0" value="${scores[i]??''}" placeholder="score"
+                style="width:80px;padding:7px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-family:'DM Mono',monospace;font-size:.95rem;text-align:center"
                 ${!kanInv?'disabled':''}
-                onchange="preSpellenData[${si}].duels[${di}].score1=this.value===''?null:parseInt(this.value);renderPreInvoer()">
-            </div>
-            <div style="text-align:center;padding-bottom:6px">
-              <div style="font-weight:800;color:var(--muted);font-size:1.2rem">–</div>
-              ${p1!==null?`<div style="font-size:.68rem;color:${p1>p2?'var(--green)':p1===p2?'var(--muted)':'var(--red)'}">${p1>p2?'W–V':p1===p2?'Gelijk':'V–W'}</div>`:''}
-            </div>
-            <div>
-              <div style="font-weight:700;font-size:.82rem;margin-bottom:4px;text-align:right">${d.team2}</div>
-              <input type="number" min="0" value="${d.score2??''}" placeholder="0"
-                style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-family:'DM Mono',monospace;font-size:1.1rem;text-align:center"
-                ${!kanInv?'disabled':''}
-                onchange="preSpellenData[${si}].duels[${di}].score2=this.value===''?null:parseInt(this.value);renderPreInvoer()">
-            </div>
-          </div>
-        </div>`;
+                onchange="preZetScore(${si},${di},${i},this.value)">
+              <span style="font-size:.72rem;min-width:44px;text-align:right;color:var(--accent);font-family:'DM Mono',monospace;font-weight:700">${pts[i]!==null?pts[i]+'pt':''}</span>
+            </div>`).join('')}
+          </div>`;
+        }
       });
       html+=`</div>`;
       if(kanInv) html+=`<button class="btn btn-primary" style="font-size:.78rem" onclick="preOpslaanSpel(${si})">&#10003; Scores opslaan</button>`;
@@ -1585,12 +1879,17 @@ function renderPreInvoer(){
 }
 
 // ── INSTELLEN TAB (admin) ─────────────────────────────────────
+function preZetTeam(si, di, idx, val) {
+  preSpellenData[si].duels[di]['team' + (idx + 1)] = val;
+  renderPreSchema();
+}
+
 function renderPreSpellen(){
   const el=document.getElementById('pre-spellen');
   if(!el)return;
   const admin=isAdmin();
   let html=`<div class="alert ${admin?'alert-info':'alert-warning'}" style="margin-bottom:12px">
-    ${admin?'Stel hier alle 10 spellen in: naam, leiders, teams per duel en uitleg. Het schema geldt voor de hele week.':'Alleen de admin kan het schema instellen.'}
+    ${admin?'Stel per dag 2 spellen in: naam, leiders, teams per ronde/veld en uitleg. Standaard speelt spel A op veld 1+2 en spel B op veld 3+4, met 2 rondes per veld. Vink "4 teams tegelijk" aan voor een spel met 4 teams op 1 veld (het andere spel gebruikt dan 2 velden — 3 velden totaal).':'Alleen de admin kan het schema instellen.'}
   </div>`;
   KAMPdagen.forEach((dag,di)=>{
     const dagSpellen=preSpellenData.filter(s=>s.dag===di);
@@ -1598,11 +1897,15 @@ function renderPreSpellen(){
     dagSpellen.forEach(spel=>{
       const si=preSpellenData.indexOf(spel);
       html+=`<div class="ak-subgame" style="margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted)">SLOT ${spel.slot+1}</span>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <span style="font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted)">SPEL ${spel.slot===0?'A':'B'} · VELD ${spel.velden.join(spel.vierTeams?'':' & ')}</span>
           ${admin
-            ?`<input value="${spel.naam}" placeholder="Naam spel..." style="flex:1;padding:5px 9px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.88rem;font-weight:700;color:var(--text)" onchange="preSpellenData[${si}].naam=this.value;renderPreSchema()">`
+            ?`<input value="${spel.naam}" placeholder="Naam spel..." style="flex:1;min-width:140px;padding:5px 9px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.88rem;font-weight:700;color:var(--text)" onchange="preSpellenData[${si}].naam=this.value;renderPreSchema()">`
             :`<span style="font-weight:700">${spel.naam}</span>`}
+          ${admin?`<label style="display:flex;align-items:center;gap:5px;font-size:.75rem;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap">
+            <input type="checkbox" ${spel.vierTeams?'checked':''} onchange="preZetVierTeams(${si},this.checked)" style="width:15px;height:15px;accent-color:var(--accent)">
+            4 teams tegelijk (1 veld)
+          </label>`:spel.vierTeams?`<span style="font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--accent-light);color:var(--accent)">4 teams</span>`:''}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
           <div>
@@ -1615,20 +1918,26 @@ function renderPreSpellen(){
           </div>
         </div>
         <div style="margin-bottom:10px">
-          <label style="font-size:.65rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">DUELS — 4 teams-paren (alle 8 teams spelen 1 duel per spel)</label>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-            ${spel.duels.map((d,di2)=>`
-              <div style="display:flex;align-items:center;gap:4px;padding:6px;background:var(--bg3);border-radius:5px;border:1px solid ${d.team1&&d.team2?'var(--green)':'var(--border)'}">
-                <span style="font-size:.65rem;color:var(--accent);font-weight:700;min-width:16px">${di2+1}.</span>
-                <select style="flex:1;min-width:0;padding:3px 4px;background:var(--bg);border:1px solid var(--border-dark);border-radius:4px;font-size:.72rem;color:var(--text)" ${!admin?'disabled':''} onchange="preSpellenData[${si}].duels[${di2}].team1=this.value">
-                  <option value="">Team A...</option>${TEAMS.map(t=>`<option value="${t.name}" ${d.team1===t.name?'selected':''}>${t.name}</option>`).join('')}
-                </select>
-                <span style="font-size:.65rem;color:var(--muted);font-weight:700">vs</span>
-                <select style="flex:1;min-width:0;padding:3px 4px;background:var(--bg);border:1px solid var(--border-dark);border-radius:4px;font-size:.72rem;color:var(--text)" ${!admin?'disabled':''} onchange="preSpellenData[${si}].duels[${di2}].team2=this.value">
-                  <option value="">Team B...</option>${TEAMS.map(t=>`<option value="${t.name}" ${d.team2===t.name?'selected':''}>${t.name}</option>`).join('')}
-                </select>
-              </div>
-            `).join('')}
+          <label style="font-size:.65rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">${spel.vierTeams?'RONDES — 4 teams tegelijk op 1 veld':'RONDES & VELDEN — 2 teams per duel'}</label>
+          <div style="display:grid;grid-template-columns:${spel.vierTeams?'1fr':'1fr 1fr'};gap:6px">
+            ${spel.duels.map((d,di2)=>{
+              const teamSelect=(idx,huidig)=>`<select style="flex:1;min-width:0;padding:3px 4px;background:var(--bg);border:1px solid var(--border-dark);border-radius:4px;font-size:.72rem;color:var(--text)" ${!admin?'disabled':''} onchange="preZetTeam(${si},${di2},${idx},this.value)">
+                  <option value="">Team...</option>${TEAMS.map(t=>`<option value="${t.name}" ${huidig===t.name?'selected':''}>${t.name}</option>`).join('')}
+                </select>`;
+              const compleet=preDuelTeamsIngesteld(spel,d);
+              if(!spel.vierTeams){
+                return `<div style="display:flex;align-items:center;gap:4px;padding:6px;background:var(--bg3);border-radius:5px;border:1px solid ${compleet?'var(--green)':'var(--border)'}">
+                  <span style="font-size:.65rem;color:var(--accent);font-weight:700;white-space:nowrap">R${d.ronde} V${d.veld}</span>
+                  ${teamSelect(0,d.team1)}
+                  <span style="font-size:.65rem;color:var(--muted);font-weight:700">vs</span>
+                  ${teamSelect(1,d.team2)}
+                </div>`;
+              }
+              return `<div style="display:flex;align-items:center;gap:4px;padding:6px;background:var(--bg3);border-radius:5px;border:1px solid ${compleet?'var(--green)':'var(--border)'};flex-wrap:wrap">
+                <span style="font-size:.65rem;color:var(--accent);font-weight:700;white-space:nowrap">R${d.ronde} V${d.veld}</span>
+                ${teamSelect(0,d.team1)}${teamSelect(1,d.team2)}${teamSelect(2,d.team3)}${teamSelect(3,d.team4)}
+              </div>`;
+            }).join('')}
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start">
@@ -1654,19 +1963,22 @@ function preSetDag(i){preHuidigeDag=i;renderPreInvoer();}
 
 function preOpslaanSpel(si){
   const spel=preSpellenData[si];
-  const metTeams=spel.duels.filter(d=>d.team1&&d.team2);
-  if(metTeams.some(d=>d.score1===null||d.score2===null)){showToast('&#9888;&#65039; Vul eerst alle scores in');return;}
+  const metTeams=spel.duels.filter(d=>preDuelTeamsIngesteld(spel,d));
+  if(metTeams.some(d=>preDuelScoresLijst(spel,d).some(s=>s===null||s===undefined))){showToast('&#9888;&#65039; Vul eerst alle scores in');return;}
   spel.opgeslagen=true;
-  // GAME_HISTORY bijwerken (vervang bestaande entry)
+  // GAME_HISTORY bijwerken (vervang bestaande entry). Punten per team = som over alle
+  // rondes/velden van dit spel (2 duels per team, of 2× het 4-teams-spel).
   const naam=`Pre-ontbijt: ${spel.naam} (${KAMPdagen[spel.dag]})`;
   const bestaand=GAME_HISTORY.findIndex(g=>g.name===naam);
   if(bestaand>=0)GAME_HISTORY.splice(bestaand,1);
-  const scores=Array(8).fill(0);
+  const scores=Array(TEAMS.length).fill(0);
   metTeams.forEach(d=>{
-    const i1=TEAMS.findIndex(t=>t.name===d.team1),i2=TEAMS.findIndex(t=>t.name===d.team2);
-    const[p1,p2]=preDuelPts(d.score1,d.score2,spel.puntenGewicht);
-    if(i1>=0)scores[i1]=p1??0;
-    if(i2>=0)scores[i2]=p2??0;
+    const teams=preDuelTeamsLijst(spel,d);
+    const pts=preDuelPunten(spel,d);
+    teams.forEach((tn,i)=>{
+      const ti=TEAMS.findIndex(t=>t.name===tn);
+      if(ti>=0&&pts[i]!==null)scores[ti]+=pts[i];
+    });
   });
   GAME_HISTORY.push({name:naam,klassement:'Teamklassement',type:'raw',date:KAMPdagen[spel.dag],time:'07:30',scores});
   showToast(`&#10003; ${spel.naam} opgeslagen!`);
@@ -1767,13 +2079,39 @@ function showSection(id,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('section-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
-  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,instellingen:renderInstellingen})[id]?.();
+  ({dashboard:renderDashboard,teamklassement:renderTeamKlassement,vierkamp:renderVierkamp,penalty:renderPenalty,individueel:renderInd,planning:renderPlanning,spellen:renderSpellen,achtkamp:renderAchtkamp,preontbijt:renderPreOntbijt,instellingen:renderInstellingen,klpenalty:renderKlPenalty,klindividueel:renderKlIndividueel,klvierkamp:renderKlVierkamp})[id]?.();
   if(id === 'planning') planningScrollNaarVandaag();
+}
+
+// "Klassement" is het hoofdmenu-item dat alle tussenstanden verzamelt (Teamklassement,
+// Penalty Bokaal, Individueel, Vierkamp) — elk als eigen subonderdeel, zelfde patroon als
+// het Spellen-submenu. De standen zelf zijn ongewijzigd; ze worden hier alleen gebundeld.
+function showKlassementSub(id) {
+  const btn = document.querySelector('.nav-btn[onclick*="teamklassement"]');
+  showSection(id, btn);
+  document.querySelectorAll('.klassement-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id));
+}
+function renderKlPenalty() {
+  const el = document.getElementById('klpen-stand');
+  if(!el) return;
+  penSyncMetPlanning();
+  el.innerHTML = penSpelersHtml();
+}
+function renderKlIndividueel() {
+  const el = document.getElementById('klind-stand');
+  if(!el) return;
+  el.innerHTML = indStandHtml();
+}
+function renderKlVierkamp() {
+  const el = document.getElementById('klvk-stand');
+  if(!el) return;
+  el.innerHTML = vkStandHtml();
 }
 
 // Bij het openen van Planning meteen naar de huidige kampdag scrollen (indien vandaag
 // binnen de kampperiode valt) — buiten de kampperiode gewoon bovenaan laten beginnen.
 function planningScrollNaarVandaag() {
+  if(planningZoekTekst.trim()) return; // bij actief zoekfilter kloppen de dag-posities niet
   const idx = huidigeKampDagIndex();
   if(idx < 0) return;
   const dagEl = document.querySelectorAll('#planning-content .day-header')[idx];
@@ -1794,17 +2132,17 @@ function showSpellenSub(id) {
 
 // ── TAB SWITCHER ─────────────────────────────────────────────
 function setTab(prefix,tab,btn){
-  const sectionMap={tk:'teamklassement',vk:'vierkamp',pen:'penalty',ak:'achtkamp',ind:'individueel',pre:'preontbijt',inst:'instellingen'};
+  const sectionMap={tk:'teamklassement',vk:'vierkamp',pen:'penalty',ak:'achtkamp',ind:'individueel',pre:'preontbijt',inst:'instellingen',sp:'spellen'};
   const section=document.getElementById('section-'+sectionMap[prefix]);
   if(!section) return;
-  section.querySelectorAll('.tab:not(.spellen-sub-btn)').forEach(t=>t.classList.remove('active'));
+  section.querySelectorAll('.tab:not(.spellen-sub-btn):not(.klassement-sub-btn)').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   // hide all sub-panels
   ['stand','historie','duels','invoer','detail','spelers','keepers','setup','finale','groepen','spellen','schema','staf','overzicht','leeftijd','teams','kampstaf','labels','leiders','planningimport','preimport','atletiekimport','datums','exporteren','kamp','log'].forEach(p=>{const el=document.getElementById(prefix+'-'+p);if(el)el.style.display='none';});
   const target=document.getElementById(prefix+'-'+tab);
   if(target)target.style.display='block';
   // re-render
-  ({tk:renderTeamKlassement,vk:renderVierkamp,pen:renderPenalty,ak:renderAchtkamp,ind:renderInd,pre:renderPreOntbijt,inst:renderInstellingen})[prefix]?.();
+  ({tk:renderTeamKlassement,vk:renderVierkamp,pen:renderPenalty,ak:renderAchtkamp,ind:renderInd,pre:renderPreOntbijt,inst:renderInstellingen,sp:renderSpellen})[prefix]?.();
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────
@@ -1821,6 +2159,7 @@ function heroGradientVoorThema(thema) {
 }
 
 function renderDashboard(){
+  penSyncMetPlanning(); // penData in lijn met de planning (nodig voor "Nog af te ronden")
   const heroDay = document.getElementById('hero-day');
   if(heroDay) heroDay.textContent = KAMP_META.naam.toUpperCase();
   const heroSub = document.getElementById('hero-sub');
@@ -1843,22 +2182,55 @@ function renderDashboard(){
     <div class="lb-row rank-${i+1}"><div class="rank-num">${i+1}</div><div class="rank-medal">${medals[i]}</div>
     <div class="rank-name">${p.name} <span style="color:var(--muted-light);font-size:.75rem">${p.team}</span></div>
     <div class="rank-pts">${p.pts}pt</div></div>`).join('');
-  const vandaagIdx = huidigeKampDagIndex();
-  const todayDi = vandaagIdx >= 0 ? vandaagIdx : 0;
+  renderDashboardVandaag();
+  renderDashboardControle();
+}
+
+// ── Dashboard: dagprogramma met bladeren ──────────────────────
+// Standaard wordt de echte huidige dag getoond (Europe/Amsterdam, geklemd op de kampperiode);
+// met ‹ › kan iedereen handmatig naar andere dagen bladeren. null = automatisch vandaag volgen.
+let dashDagIndex = null;
+function dashSetDag(i) {
+  dashDagIndex = Math.max(0, Math.min(planningData.length - 1, i));
+  if(dashDagIndex === standaardKampDagIndex()) dashDagIndex = null; // terug op vandaag → weer volgen
+  renderDashboard();
+}
+function renderDashboardVandaag() {
+  const el = document.getElementById('dash-today');
+  if(!el) return;
+  if(planningData.length === 0) { el.innerHTML = '<div class="alert alert-info">Nog geen kampdagen ingesteld.</div>'; return; }
+  const todayDi = dashDagIndex ?? standaardKampDagIndex();
   const today = planningData[todayDi];
   const huidig = planningHuidigeActiviteit();
-  document.getElementById('dash-today').innerHTML=today.acts.map((a,ai)=>{
-    const isHuidig = !a.vervallen && huidig && huidig.di===todayDi && huidig.ai===ai;
-    const mom = a.vervallen ? null : planningActiviteitMoment(todayDi, a.time);
-    const isVoorbij = !a.vervallen && !isHuidig && mom && mom <= new Date();
-    return `<div class="activity-row type-${a.type}${a.vervallen?' act-vervallen':''}${isHuidig?' act-huidig':''}${isVoorbij?' act-voorbij':''}">
-      <div class="activity-row-main">
-        <div class="activity-time">${a.time}</div><div class="activity-name">${a.name}</div>${activiteitTagHtml(a)}
-      </div>
-      ${activiteitExtraHtml(a)}
-    </div>`;
-  }).join('');
-  renderDashboardControle();
+  const isEchtVandaag = todayDi === huidigeKampDagIndex();
+  const melding = dashDagIndex === null ? kampPeriodeMelding() : '';
+
+  let html = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <button class="btn btn-outline" style="font-size:.75rem;padding:4px 10px" ${todayDi<=0?'disabled':''} onclick="dashSetDag(${todayDi-1})">‹</button>
+    <div style="flex:1;text-align:center;font-weight:700;font-size:.9rem">${today.icon} ${today.day}
+      ${isEchtVandaag?'<span style="font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--green-bg);color:var(--green);margin-left:6px">vandaag</span>':''}
+    </div>
+    <button class="btn btn-outline" style="font-size:.75rem;padding:4px 10px" ${todayDi>=planningData.length-1?'disabled':''} onclick="dashSetDag(${todayDi+1})">›</button>
+    ${!isEchtVandaag && dashDagIndex!==null?`<button class="btn btn-outline" style="font-size:.72rem;padding:4px 10px" onclick="dashDagIndex=null;renderDashboard()">↩ vandaag</button>`:''}
+  </div>`;
+  if(melding) html += `<div class="alert alert-info" style="margin-bottom:10px">📅 ${melding}</div>`;
+
+  if(today.acts.length === 0) {
+    html += '<div style="font-size:.83rem;color:var(--muted);padding:8px 12px">Geen activiteiten gepland op deze dag.</div>';
+  } else {
+    html += today.acts.map((a,ai)=>{
+      const isHuidig = !a.vervallen && huidig && huidig.di===todayDi && huidig.ai===ai;
+      const mom = a.vervallen ? null : planningActiviteitMoment(todayDi, a.time);
+      const isVoorbij = !a.vervallen && !isHuidig && mom && mom <= new Date();
+      return `<div class="activity-row type-${a.type}${a.vervallen?' act-vervallen':''}${isHuidig?' act-huidig':''}${isVoorbij?' act-voorbij':''}">
+        <div class="activity-row-main">
+          <div class="activity-time">${a.time}</div><div class="activity-name">${a.name}</div>${activiteitTagHtml(a)}
+        </div>
+        ${activiteitExtraHtml(a)}
+      </div>`;
+    }).join('');
+  }
+  el.innerHTML = html;
 }
 
 // Bepaalt of een spel-activiteit al een uitslag/afronding heeft — gebruikt door de
@@ -1874,7 +2246,11 @@ function planningActiviteitAfgerond(a, di) {
     const dagIdx = IND_DAGEN.indexOf(planningData[di].day);
     return dagIdx>=0 && indSpellen[dagIdx].spellen.every(s => s.opgeslagen);
   }
-  if(kl === 'Penalty') return !!penData[di]?.opgeslagen;
+  if(kl === 'Penalty') {
+    if(penIsFinaleActiviteit(a)) return true; // finale wordt via het Finale-tabblad afgehandeld
+    const idx = penMomentenLijst.findIndex(m => m.di === di && planningData[di]?.acts[m.ai] === a);
+    return idx >= 0 ? !!penData[idx]?.opgeslagen : true;
+  }
   if(kl === 'Vierkamp') {
     const rondesVanDag = VK_RONDES.filter(r => r.dag === planningData[di].day || r.dag === KAMP_DAGEN[di]?.weekdag);
     return rondesVanDag.length > 0 && rondesVanDag.every(r => r.afgesloten);
@@ -1931,12 +2307,13 @@ function renderTeamKlassement(){
         <span style="color:var(--muted-light);font-size:.75rem;font-weight:400;margin-left:4px">${t.leader}</span></div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(t.pts/max*100)}%;background:${t.color}"></div></div>
       <div class="rank-pts">${t.pts}pt</div></div>`).join('');
+}
 
-  // HISTORIE
+// Spelhistorie (alle Teamklassement-uitslagen) — staat als tab onder Spellen.
+function spelHistorieHtml(){
   const games=GAME_HISTORY.filter(g=>g.klassement==='Teamklassement');
   if(!games.length){
-    document.getElementById('tk-historie').innerHTML=`<div class="alert alert-info">ℹ️ Nog geen spellen ingevoerd.</div><button class="btn btn-primary" onclick="openScoreModal(null,null,'Teamklassement')">+ Eerste spel invoeren</button>`;
-    return;
+    return `<div class="alert alert-info">ℹ️ Nog geen spellen ingevoerd.</div><button class="btn btn-primary" onclick="openScoreModal(null,null,'Teamklassement')">+ Eerste spel invoeren</button>`;
   }
   let html=`<div class="gh-wrap"><table class="gh-table"><thead><tr>
     <th>Spel</th><th>Dag</th><th>Tijd</th>`;
@@ -1957,7 +2334,7 @@ function renderTeamKlassement(){
   TEAMS.forEach((t,i)=>{html+=`<td class="pts-cell">${games.reduce((s,g)=>s+g.scores[i],0)}pt</td>`;});
   html+=`</tr></tbody></table></div>`;
   html+=`<div style="margin-top:12px"><button class="btn btn-primary" onclick="openScoreModal(null,null,'Teamklassement')">+ Nieuw spel invoeren</button></div>`;
-  document.getElementById('tk-historie').innerHTML=html;
+  return html;
 }
 
 // ── VIERKAMP ─────────────────────────────────────────────────
@@ -1984,9 +2361,9 @@ function renderVierkamp() {
   renderVkDuels();
 }
 
-function renderVkStand() {
-  const el = document.getElementById('vk-stand');
-  if(!el) return;
+// De stand-HTML staat los van het doel-element zodat dezelfde stand ook onder
+// Klassement → Vierkamp getoond kan worden.
+function vkStandHtml() {
   const stand = vkStand();
   const maxR = Math.max(stand[0]?.rondesGewonnen || 0, 1);
   // Vrijdag finale opzet
@@ -2008,7 +2385,13 @@ function renderVkStand() {
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(t.rondesGewonnen/maxR*100)}%;background:${t.color}"></div></div>
       <div class="rank-pts">${t.rondesGewonnen} <span style="font-size:.72rem;color:var(--muted)">rondes</span></div>
     </div>`).join('');
-  el.innerHTML = html || '<div class="alert alert-info">Nog geen rondes afgesloten.</div>';
+  return html || '<div class="alert alert-info">Nog geen rondes afgesloten.</div>';
+}
+
+function renderVkStand() {
+  const el = document.getElementById('vk-stand');
+  if(!el) return;
+  el.innerHTML = vkStandHtml();
 }
 
 function renderVkDuels() {
@@ -2118,6 +2501,18 @@ function setInactief(naam, val) {
 const EXTRA_STAF = ['Kampleiding']; // ← pas aan naar echte namen, of beheer via Teams → Kampstaf
 const KAMPSTAF = [...LEADERS, ...EXTRA_STAF]; // wordt dynamisch bijgehouden
 
+// Inactieve kampstaf-namen: blijven in EXTRA_STAF/LEADERS staan (historische koppelingen aan
+// spellen/planning blijven intact) maar verschijnen niet meer in keuzelijsten. Leider-accounts
+// die op inactief staan (Kampbeheer → Leiders) worden op naam ook uit de lijsten gefilterd.
+const INACTIEVE_STAF = new Set();
+function stafNaamActief(naam) {
+  if(!naam) return false;
+  if(INACTIEVE_STAF.has(naam)) return false;
+  const zoek = String(naam).trim().toLowerCase();
+  return !LEIDERS.some(l => l.actief === false &&
+    (leiderNaam(l).toLowerCase() === zoek || (l.voornaam||'').toLowerCase() === zoek));
+}
+
 // ── INDIVIDUEEL DATA ──────────────────────────────────────────
 const IND_GROEPEN = [
   { id:1, naam:'Groep A', spelers:[] },
@@ -2208,9 +2603,9 @@ function renderInd() {
   renderIndStand(); renderIndLeeftijd(); renderIndInvoer(); renderIndGroepen(); renderIndSpellen();
 }
 
-function renderIndStand() {
-  const el = document.getElementById('ind-stand');
-  if(!el) return;
+// De stand-HTML staat los van het doel-element zodat dezelfde stand ook onder
+// Klassement → Individueel getoond kan worden.
+function indStandHtml() {
   const sorted = PLAYERS_ALL.filter(p=>isActief(p.name)).map(p=>({...p, pts:indPuntenSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
   const max = sorted[0]?.pts || 1;
   let html = '';
@@ -2223,7 +2618,13 @@ function renderIndStand() {
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(p.pts/max*100)}%"></div></div>
       <div class="rank-pts">${p.pts}pt</div></div>`;
   });
-  el.innerHTML = html || '<div class="alert alert-info">Nog geen scores ingevoerd.</div>';
+  return html || '<div class="alert alert-info">Nog geen scores ingevoerd.</div>';
+}
+
+function renderIndStand() {
+  const el = document.getElementById('ind-stand');
+  if(!el) return;
+  el.innerHTML = indStandHtml();
 }
 
 function renderIndLeeftijd() {
@@ -2590,10 +2991,12 @@ function renderTeamsStaf(){
     <div style="display:flex;flex-wrap:wrap;gap:6px">`;
   LEADERS.forEach((l,i) => {
     const t = TEAMS[i];
-    html += `<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.83rem">
+    const inactief = !stafNaamActief(l);
+    html += `<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.83rem;${inactief?'opacity:.5':''}">
       <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.color}"></span>
-      <span style="font-weight:600">${l}</span>
+      <span style="font-weight:600;${inactief?'text-decoration:line-through':''}">${l}</span>
       <span style="color:var(--muted-light);font-size:.75rem">${t.name}</span>
+      ${inactief?'<span style="font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--red-bg);color:var(--red)">inactief</span>':''}
     </div>`;
   });
   html += `</div></div>
@@ -2603,8 +3006,10 @@ function renderTeamsStaf(){
     <div style="margin-bottom:10px" id="extra-staf-lijst">`;
 
   EXTRA_STAF.forEach((naam, i) => {
-    html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
-      <span style="flex:1;font-weight:600;font-size:.88rem">&#128100; ${naam}</span>
+    const inactief = INACTIEVE_STAF.has(naam);
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);${inactief?'opacity:.55':''}">
+      <span style="flex:1;font-weight:600;font-size:.88rem;${inactief?'text-decoration:line-through':''}">&#128100; ${naam}</span>
+      <button onclick="stafZetInactief('${naam.replace(/'/g,"\\'")}',${inactief?'false':'true'})" style="padding:3px 10px;border-radius:20px;border:1px solid ${inactief?'#FECACA':'#A7F3D0'};background:${inactief?'var(--red-bg)':'var(--green-bg)'};color:${inactief?'var(--red)':'var(--green)'};font-size:.72rem;font-weight:700;cursor:pointer">${inactief?'Inactief':'Actief'}</button>
       <button onclick="stafVerwijder(${i})" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;font-size:.75rem;color:var(--red);cursor:pointer">Verwijder</button>
     </div>`;
   });
@@ -2635,9 +3040,20 @@ function stafToevoegen() {
 }
 
 function stafVerwijder(idx) {
+  INACTIEVE_STAF.delete(EXTRA_STAF[idx]);
   EXTRA_STAF.splice(idx, 1);
   herbouwKampstaf();
   renderTeamsStaf();
+}
+
+// Kampstaflid op inactief zetten: naam blijft bestaan (historische koppelingen intact) maar
+// verdwijnt uit alle keuzelijsten (keepers, spelleiders, planning-leiders).
+function stafZetInactief(naam, inactief) {
+  if(inactief) INACTIEVE_STAF.add(naam); else INACTIEVE_STAF.delete(naam);
+  herbouwKampstaf();
+  logActie(inactief ? 'Kampstaflid op inactief gezet' : 'Kampstaflid geheractiveerd', naam);
+  showToast(`&#10003; ${naam} is nu ${inactief?'inactief':'actief'}`);
+  renderTeamsStaf(); renderInstKampstaf();
 }
 
 function showTeamModal(id){
@@ -2743,14 +3159,25 @@ function teamsCsvToepassen() {
 // hebben echte scoring-logica erachter (Teamklassement/Vierkamp/etc.) en zijn daarom niet
 // verwijderbaar — alleen hun kleur is aanpasbaar. Custom labels zijn puur organisatorisch
 // (geen scoring) en vrij toe te voegen/verwijderen door de admin (Kampbeheer → Labels).
+// Elk label heeft een `type` — exact dezelfde lijst als de TYPE-keuze in de planning (zie
+// LABEL_TYPES, afgeleid van PLANNING_TYPES — één gedeelde bron). Het type bepaalt of een
+// activiteit met dat label terugkomt op de Spellen-pagina (alleen type 'spel' verschijnt daar).
 let LABELS = [
-  {id:'Teamklassement', naam:'Teamklassement', kleur:'#2563EB', systeem:true},
-  {id:'Vierkamp',       naam:'Vierkamp',       kleur:'#7C3AED', systeem:true},
-  {id:'Penalty',        naam:'Penalty',        kleur:'#A21CAF', systeem:true},
-  {id:'Individueel',    naam:'Individueel',    kleur:'#059669', systeem:true},
-  {id:'8-Kamp',         naam:'8-Kamp',         kleur:'#E11D48', systeem:true},
-  {id:'Pre-Ontbijt',    naam:'Pre-Ontbijt',    kleur:'#16A34A', systeem:true},
+  {id:'Teamklassement', naam:'Teamklassement', kleur:'#2563EB', systeem:true, type:'spel'},
+  {id:'Vierkamp',       naam:'Vierkamp',       kleur:'#7C3AED', systeem:true, type:'spel'},
+  {id:'Penalty',        naam:'Penalty',        kleur:'#A21CAF', systeem:true, type:'spel'},
+  {id:'Individueel',    naam:'Individueel',    kleur:'#059669', systeem:true, type:'spel'},
+  {id:'8-Kamp',         naam:'8-Kamp',         kleur:'#E11D48', systeem:true, type:'spel'},
+  {id:'Pre-Ontbijt',    naam:'Pre-Ontbijt',    kleur:'#16A34A', systeem:true, type:'spel'},
 ];
+// Migratie: labels van vóór het type-veld krijgen 'spel' (het oude gedrag).
+function labelsMigreer() { LABELS.forEach(l => { if(!l.type) l.type = 'spel'; }); }
+// Het opgeslagen labeltype is een PLANNING_TYPES-val (kan ook een sneltoets zijn, bv.
+// 'vierkamp'); deze helper vertaalt dat naar het onderliggende activiteitstype.
+function labelType(naam) {
+  const val = LABELS.find(l => l.naam === naam)?.type || 'spel';
+  return (PLANNING_TYPES.find(t => t.val === val) || PLANNING_TYPES[0]).type;
+}
 let LABELS_NEXT_ID = 1;
 const TYPE_KLEUREN = { maaltijd:'#EA580C', vrij:'#64748B', info:'#2563EB', pauze:'#64748B' };
 // "Vierkamp"/"Penalty Bokaal"/"Individuele Spellen" zijn sneltoetsen in de TYPE-keuze: ze
@@ -2768,6 +3195,9 @@ const PLANNING_TYPES = [
   {val:'info',        label:'💬 Info / Aankondiging', type:'info'},
   {val:'pauze',       label:'⏸️ Pauze',               type:'pauze'},
 ];
+// De types die een label kan hebben = exact dezelfde lijst als de TYPE-keuze in de planning.
+// Eén gedeelde bron: wijzigt PLANNING_TYPES, dan wijzigen de labeltypes automatisch mee.
+const LABEL_TYPES = PLANNING_TYPES;
 // Geeft de te selecteren TYPE-optie voor een bestaande activiteit terug — herkent een
 // sneltoets (Vierkamp/Penalty/Individueel) aan het klassement, anders het gewone type.
 function planningTypeWaarde(a) {
@@ -2835,9 +3265,32 @@ function activiteitExtraHtml(a) {
 // Vergelijkt elke activiteit (dag + tijd, gekoppeld aan de echte kalenderdatum via
 // KAMP_DAGEN) met het huidige moment, zodat Planning en dashboard consistent kunnen tonen
 // welke activiteit nu bezig is (lichtgroen) en welke al voorbij zijn (lichtgrijs).
+// Vandaag als YYYY-MM-DD in Europe/Amsterdam. De kampdag-keys zijn lokale datums, dus
+// vergelijken via toISOString() (UTC) zou 's avonds/nachts de verkeerde dag aanwijzen.
+function vandaagIso() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date());
+}
 function huidigeKampDagIndex() {
-  const vandaag = new Date().toISOString().slice(0,10);
+  const vandaag = vandaagIso();
   return KAMP_DAGEN.findIndex(d => d.key === vandaag);
+}
+// De dag die de app standaard toont: vandaag als die binnen de kampperiode valt, anders
+// vastgeklemd op de eerste (vóór het kamp) of laatste (na het kamp) kampdag.
+function standaardKampDagIndex() {
+  const idx = huidigeKampDagIndex();
+  if(idx >= 0) return idx;
+  if(KAMP_DAGEN.length === 0) return 0;
+  return vandaagIso() < KAMP_DAGEN[0].key ? 0 : KAMP_DAGEN.length - 1;
+}
+// Melding wanneer vandaag buiten de kampperiode valt (leeg = we zitten in de kampweek).
+function kampPeriodeMelding() {
+  if(KAMP_DAGEN.length === 0 || huidigeKampDagIndex() >= 0) return '';
+  const vandaag = vandaagIso();
+  if(vandaag < KAMP_DAGEN[0].key) {
+    const dagen = Math.round((new Date(KAMP_DAGEN[0].key+'T00:00:00') - new Date(vandaag+'T00:00:00')) / 86400000);
+    return `Het kamp begint ${dagen===1?'morgen':`over ${dagen} dagen`} — je kijkt naar ${KAMP_DAGEN[0].label}.`;
+  }
+  return `Het kamp is afgelopen — je kijkt naar de laatste dag (${KAMP_DAGEN[KAMP_DAGEN.length-1].label}).`;
 }
 function planningActiviteitMoment(dagIdx, tijd) {
   const dagKey = KAMP_DAGEN[dagIdx]?.key;
@@ -2861,6 +3314,23 @@ function planningHuidigeActiviteit() {
   return best;
 }
 
+// ── PLANNING ZOEKEN/FILTEREN ──────────────────────────────────
+// Live filter over de hele weekplanning: matcht op activiteitnaam, label, leiders,
+// opmerking, tijd, type én dagnaam (dagnaam-match toont de hele dag). Het zoekveld staat
+// buiten planning-content zodat het focus houdt terwijl de lijst opnieuw rendert.
+let planningZoekTekst = '';
+function planningZoek(tekst) { planningZoekTekst = tekst; renderPlanning(); }
+function planningZoekWissen() {
+  planningZoekTekst = '';
+  const inp = document.getElementById('planning-zoek');
+  if(inp) { inp.value = ''; inp.focus(); }
+  renderPlanning();
+}
+function planningActMatcht(a, q) {
+  const velden = [a.name, a.klassement, a.customLabel, a.opmerking, a.time, a.type, ...(a.leiders||[])];
+  return velden.some(v => v && String(v).toLowerCase().includes(q));
+}
+
 function renderPlanning(){
   const el = document.getElementById('planning-content');
   if(!el) return;
@@ -2871,11 +3341,20 @@ function renderPlanning(){
     : 'Klik op een spel om direct de score in te voeren';
   const huidig = planningHuidigeActiviteit();
 
-  el.innerHTML = planningData.map((day, di) => `
+  const q = planningZoekTekst.trim().toLowerCase();
+  let gevonden = 0;
+  const dagenHtml = planningData.map((day, di) => {
+    const dagMatcht = q && day.day.toLowerCase().includes(q);
+    const rows = day.acts
+      .map((a, ai) => ({a, ai}))
+      .filter(({a}) => !q || dagMatcht || planningActMatcht(a, q));
+    if(q && rows.length === 0) return '';
+    gevonden += rows.length;
+    return `
     <div class="day-header">${day.icon} ${day.day}
-      ${admin ? `<button onclick="planningAdd(${di})" style="float:right;font-size:.72rem;padding:3px 10px;border:1px dashed var(--border-dark);border-radius:5px;background:transparent;cursor:pointer;color:var(--muted)">+ toevoegen</button>` : ''}
+      ${admin && !q ? `<button onclick="planningAdd(${di})" style="float:right;font-size:.72rem;padding:3px 10px;border:1px dashed var(--border-dark);border-radius:5px;background:transparent;cursor:pointer;color:var(--muted)">+ toevoegen</button>` : ''}
     </div>
-    ${day.acts.map((a, ai) => {
+    ${rows.map(({a, ai}) => {
       const kl = a.klassement;
       const is8kamp = kl === '8-Kamp';
 
@@ -2925,7 +3404,18 @@ function renderPlanning(){
         ${activiteitExtraHtml(a)}
       </div>`;
     }).join('')}
-  `).join('');
+  `;
+  }).join('');
+
+  el.innerHTML = (q && gevonden === 0)
+    ? `<div class="alert alert-info">&#128269; Geen activiteiten gevonden voor "<strong>${planningZoekTekst.trim()}</strong>".</div>`
+    : dagenHtml;
+
+  const teller = document.getElementById('planning-zoek-teller');
+  if(teller) {
+    teller.style.display = q ? 'block' : 'none';
+    if(q) teller.textContent = `${gevonden} activiteit${gevonden===1?'':'en'} gevonden`;
+  }
 }
 
 // ── PLANNING BEWERKEN (admin) ─────────────────────────────────
@@ -3006,6 +3496,8 @@ function planningEditSave(di, ai) {
   const typeOptie = PLANNING_TYPES.find(t => t.val === document.getElementById('pe-type')?.value) || PLANNING_TYPES[0];
   a.type       = typeOptie.type;
   a.klassement = typeOptie.klassement || (typeOptie.val==='spel' ? (document.getElementById('pe-kl')?.value||undefined) : undefined);
+  // Het gekozen label kan zelf een ander type meegeven (bv. een eigen label met type maaltijd)
+  if(!typeOptie.klassement && a.klassement) a.type = labelType(a.klassement);
   a.leiders    = [...document.querySelectorAll('#pe-leiders input[type=checkbox]:checked')].map(el=>el.value);
   const duurVal = document.getElementById('pe-duur')?.value;
   a.duur       = duurVal ? parseInt(duurVal) : undefined;
@@ -3097,9 +3589,10 @@ function planningAddSave(di) {
   const naam = document.getElementById('pa-naam')?.value?.trim();
   if(!naam){ showToast('&#9888;&#65039; Vul een naam in'); return; }
   const typeOptie = PLANNING_TYPES.find(t => t.val === document.getElementById('pa-type')?.value) || PLANNING_TYPES[0];
-  const type = typeOptie.type;
   const time = document.getElementById('pa-time')?.value || '12:00';
   const kl   = typeOptie.klassement || (typeOptie.val==='spel' ? (document.getElementById('pa-kl')?.value||undefined) : undefined);
+  // Het gekozen label kan zelf een ander type meegeven (bv. een eigen label met type maaltijd)
+  const type = (!typeOptie.klassement && kl) ? labelType(kl) : typeOptie.type;
   const leiders = [...document.querySelectorAll('#pa-leiders input[type=checkbox]:checked')].map(el=>el.value);
   const duurVal = document.getElementById('pa-duur')?.value;
   const duur = duurVal ? parseInt(duurVal) : undefined;
@@ -3273,11 +3766,12 @@ function planningImportToepassen() {
     } else if(r.typeLabel) {
       let label = LABELS.find(l => l.naam.toLowerCase() === r.typeLabel.toLowerCase());
       if(!label) {
-        label = {id:'custom_'+(LABELS_NEXT_ID++), naam: r.typeLabel, kleur: labelAutoKleur(), systeem:false};
+        label = {id:'custom_'+(LABELS_NEXT_ID++), naam: r.typeLabel, kleur: labelAutoKleur(), systeem:false, type:'spel'};
         LABELS.push(label);
         nieuweLabels.push(label.naam);
       }
       klassement = label.naam;
+      type = label.type || 'spel'; // labeltype bepaalt o.a. of de activiteit op de Spellen-pagina komt
     }
     const leiders = r.leiders.map(n => {
       const bekend = kampstafNaamHerkennen(n);
@@ -3309,7 +3803,9 @@ function planningImportToepassen() {
 let spellenLeiderFilter = '';
 
 function renderSpellen() {
-  const el = document.getElementById('spellen-content');
+  const historieEl = document.getElementById('sp-historie');
+  if(historieEl) historieEl.innerHTML = spelHistorieHtml();
+  const el = document.getElementById('sp-overzicht');
   if(!el) return;
 
   const rows = [];
@@ -3869,11 +4365,18 @@ function downloadTemplatePlanning() {
 function downloadTemplatePreOntbijt() {
   const dag = KAMPdagen[1] || KAMPdagen[0] || 'Maandag';
   const t = TEAMS;
-  downloadExcelTemplate('pre_ontbijt_template.xlsx', ['Dag','Slot','SpelNaam','Leider1','Leider2','Veld','Team1','Team2'], [
-    [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 1, t[0]?.name||'Rood Vuur', t[1]?.name||'Blauw Staal'],
-    [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 2, t[2]?.name||'Groen Woud', t[3]?.name||'Geel Zand'],
-    [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 3, t[4]?.name||'Oranje Zon', t[5]?.name||'Paars Veld'],
-    [dag, 1, 'Zaklopen', LEADERS[0]||'Thomas', LEADERS[1]||'Sven', 4, t[6]?.name||'Zwart Rots', t[7]?.name||'Wit Licht'],
+  const n = i => t[i]?.name || `Team ${i+1}`;
+  downloadExcelTemplate('pre_ontbijt_template.xlsx', ['Dag','Ronde','Spelnaam','Veld','Leider1','Leider2','Team1','Team2','Team3','Team4'], [
+    // Spel A (2 velden, 2 rondes)
+    [dag, 1, 'Zaklopen', 1, LEADERS[0]||'Thomas', LEADERS[1]||'Sven', n(0), n(1), '', ''],
+    [dag, 1, 'Zaklopen', 2, LEADERS[0]||'Thomas', LEADERS[1]||'Sven', n(2), n(3), '', ''],
+    [dag, 2, 'Zaklopen', 1, LEADERS[0]||'Thomas', LEADERS[1]||'Sven', n(0), n(2), '', ''],
+    [dag, 2, 'Zaklopen', 2, LEADERS[0]||'Thomas', LEADERS[1]||'Sven', n(1), n(3), '', ''],
+    // Spel B (2 velden, 2 rondes)
+    [dag, 1, 'Koekhappen', 3, LEADERS[2]||'Rick', LEADERS[3]||'Pieter', n(4), n(5), '', ''],
+    [dag, 1, 'Koekhappen', 4, LEADERS[2]||'Rick', LEADERS[3]||'Pieter', n(6), n(7), '', ''],
+    [dag, 2, 'Koekhappen', 3, LEADERS[2]||'Rick', LEADERS[3]||'Pieter', n(4), n(6), '', ''],
+    [dag, 2, 'Koekhappen', 4, LEADERS[2]||'Rick', LEADERS[3]||'Pieter', n(5), n(7), '', ''],
   ]);
 }
 
@@ -4088,18 +4591,24 @@ function instHuidigeSpelersHtml() {
 function renderInstLabels() {
   const el = document.getElementById('inst-labels');
   if(!el) return;
+  labelsMigreer();
+  const typeSelect = (huidig, onchange, disabled) => `<select ${disabled?'disabled ':''}onchange="${onchange}" style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;font-size:.78rem;color:var(--text);${disabled?'opacity:.55;':''}">
+      ${LABEL_TYPES.map(t=>`<option value="${t.val}" ${huidig===t.val?'selected':''}>${t.label}</option>`).join('')}
+    </select>`;
   let html = `<div class="alert alert-info" style="margin-bottom:12px">
-    Labels bepalen de gekleurde tag op een activiteit in Planning/Spellen. De 6 systeemlabels
-    (Teamklassement, Vierkamp, Penalty, Individueel, 8-Kamp, Pre-Ontbijt) horen bij een werkend
-    onderdeel van de app en zijn niet verwijderbaar — wel van kleur te wisselen. Eigen labels
-    zijn puur organisatorisch (geen score-logica erachter) en vrij toe te voegen/verwijderen.
+    Labels bepalen de gekleurde tag op een activiteit in Planning/Spellen. Elk label heeft een
+    <strong>type</strong> — dezelfde lijst als de TYPE-keuze in de planning. Het type bepaalt of
+    activiteiten met dat label terugkomen op de Spellen-pagina (alleen type "Spel" verschijnt
+    daar). De 6 systeemlabels horen bij een werkend spelonderdeel en zijn altijd type "Spel" en
+    niet verwijderbaar — wel van kleur te wisselen. Eigen labels zijn vrij toe te voegen/verwijderen.
   </div>
   <div class="card" style="margin-bottom:12px">
     <div class="card-title">Labels</div>`;
   LABELS.forEach((l,i) => {
-    html += `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
       <input type="color" value="${l.kleur}" onchange="labelSetKleur(${i},this.value)" style="width:36px;height:28px;border:1px solid var(--border-dark);border-radius:5px;padding:0;cursor:pointer">
       <span class="activity-tag" style="background:${l.kleur}1a;color:${l.kleur}">${l.naam}</span>
+      ${typeSelect(l.type, `labelSetType(${i},this.value)`, l.systeem)}
       <span style="flex:1;font-size:.8rem;color:var(--muted-light)">${l.systeem?'Systeemlabel':'Eigen label'}</span>
       ${!l.systeem?`<button onclick="labelVerwijder(${i})" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;font-size:.75rem;color:var(--red);cursor:pointer">Verwijder</button>`:''}
     </div>`;
@@ -4109,11 +4618,26 @@ function renderInstLabels() {
     <div class="card-title">Nieuw label toevoegen</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <input id="nieuw-label-naam" placeholder="Naam label..." style="flex:1;min-width:160px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
+      <select id="nieuw-label-type" style="padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.82rem;color:var(--text)">
+        ${LABEL_TYPES.map(t=>`<option value="${t.val}">${t.label}</option>`).join('')}
+      </select>
       <input id="nieuw-label-kleur" type="color" value="#2563EB" style="width:44px;height:36px;border:1px solid var(--border-dark);border-radius:6px;padding:0;cursor:pointer">
       <button class="btn btn-primary" onclick="labelToevoegen()">+ Toevoegen</button>
     </div>
   </div>`;
   el.innerHTML = html;
+}
+
+// Type van een label wijzigen — bestaande planning-activiteiten met dit label krijgen
+// meteen het nieuwe type, zodat "terugkomen in de spellen" direct klopt met de instelling.
+function labelSetType(i, type) {
+  const l = LABELS[i];
+  if(l.systeem) return;
+  l.type = type;
+  const optie = LABEL_TYPES.find(t => t.val === type) || LABEL_TYPES[0];
+  planningData.forEach(day => day.acts.forEach(a => { if(a.klassement === l.naam) a.type = optie.type; }));
+  logActie('Label type aangepast', `${l.naam} → ${optie.label.replace(/^\S+\s/,'')}`);
+  renderInstLabels(); renderPlanning(); renderDashboard(); renderSpellen();
 }
 
 function labelSetKleur(i, kleur) {
@@ -4128,8 +4652,9 @@ function labelToevoegen() {
   if(!naam) { showToast('&#9888; Vul een naam in'); return; }
   if(LABELS.some(l => l.naam.toLowerCase() === naam.toLowerCase())) { showToast('&#9888; Dit label bestaat al'); return; }
   const kleur = document.getElementById('nieuw-label-kleur')?.value || '#2563EB';
-  LABELS.push({id:'custom_'+(LABELS_NEXT_ID++), naam, kleur, systeem:false});
-  logActie('Label toegevoegd', naam);
+  const type = document.getElementById('nieuw-label-type')?.value || 'spel';
+  LABELS.push({id:'custom_'+(LABELS_NEXT_ID++), naam, kleur, systeem:false, type});
+  logActie('Label toegevoegd', `${naam} (type: ${type})`);
   showToast(`&#10003; Label "${naam}" toegevoegd`);
   renderInstLabels();
 }
@@ -4146,27 +4671,37 @@ function labelVerwijder(i) {
 function renderInstLeiders() {
   const el = document.getElementById('inst-leiders');
   if(!el) return;
+  LEIDERS.forEach(l => { if(l.actief === undefined) l.actief = true; }); // migratie oudere data
+  const nInactief = LEIDERS.filter(l => l.actief === false).length;
   let html = `<div class="alert alert-info" style="margin-bottom:12px">
     Elke kampleider heeft een eigen account. Gebruikersnaam = voornaam+achternaam aan elkaar
     (automatisch bepaald). Wachtwoorden worden alleen als hash opgeslagen, nooit in platte tekst.
+    Een <strong>inactieve</strong> leider hoeft niet verwijderd te worden: het account kan niet
+    meer inloggen en de naam verdwijnt uit keuzelijsten (spellen, keepers, planning), maar alle
+    bestaande koppelingen aan eerdere spellen en scores blijven gewoon staan.
   </div>
   <div class="card" style="margin-bottom:12px">
-    <div class="card-title">Leiders (${LEIDERS.length})</div>
+    <div class="card-title">Leiders (${LEIDERS.length}${nInactief?` · ${nInactief} inactief`:''})</div>
     <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.82rem">
       <thead><tr style="background:var(--bg2)">
         <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Naam</th>
         <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Login</th>
         <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Rol</th>
         <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Team</th>
+        <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">Status</th>
         <th style="padding:6px 8px"></th>
       </tr></thead><tbody>`;
   LEIDERS.forEach((l,i) => {
     const teamNaam = l.teamId ? (TEAMS.find(t=>t.id===l.teamId)?.name || '—') : '—';
-    html += `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}">
-      <td style="padding:6px 8px;font-weight:600">${leiderNaam(l)}</td>
+    const inactief = l.actief === false;
+    html += `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}${inactief?';opacity:.55':''}">
+      <td style="padding:6px 8px;font-weight:600;${inactief?'text-decoration:line-through':''}">${leiderNaam(l)}</td>
       <td style="padding:6px 8px;font-family:'DM Mono',monospace;color:var(--muted)">${l.login}</td>
       <td style="padding:6px 8px"><span class="rol-badge rol-${l.rol}">${l.rol==='admin'?'Admin':l.rol==='groepsleider'?'Groepsleider':'Kampstaf'}</span></td>
       <td style="padding:6px 8px;color:var(--muted)">${teamNaam}</td>
+      <td style="padding:6px 8px">
+        <button onclick="leiderToggleActief(${i})" style="padding:3px 10px;border-radius:20px;border:1px solid ${inactief?'#FECACA':'#A7F3D0'};background:${inactief?'var(--red-bg)':'var(--green-bg)'};color:${inactief?'var(--red)':'var(--green)'};font-size:.72rem;font-weight:700;cursor:pointer">${inactief?'Inactief':'Actief'}</button>
+      </td>
       <td style="padding:6px 8px;text-align:right"><button onclick="leiderBewerken(${i})" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;font-size:.75rem;color:var(--muted);cursor:pointer">Bewerken</button></td>
     </tr>`;
   });
@@ -4174,6 +4709,20 @@ function renderInstLeiders() {
     <div style="margin-top:10px"><button class="btn btn-primary" style="font-size:.82rem" onclick="leiderNieuw()">&#43; Nieuwe leider</button></div>
   </div>`;
   el.innerHTML = html;
+}
+
+function leiderToggleActief(i) {
+  const l = LEIDERS[i];
+  const naarInactief = l.actief !== false;
+  if(naarInactief && l.rol === 'admin' && LEIDERS.filter(x => x.rol === 'admin' && x.actief !== false).length <= 1) {
+    showToast('&#9888; Je kunt de laatste actieve admin niet op inactief zetten');
+    return;
+  }
+  l.actief = !naarInactief;
+  herbouwKampstaf();
+  logActie(naarInactief ? 'Leider op inactief gezet' : 'Leider geheractiveerd', leiderNaam(l));
+  showToast(`&#10003; ${leiderNaam(l)} is nu ${naarInactief?'inactief':'actief'}`);
+  renderInstLeiders(); renderTeamsStaf();
 }
 
 function leiderNieuw() {
@@ -4217,7 +4766,7 @@ async function leiderNieuwOpslaan() {
   const login = leiderLogin(voornaam, achternaam);
   if(LEIDERS.some(l => l.login === login)) { showToast('&#9888; Deze gebruikersnaam bestaat al'); return; }
   const wachtwoordHash = await hashWachtwoord(wachtwoord);
-  LEIDERS.push({id: LEIDERS_NEXT_ID++, voornaam, achternaam, login, wachtwoordHash, rol, teamId});
+  LEIDERS.push({id: LEIDERS_NEXT_ID++, voornaam, achternaam, login, wachtwoordHash, rol, teamId, actief: true});
   closeModal();
   logActie('Leider aangemaakt', `${voornaam} ${achternaam}`.trim());
   showToast(`&#10003; ${voornaam} toegevoegd als leider`);
@@ -4260,7 +4809,7 @@ function leiderBewerken(i) {
 async function leiderBewerkenOpslaan(i) {
   const l = LEIDERS[i];
   const nieuweRol = document.getElementById('ln-rol')?.value || l.rol;
-  const isLaatsteAdmin = l.rol === 'admin' && nieuweRol !== 'admin' && LEIDERS.filter(x => x.rol === 'admin').length <= 1;
+  const isLaatsteAdmin = l.rol === 'admin' && nieuweRol !== 'admin' && LEIDERS.filter(x => x.rol === 'admin' && x.actief !== false).length <= 1;
   if(isLaatsteAdmin) { showToast('&#9888; Je kunt de rol van het laatste admin-account niet wijzigen — maak eerst een ander admin-account aan'); return; }
   l.voornaam = document.getElementById('ln-voornaam')?.value?.trim() || l.voornaam;
   l.achternaam = document.getElementById('ln-achternaam')?.value?.trim() || '';
@@ -4277,7 +4826,7 @@ async function leiderBewerkenOpslaan(i) {
 
 function leiderVerwijderen(i) {
   if(LEIDERS.length <= 1) { showToast('&#9888; Je kunt niet de laatste leider verwijderen'); return; }
-  const isLaatsteAdmin = LEIDERS[i].rol === 'admin' && LEIDERS.filter(l => l.rol === 'admin').length <= 1;
+  const isLaatsteAdmin = LEIDERS[i].rol === 'admin' && LEIDERS.filter(l => l.rol === 'admin' && l.actief !== false).length <= 1;
   if(isLaatsteAdmin) { showToast('&#9888; Je kunt niet het laatste admin-account verwijderen — maak eerst een ander admin-account aan'); return; }
   const naam = leiderNaam(LEIDERS[i]);
   LEIDERS.splice(i,1);
@@ -4376,7 +4925,7 @@ function kampAfsluitenDoen() {
   penFinale.drempel = null; penFinale.rondes = []; penFinale.handmatigDeelnemers = null; penFinale.actieveRonde = null; penFinale.schietBeurt = 0;
   IND_LEEFTIJDEN.forEach(c => c.spelers = []);
   indSpellen.forEach(d => { d.spellen.forEach(s => { s.naam=''; s.maker=''; s.leider1=''; s.leider2=''; s.uitleg=''; s.opgeslagen=false; s.scores={}; }); });
-  preSpellenData.forEach(sp => { sp.opgeslagen = false; sp.duels.forEach(d => { d.score1=null; d.score2=null; }); });
+  preSpellenData.forEach(sp => { sp.opgeslagen = false; sp.duels.forEach(d => { d.score1=null; d.score2=null; if('score3' in d){d.score3=null;} if('score4' in d){d.score4=null;} }); });
   ACHTKAMP_INSTANTIES.length = 0;
   ACHTKAMP_INSTANTIES.push({id:1, naam:'8-Kamp', verwerkt:false, subspellen: akNieuweSubspellen()});
   AK_NEXT_ID = 2; akHuidigeId = 1;
@@ -4419,14 +4968,16 @@ function toepassenKampDagen(start, eind) {
   // IND_DAGEN === KAMPdagen (zelfde array) — automatisch mee bijgewerkt.
 
   planningData.splice(0, planningData.length, ...genereerPlanningData());
+  // Penalty-momenten volgen de (zojuist herbouwde) planning
   Object.keys(penKeepersPerDag).forEach(k => delete penKeepersPerDag[k]);
-  KAMPdagen.forEach((_, i) => { penKeepersPerDag[i] = ['','']; });
-  penData.splice(0, penData.length, ...KAMPdagen.map(dag => ({ dag, pogingen: [], opgeslagen: false })));
+  penData.splice(0, penData.length);
   penHuidigeDag = 0;
+  penDagHandmatig = false;
+  penSyncMetPlanning();
   preSpellenData.splice(0, preSpellenData.length, ...genereerPreSpellenData());
-  preHuidigeDag = 0;
+  preHuidigeDag = standaardKampDagIndex();
   indSpellen.splice(0, indSpellen.length, ...genereerIndSpellen());
-  indHuidigeDag = 0;
+  indHuidigeDag = standaardKampDagIndex();
   return true;
 }
 
@@ -4505,8 +5056,8 @@ function renderInstLog() {
 // nieuwste lijst ziet zonder dat de array-referentie verandert.
 function herbouwKampstaf() {
   KAMPSTAF.length = 0;
-  LEADERS.forEach(l => KAMPSTAF.push(l));
-  EXTRA_STAF.forEach(l => KAMPSTAF.push(l));
+  LEADERS.forEach(l => { if(stafNaamActief(l)) KAMPSTAF.push(l); });
+  EXTRA_STAF.forEach(l => { if(stafNaamActief(l)) KAMPSTAF.push(l); });
 }
 
 function renderInstKampstaf() {
@@ -4624,10 +5175,10 @@ function renderInstPreImport() {
   el.innerHTML = `<div class="card">
     <div class="card-title">&#128229; Pre-Ontbijtspellen importeren</div>
     <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
-      <strong>Formaat</strong> — één rij per veld/duel (4 rijen per spel, 2 spellen per kampdag):<br>
-      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Slot,SpelNaam,Leider1,Leider2,Veld,Team1,Team2</code>
-      <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: ${KAMPdagen[1]||'Maandag'},1,Zaklopen,Thomas,Sven,1,Rood Vuur,Blauw Staal</span><br>
-      <span style="color:var(--muted-light);font-size:.76rem">Slot is 1 of 2 (welk van de 2 pre-ontbijtspellen die dag). Veld is 1 t/m 4.</span>
+      <strong>Formaat</strong> — één rij per ronde/veld (2 spellen per kampdag, 2 rondes per veld):<br>
+      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Ronde,Spelnaam,Veld,Leider1,Leider2,Team1,Team2,Team3,Team4</code>
+      <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: ${KAMPdagen[1]||'Maandag'},1,Zaklopen,1,Thomas,Sven,Rood Vuur,Blauw Staal</span><br>
+      <span style="color:var(--muted-light);font-size:.76rem">Ronde is 1 of 2. De spelnaam bepaalt bij welk spel de rij hoort (max. 2 verschillende spellen per dag). Team3/Team4 blijven normaal leeg — vul ze alleen bij een 4-teams-spel (dat spel gebruikt dan 1 veld en wordt automatisch als 4-teams ingesteld).</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplatePreOntbijt()">&#8681; Download voorbeeld-Excel</button>
@@ -4635,7 +5186,7 @@ function renderInstPreImport() {
       <button class="btn btn-outline" style="font-size:.8rem" onclick="document.getElementById('pre-csv-file').click()">&#128196; Bestand uploaden</button>
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
-    <textarea id="pre-csv-tekst" placeholder="Dag,Slot,SpelNaam,Leider1,Leider2,Veld,Team1,Team2"
+    <textarea id="pre-csv-tekst" placeholder="Dag,Ronde,Spelnaam,Veld,Leider1,Leider2,Team1,Team2,Team3,Team4"
       style="width:100%;min-height:100px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
     <div style="margin-top:8px">
       <button class="btn btn-primary" style="font-size:.8rem" onclick="preCsvToepassen()">&#10003; Importeren &amp; toepassen</button>
@@ -4652,23 +5203,49 @@ function preCsvLeesBestand(input) {
 function preCsvToepassen() {
   const tekst = document.getElementById('pre-csv-tekst')?.value || '';
   if(!tekst.trim()) { showToast('&#9888; Plak of upload eerst een Excel-bestand.'); return; }
-  const rijen = parseCsvGeneriek(tekst, ['dag','slot','naam','leider1','leider2','veld','team1','team2']);
-  let toegepast = 0, overgeslagen = 0;
+  const rijen = parseCsvGeneriek(tekst, ['dag','ronde','naam','veld','leider1','leider2','team1','team2','team3','team4']);
+  // Eerst per dag verzamelen: de spelnaam bepaalt bij welk spel (slot A/B) een rij hoort —
+  // het eerste onderscheiden spel van een dag wordt spel A, het tweede spel B.
+  const perSpel = new Map(); // "dagIdx::naam" → {dagIdx, naam, leider1, leider2, vierTeams, rijen[]}
+  let overgeslagen = 0;
   rijen.forEach(r => {
     const dagIdx = KAMPdagen.findIndex(d => d.toLowerCase() === (r.dag||'').trim().toLowerCase());
-    const slot = parseInt(r.slot) - 1;
-    const veld = parseInt(r.veld) - 1;
-    if(dagIdx < 0 || (slot!==0 && slot!==1) || isNaN(veld) || veld<0 || veld>3) { overgeslagen++; return; }
-    const spel = preSpellenData.find(s => s.dag === dagIdx && s.slot === slot);
-    if(!spel) { overgeslagen++; return; }
-    if(r.naam) spel.naam = r.naam.trim();
+    const ronde = parseInt(r.ronde);
+    const veld = parseInt(r.veld);
+    const naam = (r.naam||'').trim();
+    if(dagIdx < 0 || !naam || isNaN(ronde) || ronde < 1 || ronde > PRE_RONDES_PER_VELD || isNaN(veld) || veld < 1 || veld > 4) { overgeslagen++; return; }
+    const key = `${dagIdx}::${naam.toLowerCase()}`;
+    if(!perSpel.has(key)) perSpel.set(key, {dagIdx, naam, leider1:'', leider2:'', vierTeams:false, rijen:[]});
+    const spel = perSpel.get(key);
     if(r.leider1) spel.leider1 = r.leider1.trim();
     if(r.leider2) spel.leider2 = r.leider2.trim();
-    spel.duels[veld] = { team1: r.team1||'', team2: r.team2||'', score1:null, score2:null };
-    toegepast++;
+    if((r.team3||'').trim() || (r.team4||'').trim()) spel.vierTeams = true;
+    spel.rijen.push({ronde, veld, team1:(r.team1||'').trim(), team2:(r.team2||'').trim(), team3:(r.team3||'').trim(), team4:(r.team4||'').trim()});
   });
-  logActie('Pre-Ontbijt geïmporteerd', `${toegepast} velden${overgeslagen?`, ${overgeslagen} overgeslagen`:''}`);
-  showToast(`&#10003; ${toegepast} velden geïmporteerd`);
+
+  let toegepast = 0;
+  const slotsPerDag = {}; // dagIdx → volgend slot (0 = spel A, 1 = spel B)
+  perSpel.forEach(imp => {
+    const slot = slotsPerDag[imp.dagIdx] = (slotsPerDag[imp.dagIdx] ?? -1) + 1;
+    if(slot > 1) { overgeslagen += imp.rijen.length; return; } // max 2 spellen per dag
+    const spel = preSpellenData.find(s => s.dag === imp.dagIdx && s.slot === slot);
+    if(!spel) { overgeslagen += imp.rijen.length; return; }
+    spel.naam = imp.naam;
+    spel.leider1 = imp.leider1;
+    spel.leider2 = imp.leider2;
+    spel.vierTeams = imp.vierTeams;
+    spel.velden = [...new Set(imp.rijen.map(r => r.veld))].sort((a,b)=>a-b);
+    spel.opgeslagen = false;
+    spel.duels = imp.rijen
+      .sort((a,b) => a.ronde - b.ronde || a.veld - b.veld)
+      .map(r => imp.vierTeams
+        ? {ronde:r.ronde, veld:r.veld, team1:r.team1, team2:r.team2, team3:r.team3, team4:r.team4, score1:null, score2:null, score3:null, score4:null}
+        : {ronde:r.ronde, veld:r.veld, team1:r.team1, team2:r.team2, score1:null, score2:null});
+    toegepast += imp.rijen.length;
+  });
+
+  logActie('Pre-Ontbijt geïmporteerd', `${toegepast} rondes/velden${overgeslagen?`, ${overgeslagen} overgeslagen`:''}`);
+  showToast(`&#10003; ${toegepast} rondes/velden geïmporteerd${overgeslagen?` &#183; ${overgeslagen} overgeslagen`:''}`);
   renderPreOntbijt();
 }
 
@@ -4807,9 +5384,10 @@ function exportExcel(type) {
   }
   else if(type === 'penalty') {
     filename = 'penalty_bokaal.xlsx';
-    rows = [['Speler','Team', ...KAMPdagen, 'Totaal']];
+    penSyncMetPlanning();
+    rows = [['Speler','Team', ...penData.map((_,i) => penMomentLabel(i)), 'Totaal']];
     PLAYERS_ALL.forEach(p => {
-      const dagPts = KAMPdagen.map((_,i) => penDagTotaalSpeler(p.name, i));
+      const dagPts = penData.map((_,i) => penDagTotaalSpeler(p.name, i));
       rows.push([p.name, p.team, ...dagPts, penTotaalSpeler(p.name)]);
     });
   }
@@ -4839,6 +5417,11 @@ function exportExcel(type) {
 
 // ── INIT ─────────────────────────────────────────────────────
 // Login overlay is standaard zichtbaar — renderDashboard() wordt aangeroepen na inloggen
+// Dag-tabbladen starten op de huidige datum (Europe/Amsterdam), geklemd op de kampperiode.
+preHuidigeDag = standaardKampDagIndex();
+indHuidigeDag = standaardKampDagIndex();
+// Keuzelijsten meteen filteren op actieve leiders/kampstaf.
+herbouwKampstaf();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -4852,7 +5435,9 @@ function exportExcel(type) {
 const SUPABASE_URL = 'https://trkomvzrkqjfoxnnpvly.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Pd_nwMN-LfAGAO-PZgfSjw_lhzatePy'; // Supabase → Settings → API Keys → anon/public
 
-const sbActief = SUPABASE_KEY !== 'PLAK_HIER_JE_ANON_KEY';
+// window.supabase ontbreekt als de CDN-script niet kon laden (geen internet) — dan draait
+// de app gewoon lokaal zonder sync in plaats van dat de hele sync-engine stukloopt.
+const sbActief = SUPABASE_KEY !== 'PLAK_HIER_JE_ANON_KEY' && !!window.supabase;
 const sb = sbActief ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 const SYNC_CLIENT_ID = 'c_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
 
@@ -4877,15 +5462,21 @@ const SYNC_MODULES = {
   ind_groepen:      { get: () => IND_GROEPEN,        set: v => _vulArray(IND_GROEPEN, v) },
   ind_leeftijden:   { get: () => IND_LEEFTIJDEN,     set: v => _vulArray(IND_LEEFTIJDEN, v) },
   ind_spellen:      { get: () => indSpellen,         set: v => _vulArray(indSpellen, v) },
-  preontbijt:       { get: () => preSpellenData,     set: v => _vulArray(preSpellenData, v) },
+  preontbijt:       { get: () => preSpellenData,     set: v => { _vulArray(preSpellenData, v); preMigreerData(); } },
   achtkamp_instanties: { get: () => ACHTKAMP_INSTANTIES, set: v => _vulArray(ACHTKAMP_INSTANTIES, v) },
   planning:         { get: () => planningData,       set: v => _vulArray(planningData, v) },
   inactief:         { get: () => [...inactiefSpelers],
                       set: v => { inactiefSpelers.clear(); (v || []).forEach(n => inactiefSpelers.add(n)); } },
   extra_staf:       { get: () => EXTRA_STAF,
                       set: v => { _vulArray(EXTRA_STAF, v); herbouwKampstaf(); } },
-  labels:           { get: () => LABELS,             set: v => _vulArray(LABELS, v) },
-  leiders:          { get: () => LEIDERS,            set: v => _vulArray(LEIDERS, v) },
+  inactieve_staf:   { get: () => [...INACTIEVE_STAF],
+                      set: v => { INACTIEVE_STAF.clear(); (v || []).forEach(n => INACTIEVE_STAF.add(n)); herbouwKampstaf(); } },
+  labels:           { get: () => LABELS,             set: v => { _vulArray(LABELS, v); labelsMigreer(); } },
+  leiders:          { get: () => LEIDERS,            set: v => {
+                        _vulArray(LEIDERS, v);
+                        LEIDERS.forEach(l => { if(l.actief === undefined) l.actief = true; });
+                        herbouwKampstaf(); // inactieve accounts filteren op naam mee uit de keuzelijsten
+                      } },
   kamp_meta:        { get: () => KAMP_META,
                       set: v => {
                         const nieuw = v || {};
@@ -4969,7 +5560,8 @@ setInterval(syncDiffSave, 5000);
 [
   'renderDashboard','renderTeamKlassement','renderVierkamp','renderPenalty','renderInd',
   'renderTeams','renderPlanning','renderSpellen','renderAchtkamp','renderPreOntbijt','renderExport',
-  'renderInstellingen','renderTeamsStaf','renderPenSpelers','renderIndStand'
+  'renderInstellingen','renderTeamsStaf','renderPenSpelers','renderIndStand',
+  'renderKlPenalty','renderKlIndividueel','renderKlVierkamp'
 ].forEach(fn => {
   const orig = window[fn];
   if (typeof orig !== 'function') return;
@@ -4989,7 +5581,8 @@ function herRenderActieveSectie() {
     dashboard: renderDashboard, teamklassement: renderTeamKlassement, vierkamp: renderVierkamp,
     penalty: renderPenalty, individueel: renderInd, planning: renderPlanning,
     spellen: renderSpellen, achtkamp: renderAchtkamp, preontbijt: renderPreOntbijt, exporteren: renderExport,
-    instellingen: renderInstellingen
+    instellingen: renderInstellingen,
+    klpenalty: renderKlPenalty, klindividueel: renderKlIndividueel, klvierkamp: renderKlVierkamp
   };
   map[id]?.();
   // Na een remote update is de lokale staat gelijk aan de DB → niets opnieuw opslaan
