@@ -482,6 +482,15 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="section" id="section-planning">
   <div class="page-title">Weekplanning</div>
   <div class="page-sub" id="planning-sub">Klik op een spel om direct de score in te voeren</div>
+  <div class="card" style="padding:10px 14px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <input id="planning-zoek" type="search" placeholder="&#128269; Zoek in de planning — naam, label, leider, dag of tijd..."
+        oninput="planningZoek(this.value)"
+        style="flex:1;padding:9px 12px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:8px;font-size:.88rem;color:var(--text);font-family:'Barlow',sans-serif">
+      <button class="btn btn-outline" style="font-size:.75rem;padding:7px 12px" onclick="planningZoekWissen()">&#10005; Wissen</button>
+    </div>
+    <div id="planning-zoek-teller" style="font-size:.75rem;color:var(--muted);margin-top:6px;display:none"></div>
+  </div>
   <div id="planning-content"></div>
 </div>
 
@@ -2102,6 +2111,7 @@ function renderKlVierkamp() {
 // Bij het openen van Planning meteen naar de huidige kampdag scrollen (indien vandaag
 // binnen de kampperiode valt) — buiten de kampperiode gewoon bovenaan laten beginnen.
 function planningScrollNaarVandaag() {
+  if(planningZoekTekst.trim()) return; // bij actief zoekfilter kloppen de dag-posities niet
   const idx = huidigeKampDagIndex();
   if(idx < 0) return;
   const dagEl = document.querySelectorAll('#planning-content .day-header')[idx];
@@ -3162,7 +3172,12 @@ let LABELS = [
 ];
 // Migratie: labels van vóór het type-veld krijgen 'spel' (het oude gedrag).
 function labelsMigreer() { LABELS.forEach(l => { if(!l.type) l.type = 'spel'; }); }
-function labelType(naam) { return LABELS.find(l => l.naam === naam)?.type || 'spel'; }
+// Het opgeslagen labeltype is een PLANNING_TYPES-val (kan ook een sneltoets zijn, bv.
+// 'vierkamp'); deze helper vertaalt dat naar het onderliggende activiteitstype.
+function labelType(naam) {
+  const val = LABELS.find(l => l.naam === naam)?.type || 'spel';
+  return (PLANNING_TYPES.find(t => t.val === val) || PLANNING_TYPES[0]).type;
+}
 let LABELS_NEXT_ID = 1;
 const TYPE_KLEUREN = { maaltijd:'#EA580C', vrij:'#64748B', info:'#2563EB', pauze:'#64748B' };
 // "Vierkamp"/"Penalty Bokaal"/"Individuele Spellen" zijn sneltoetsen in de TYPE-keuze: ze
@@ -3180,10 +3195,9 @@ const PLANNING_TYPES = [
   {val:'info',        label:'💬 Info / Aankondiging', type:'info'},
   {val:'pauze',       label:'⏸️ Pauze',               type:'pauze'},
 ];
-// De types die een label kan hebben = exact de basis-types uit de planning (de Vierkamp/
-// Penalty/Individueel-sneltoetsen zijn zelf al labels en horen hier dus niet bij).
+// De types die een label kan hebben = exact dezelfde lijst als de TYPE-keuze in de planning.
 // Eén gedeelde bron: wijzigt PLANNING_TYPES, dan wijzigen de labeltypes automatisch mee.
-const LABEL_TYPES = PLANNING_TYPES.filter(t => !t.klassement);
+const LABEL_TYPES = PLANNING_TYPES;
 // Geeft de te selecteren TYPE-optie voor een bestaande activiteit terug — herkent een
 // sneltoets (Vierkamp/Penalty/Individueel) aan het klassement, anders het gewone type.
 function planningTypeWaarde(a) {
@@ -3300,6 +3314,23 @@ function planningHuidigeActiviteit() {
   return best;
 }
 
+// ── PLANNING ZOEKEN/FILTEREN ──────────────────────────────────
+// Live filter over de hele weekplanning: matcht op activiteitnaam, label, leiders,
+// opmerking, tijd, type én dagnaam (dagnaam-match toont de hele dag). Het zoekveld staat
+// buiten planning-content zodat het focus houdt terwijl de lijst opnieuw rendert.
+let planningZoekTekst = '';
+function planningZoek(tekst) { planningZoekTekst = tekst; renderPlanning(); }
+function planningZoekWissen() {
+  planningZoekTekst = '';
+  const inp = document.getElementById('planning-zoek');
+  if(inp) { inp.value = ''; inp.focus(); }
+  renderPlanning();
+}
+function planningActMatcht(a, q) {
+  const velden = [a.name, a.klassement, a.customLabel, a.opmerking, a.time, a.type, ...(a.leiders||[])];
+  return velden.some(v => v && String(v).toLowerCase().includes(q));
+}
+
 function renderPlanning(){
   const el = document.getElementById('planning-content');
   if(!el) return;
@@ -3310,11 +3341,20 @@ function renderPlanning(){
     : 'Klik op een spel om direct de score in te voeren';
   const huidig = planningHuidigeActiviteit();
 
-  el.innerHTML = planningData.map((day, di) => `
+  const q = planningZoekTekst.trim().toLowerCase();
+  let gevonden = 0;
+  const dagenHtml = planningData.map((day, di) => {
+    const dagMatcht = q && day.day.toLowerCase().includes(q);
+    const rows = day.acts
+      .map((a, ai) => ({a, ai}))
+      .filter(({a}) => !q || dagMatcht || planningActMatcht(a, q));
+    if(q && rows.length === 0) return '';
+    gevonden += rows.length;
+    return `
     <div class="day-header">${day.icon} ${day.day}
-      ${admin ? `<button onclick="planningAdd(${di})" style="float:right;font-size:.72rem;padding:3px 10px;border:1px dashed var(--border-dark);border-radius:5px;background:transparent;cursor:pointer;color:var(--muted)">+ toevoegen</button>` : ''}
+      ${admin && !q ? `<button onclick="planningAdd(${di})" style="float:right;font-size:.72rem;padding:3px 10px;border:1px dashed var(--border-dark);border-radius:5px;background:transparent;cursor:pointer;color:var(--muted)">+ toevoegen</button>` : ''}
     </div>
-    ${day.acts.map((a, ai) => {
+    ${rows.map(({a, ai}) => {
       const kl = a.klassement;
       const is8kamp = kl === '8-Kamp';
 
@@ -3364,7 +3404,18 @@ function renderPlanning(){
         ${activiteitExtraHtml(a)}
       </div>`;
     }).join('')}
-  `).join('');
+  `;
+  }).join('');
+
+  el.innerHTML = (q && gevonden === 0)
+    ? `<div class="alert alert-info">&#128269; Geen activiteiten gevonden voor "<strong>${planningZoekTekst.trim()}</strong>".</div>`
+    : dagenHtml;
+
+  const teller = document.getElementById('planning-zoek-teller');
+  if(teller) {
+    teller.style.display = q ? 'block' : 'none';
+    if(q) teller.textContent = `${gevonden} activiteit${gevonden===1?'':'en'} gevonden`;
+  }
 }
 
 // ── PLANNING BEWERKEN (admin) ─────────────────────────────────
