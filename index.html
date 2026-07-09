@@ -51,6 +51,10 @@ header{background:rgba(255,255,255,.82);backdrop-filter:blur(14px);-webkit-backd
 .logo::before{content:'⚽';display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#1e3a8a);font-size:16px;box-shadow:0 6px 16px -6px rgba(37,99,235,.55);flex-shrink:0;}
 .logo span{color:var(--accent);}
 .day-badge{background:var(--accent);color:#fff;font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:20px;}
+.app-klok{display:flex;flex-direction:column;align-items:center;line-height:1.1;color:var(--accent-dark);text-align:center;}
+.app-klok .klok-tijd{font-family:'DM Mono',monospace;font-weight:600;font-size:.95rem;letter-spacing:.5px;}
+.app-klok .klok-datum{font-size:.66rem;font-weight:600;color:var(--muted);text-transform:capitalize;}
+@media(max-width:520px){.app-klok .klok-datum{display:none;}.app-klok .klok-tijd{font-size:.85rem;}}
 
 .nav-wrap{background:transparent;overflow-x:auto;scrollbar-width:none;}
 .nav-wrap::-webkit-scrollbar{display:none;}
@@ -284,6 +288,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <header>
   <div class="header-inner">
     <div class="logo">Pupillen<span>kamp</span> '26</div>
+    <div id="app-klok" class="app-klok"><div class="klok-tijd">--:--</div><div class="klok-datum"></div></div>
     <div id="gebruiker-info" style="display:flex;align-items:center;gap:6px"></div>
   </div>
 </header>
@@ -759,7 +764,10 @@ function genereerKampDagenLijst(startIso, eindIso) {
   for(let d = new Date(start); d <= eind; d.setDate(d.getDate() + 1)) {
     const weekdag = WEEKDAG_NAMEN[d.getDay()];
     const weekdagLabel = weekdag.charAt(0).toUpperCase() + weekdag.slice(1);
-    dagen.push({ key: d.toISOString().slice(0,10), weekdag: weekdagLabel, label: `${weekdagLabel} ${d.getDate()} ${MAAND_NAMEN[d.getMonth()]}` });
+    // key uit lokale datumdelen (niet toISOString/UTC): anders schuift de dag met een
+    // positieve UTC-offset — bv. Amsterdam zomertijd — een dag terug t.o.v. het label.
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    dagen.push({ key, weekdag: weekdagLabel, label: `${weekdagLabel} ${d.getDate()} ${MAAND_NAMEN[d.getMonth()]}` });
   }
   return dagen;
 }
@@ -5666,6 +5674,23 @@ async function syncHydrate() {
     })
     .subscribe();
 }
+
+// ── LIVE KLOK (datum + tijd, Europe/Amsterdam) ────────────────
+// Toont de actuele datum en tijd in de header. Vaste tijdzone Europe/Amsterdam zodat de
+// weergave overeenkomt met de kampdag-logica (vandaagIso) — ook op apparaten met een
+// afwijkende tijdzone-instelling.
+function updateKlok() {
+  const el = document.getElementById('app-klok');
+  if (!el) return;
+  const nu = new Date();
+  const tijd = new Intl.DateTimeFormat('nl-NL', { timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit' }).format(nu);
+  const datum = new Intl.DateTimeFormat('nl-NL', { timeZone: 'Europe/Amsterdam', weekday: 'short', day: 'numeric', month: 'short' }).format(nu);
+  const tijdEl = el.querySelector('.klok-tijd'), datumEl = el.querySelector('.klok-datum');
+  if (tijdEl) tijdEl.textContent = tijd;
+  if (datumEl) datumEl.textContent = datum;
+}
+updateKlok();
+setInterval(updateKlok, 1000);
 
 syncHydrate();
 </script>
