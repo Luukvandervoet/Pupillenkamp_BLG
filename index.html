@@ -1072,8 +1072,8 @@ function renderPenInvoer() {
           <span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700">${dagPts}pt · ${totPts}pt tot</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          ${penShotRow(fullName, 0, p1, opgeslagen, keeper1)}
-          ${penShotRow(fullName, 1, p2, opgeslagen, keeper2)}
+          ${penShotRow(fullName, 0, p1, keeper1)}
+          ${penShotRow(fullName, 1, p2, keeper2)}
         </div>
       </div>`;
     });
@@ -1095,29 +1095,17 @@ function renderPenInvoer() {
   el.innerHTML = html;
 }
 
-function penShotRow(spelerNaam, shotIdx, bestaand, opgeslagen, defaultKeeper) {
-  const keeperVal = bestaand?.keeperNaam || defaultKeeper || '?';
+function penShotRow(spelerNaam, shotIdx, bestaand, defaultKeeper) {
   const goalVal = bestaand?.goal;
-
-  if(opgeslagen) {
-    const goalLabel = goalVal === true ? '⚽ Goal' : goalVal === false ? '✗ Mis' : '—';
-    return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:.82rem">
-      <div style="font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:4px">Penalty ${shotIdx+1}</div>
-      <div style="font-weight:600">${keeperVal}</div>
-      <div style="color:${goalVal===true?'var(--green)':goalVal===false?'var(--red)':'var(--muted)'};font-weight:700;margin-top:2px">${goalLabel}</div>
-      <button onclick="penAdminEdit('${spelerNaam}',${penHuidigeDag},${shotIdx})" style="margin-top:6px;font-size:.68rem;padding:2px 8px;border-radius:4px;border:1px solid var(--border-dark);background:transparent;cursor:pointer;color:var(--muted)">✏️ aanpassen</button>
-    </div>`;
-  }
-
   const keeperOk = defaultKeeper && defaultKeeper !== '?';
   return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px">
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
       <span style="font-size:.7rem;font-weight:700;color:var(--muted)">Penalty ${shotIdx+1} vs</span>
-      <span style="font-size:.78rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${keeperOk?'var(--bg3)':'var(--red-bg)'};border:1px solid var(--border-dark);color:${keeperOk?'var(--text)':'var(--red)'}">${keeperOk?defaultKeeper:'niet ingesteld'}</span>
+      <span style="font-size:.78rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${keeperOk?'var(--bg3)':'var(--red-bg)'};border:1px solid var(--border-dark);color:${keeperOk?'var(--text)':'var(--red)'}">${keeperOk?escapeHtml(defaultKeeper):'niet ingesteld'}</span>
     </div>
     <div style="display:flex;gap:4px">
-      <button class="pen-btn ${goalVal===true?'goal':''}" style="flex:1;padding:7px 0" onclick="penToggleGoal('${spelerNaam}',${shotIdx},true)">⚽</button>
-      <button class="pen-btn" style="flex:1;padding:7px 0;${goalVal===false?'background:var(--red-bg);border-color:#FECACA;color:var(--red)':''}" onclick="penToggleGoal('${spelerNaam}',${shotIdx},false)">✗</button>
+      <button class="pen-btn ${goalVal===true?'goal':''}" style="flex:1;padding:7px 0" onclick="penToggleGoal('${jsStr(spelerNaam)}',${shotIdx},true)">⚽</button>
+      <button class="pen-btn" style="flex:1;padding:7px 0;${goalVal===false?'background:var(--red-bg);border-color:#FECACA;color:var(--red)':''}" onclick="penToggleGoal('${jsStr(spelerNaam)}',${shotIdx},false)">✗</button>
     </div>
   </div>`;
 }
@@ -1136,47 +1124,6 @@ function penToggleGoal(spelerNaam, shotIdx, isGoal) {
     existing[shotIdx].verdubbelaar = verdVandaag;
   }
   renderPenInvoer();
-}
-
-function penAdminEdit(spelerNaam, dagIdx, shotIdx) {
-  // Heropen tijdelijk voor admin aanpassing
-  const dagData = penData[dagIdx];
-  const bestaand = dagData.pogingen.filter(p => p.spelerNaam === spelerNaam)[shotIdx];
-  const keepers = penKeepersPerDag[dagIdx];
-
-  document.getElementById('modal-title').textContent = `Aanpassen: ${spelerNaam}`;
-  document.getElementById('modal-sub').textContent = `Penalty ${shotIdx+1} · ${penMomentLabel(dagIdx)}`;
-  document.getElementById('modal-body').innerHTML = `
-    <div style="margin-bottom:12px">
-      <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Keeper</label>
-      ${comboVeld(penKeeperOpties(bestaand?.keeperNaam), {id:'admin-keeper', value:bestaand?.keeperNaam||'', placeholder:'Kies of typ een naam (bv. bezoeker)...', style:'width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text);box-sizing:border-box'})}
-    </div>
-    <div>
-      <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Resultaat</label>
-      <div style="display:flex;gap:8px">
-        <button id="admin-goal" class="btn ${bestaand?.goal===true?'btn-green':'btn-outline'}" style="flex:1" onclick="document.getElementById('admin-goal').className='btn btn-green';document.getElementById('admin-mis').className='btn btn-outline'">⚽ Goal</button>
-        <button id="admin-mis" class="btn ${bestaand?.goal===false?'btn-danger':'btn-outline'}" style="flex:1" onclick="document.getElementById('admin-mis').className='btn btn-danger';document.getElementById('admin-goal').className='btn btn-outline'">✗ Mis</button>
-      </div>
-    </div>`;
-  document.getElementById('modal-footer').innerHTML = `
-    <button class="btn btn-outline" onclick="closeModal()">Annuleren</button>
-    <button class="btn btn-primary" onclick="penAdminSave('${spelerNaam}',${dagIdx},${shotIdx})">✓ Opslaan</button>`;
-  openModal();
-}
-
-function penAdminSave(spelerNaam, dagIdx, shotIdx) {
-  const keeper = document.getElementById('admin-keeper')?.value?.trim() || '';
-  const goalBtn = document.getElementById('admin-goal');
-  const isGoal = goalBtn.className.includes('btn-green') ? true : false;
-  const existing = penData[dagIdx].pogingen.filter(p => p.spelerNaam === spelerNaam);
-  if(existing[shotIdx]) {
-    existing[shotIdx].keeperNaam = keeper;
-    existing[shotIdx].goal = isGoal;
-  }
-  closeModal();
-  showToast('✓ Penalty aangepast!');
-  logActie('Penalty aangepast', `${spelerNaam} · ${penMomentLabel(dagIdx)}`);
-  renderPenalty();
 }
 
 function penSetDag(idx) { penHuidigeDag = idx; penDagHandmatig = true; renderPenInvoer(); }
