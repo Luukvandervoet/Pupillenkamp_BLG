@@ -51,6 +51,10 @@ header{background:rgba(255,255,255,.82);backdrop-filter:blur(14px);-webkit-backd
 .logo::before{content:'⚽';display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#1e3a8a);font-size:16px;box-shadow:0 6px 16px -6px rgba(37,99,235,.55);flex-shrink:0;}
 .logo span{color:var(--accent);}
 .day-badge{background:var(--accent);color:#fff;font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:20px;}
+.app-klok{display:flex;flex-direction:column;align-items:center;line-height:1.1;color:var(--accent-dark);text-align:center;}
+.app-klok .klok-tijd{font-family:'DM Mono',monospace;font-weight:600;font-size:.95rem;letter-spacing:.5px;}
+.app-klok .klok-datum{font-size:.66rem;font-weight:600;color:var(--muted);text-transform:capitalize;}
+@media(max-width:520px){.app-klok .klok-datum{display:none;}.app-klok .klok-tijd{font-size:.85rem;}}
 
 .nav-wrap{background:transparent;overflow-x:auto;scrollbar-width:none;}
 .nav-wrap::-webkit-scrollbar{display:none;}
@@ -248,6 +252,10 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 .export-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
 .export-btn-wrap{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
 @media print{#login-overlay,header,.nav-wrap{display:none!important;}.section{display:block!important;padding-bottom:0;}}
+/* UTILITIES — vaak herhaalde inline-patronen gebundeld (geen visuele wijziging) */
+.team-dot{display:inline-block;width:8px;height:8px;border-radius:50%;}
+.field-label{font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;}
+.mono{font-family:'DM Mono',monospace;}
 </style>
 </head>
 <body>
@@ -280,6 +288,7 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <header>
   <div class="header-inner">
     <div class="logo">Pupillen<span>kamp</span> '26</div>
+    <div id="app-klok" class="app-klok"><div class="klok-tijd">--:--</div><div class="klok-datum"></div></div>
     <div id="gebruiker-info" style="display:flex;align-items:center;gap:6px"></div>
   </div>
 </header>
@@ -382,8 +391,8 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <button class="tab spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
   </div>
   <div class="tab-row">
-    <button class="tab active" onclick="setTab('vk','stand',this)">Stand</button>
-    <button class="tab" onclick="setTab('vk','duels',this)">Duels</button>
+    <button class="tab active" data-tab="stand" onclick="setTab('vk','stand',this)">Stand</button>
+    <button class="tab" data-tab="duels" onclick="setTab('vk','duels',this)">Duels</button>
   </div>
   <div id="vk-stand"></div>
   <div id="vk-duels" style="display:none"></div>
@@ -428,11 +437,11 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <button class="tab active spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
   </div>
   <div class="tab-row">
-    <button class="tab active" onclick="setTab('ind','stand',this)">&#127941; Stand</button>
-    <button class="tab" onclick="setTab('ind','leeftijd',this)">&#127875; Leeftijd</button>
-    <button class="tab" onclick="setTab('ind','invoer',this)">&#128221; Invoer</button>
-    <button class="tab" onclick="setTab('ind','groepen',this)">&#128101; Groepen</button>
-    <button class="tab" onclick="setTab('ind','spellen',this)">&#127918; Spellen</button>
+    <button class="tab active" data-tab="stand" onclick="setTab('ind','stand',this)">&#127941; Stand</button>
+    <button class="tab" data-tab="leeftijd" onclick="setTab('ind','leeftijd',this)">&#127875; Leeftijd</button>
+    <button class="tab" data-tab="invoer" onclick="setTab('ind','invoer',this)">&#128221; Invoer</button>
+    <button class="tab" data-tab="groepen" onclick="setTab('ind','groepen',this)">&#128101; Groepen</button>
+    <button class="tab" data-tab="spellen" onclick="setTab('ind','spellen',this)">&#127918; Spellen</button>
   </div>
   <div id="ind-stand"></div>
   <div id="ind-leeftijd" style="display:none"></div>
@@ -453,9 +462,9 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <button class="tab spellen-sub-btn" data-sub="individueel" onclick="showSpellenSub('individueel')">&#127939; Individueel</button>
   </div>
   <div class="tab-row">
-    <button class="tab active" onclick="setTab('pre','schema',this)">&#128202; Schema &amp; Stand</button>
-    <button class="tab" onclick="setTab('pre','invoer',this)">&#128221; Invoer</button>
-    <button class="tab" onclick="setTab('pre','spellen',this)">&#9881;&#65039; Instellen</button>
+    <button class="tab active" data-tab="schema" onclick="setTab('pre','schema',this)">&#128202; Schema &amp; Stand</button>
+    <button class="tab" data-tab="invoer" onclick="setTab('pre','invoer',this)">&#128221; Invoer</button>
+    <button class="tab" data-tab="spellen" onclick="setTab('pre','spellen',this)">&#9881;&#65039; Instellen</button>
   </div>
   <div id="pre-schema"></div>
   <div id="pre-invoer" style="display:none"></div>
@@ -468,9 +477,9 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
   <div class="page-sub">8 sub-spellen → totaalscore → eindstand telt mee voor teamklassement</div>
   <div id="ak-picker"></div>
   <div class="tab-row">
-    <button class="tab active" onclick="setTab('ak','invoer',this)">Invoer</button>
-    <button class="tab" onclick="setTab('ak','stand',this)">Eindstand</button>
-    <button class="tab" onclick="setTab('ak','detail',this)">Per spel</button>
+    <button class="tab active" data-tab="invoer" onclick="setTab('ak','invoer',this)">Invoer</button>
+    <button class="tab" data-tab="stand" onclick="setTab('ak','stand',this)">Eindstand</button>
+    <button class="tab" data-tab="detail" onclick="setTab('ak','detail',this)">Per spel</button>
   </div>
   <div id="ak-invoer"></div>
   <div id="ak-stand" style="display:none"></div>
@@ -560,6 +569,15 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 <div class="toast" id="toast">✓ Opgeslagen!</div>
 
 <script>
+// ── GLOBALE HELPERS ──────────────────────────────────────────
+// Escape voor tekst en HTML-attributen (gebruikt voor spelernaam/teamnaam/leidernaam die
+// via import willekeurige tekens kunnen bevatten, zoals " of <).
+function escapeHtml(s){return String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// Escape voor namen die in een JS-string binnen een onclick-attribuut belanden: maakt
+// zowel \ als ' en " veilig. Combineer met escapeHtml wanneer het resultaat in een
+// dubbel-aangehaald attribuut staat (bv. onclick="fn('${jsStr(naam)}')").
+function jsStr(s){return String(s??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');}
+
 // ── AUTHENTICATIE ────────────────────────────────────────────
 // LEIDERS is de door de admin beheerde accountlijst (Kampbeheer → Leiders, admin-only).
 // Login = voornaam+achternaam aan elkaar (lowercase). Wachtwoorden staan nooit in platte
@@ -722,7 +740,7 @@ const VK_RONDES = [
   {id:16,dag:'Donderdag',team1Id:4,team2Id:7,spellen:[null,null,null,null],afgesloten:false},
 ];
 
-const PLAYERS_ALL = TEAMS.flatMap(t=>t.players.map(p=>({...p,team:t.name,teamId:t.id,color:t.color,indPts:0})));
+const PLAYERS_ALL = TEAMS.flatMap(t=>t.players.map(p=>({...p,team:t.name,teamId:t.id,color:t.color})));
 
 // ── KAMP & ARCHIEF ────────────────────────────────────────────
 // Eén actief kamp tegelijk. "Kamp afsluiten" (Kampbeheer → Kamp & Archief) maakt een
@@ -746,7 +764,10 @@ function genereerKampDagenLijst(startIso, eindIso) {
   for(let d = new Date(start); d <= eind; d.setDate(d.getDate() + 1)) {
     const weekdag = WEEKDAG_NAMEN[d.getDay()];
     const weekdagLabel = weekdag.charAt(0).toUpperCase() + weekdag.slice(1);
-    dagen.push({ key: d.toISOString().slice(0,10), weekdag: weekdagLabel, label: `${weekdagLabel} ${d.getDate()} ${MAAND_NAMEN[d.getMonth()]}` });
+    // key uit lokale datumdelen (niet toISOString/UTC): anders schuift de dag met een
+    // positieve UTC-offset — bv. Amsterdam zomertijd — een dag terug t.o.v. het label.
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    dagen.push({ key, weekdag: weekdagLabel, label: `${weekdagLabel} ${d.getDate()} ${MAAND_NAMEN[d.getMonth()]}` });
   }
   return dagen;
 }
@@ -945,7 +966,7 @@ function renderPenSetup() {
   TEAMS.forEach(t => {
     html += `<div style="margin-bottom:10px">
       <div style="font-weight:700;font-size:.85rem;color:${t.color};margin-bottom:6px">
-        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.color};margin-right:6px"></span>${t.name}
+        <span class="team-dot" style="background:${t.color};margin-right:6px"></span>${t.name}
       </div>`;
     t.players.forEach(p => {
       const vdag = penVerdubbelaar[p.name];
@@ -1059,8 +1080,8 @@ function renderPenInvoer() {
           <span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700">${dagPts}pt · ${totPts}pt tot</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          ${penShotRow(fullName, 0, p1, opgeslagen, keeper1)}
-          ${penShotRow(fullName, 1, p2, opgeslagen, keeper2)}
+          ${penShotRow(fullName, 0, p1, keeper1)}
+          ${penShotRow(fullName, 1, p2, keeper2)}
         </div>
       </div>`;
     });
@@ -1082,29 +1103,17 @@ function renderPenInvoer() {
   el.innerHTML = html;
 }
 
-function penShotRow(spelerNaam, shotIdx, bestaand, opgeslagen, defaultKeeper) {
-  const keeperVal = bestaand?.keeperNaam || defaultKeeper || '?';
+function penShotRow(spelerNaam, shotIdx, bestaand, defaultKeeper) {
   const goalVal = bestaand?.goal;
-
-  if(opgeslagen) {
-    const goalLabel = goalVal === true ? '⚽ Goal' : goalVal === false ? '✗ Mis' : '—';
-    return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:.82rem">
-      <div style="font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:4px">Penalty ${shotIdx+1}</div>
-      <div style="font-weight:600">${keeperVal}</div>
-      <div style="color:${goalVal===true?'var(--green)':goalVal===false?'var(--red)':'var(--muted)'};font-weight:700;margin-top:2px">${goalLabel}</div>
-      <button onclick="penAdminEdit('${spelerNaam}',${penHuidigeDag},${shotIdx})" style="margin-top:6px;font-size:.68rem;padding:2px 8px;border-radius:4px;border:1px solid var(--border-dark);background:transparent;cursor:pointer;color:var(--muted)">✏️ aanpassen</button>
-    </div>`;
-  }
-
   const keeperOk = defaultKeeper && defaultKeeper !== '?';
   return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px">
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
       <span style="font-size:.7rem;font-weight:700;color:var(--muted)">Penalty ${shotIdx+1} vs</span>
-      <span style="font-size:.78rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${keeperOk?'var(--bg3)':'var(--red-bg)'};border:1px solid var(--border-dark);color:${keeperOk?'var(--text)':'var(--red)'}">${keeperOk?defaultKeeper:'niet ingesteld'}</span>
+      <span style="font-size:.78rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${keeperOk?'var(--bg3)':'var(--red-bg)'};border:1px solid var(--border-dark);color:${keeperOk?'var(--text)':'var(--red)'}">${keeperOk?escapeHtml(defaultKeeper):'niet ingesteld'}</span>
     </div>
     <div style="display:flex;gap:4px">
-      <button class="pen-btn ${goalVal===true?'goal':''}" style="flex:1;padding:7px 0" onclick="penToggleGoal('${spelerNaam}',${shotIdx},true)">⚽</button>
-      <button class="pen-btn" style="flex:1;padding:7px 0;${goalVal===false?'background:var(--red-bg);border-color:#FECACA;color:var(--red)':''}" onclick="penToggleGoal('${spelerNaam}',${shotIdx},false)">✗</button>
+      <button class="pen-btn ${goalVal===true?'goal':''}" style="flex:1;padding:7px 0" onclick="penToggleGoal('${jsStr(spelerNaam)}',${shotIdx},true)">⚽</button>
+      <button class="pen-btn" style="flex:1;padding:7px 0;${goalVal===false?'background:var(--red-bg);border-color:#FECACA;color:var(--red)':''}" onclick="penToggleGoal('${jsStr(spelerNaam)}',${shotIdx},false)">✗</button>
     </div>
   </div>`;
 }
@@ -1123,47 +1132,6 @@ function penToggleGoal(spelerNaam, shotIdx, isGoal) {
     existing[shotIdx].verdubbelaar = verdVandaag;
   }
   renderPenInvoer();
-}
-
-function penAdminEdit(spelerNaam, dagIdx, shotIdx) {
-  // Heropen tijdelijk voor admin aanpassing
-  const dagData = penData[dagIdx];
-  const bestaand = dagData.pogingen.filter(p => p.spelerNaam === spelerNaam)[shotIdx];
-  const keepers = penKeepersPerDag[dagIdx];
-
-  document.getElementById('modal-title').textContent = `Aanpassen: ${spelerNaam}`;
-  document.getElementById('modal-sub').textContent = `Penalty ${shotIdx+1} · ${penMomentLabel(dagIdx)}`;
-  document.getElementById('modal-body').innerHTML = `
-    <div style="margin-bottom:12px">
-      <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Keeper</label>
-      ${comboVeld(penKeeperOpties(bestaand?.keeperNaam), {id:'admin-keeper', value:bestaand?.keeperNaam||'', placeholder:'Kies of typ een naam (bv. bezoeker)...', style:'width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text);box-sizing:border-box'})}
-    </div>
-    <div>
-      <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Resultaat</label>
-      <div style="display:flex;gap:8px">
-        <button id="admin-goal" class="btn ${bestaand?.goal===true?'btn-green':'btn-outline'}" style="flex:1" onclick="document.getElementById('admin-goal').className='btn btn-green';document.getElementById('admin-mis').className='btn btn-outline'">⚽ Goal</button>
-        <button id="admin-mis" class="btn ${bestaand?.goal===false?'btn-danger':'btn-outline'}" style="flex:1" onclick="document.getElementById('admin-mis').className='btn btn-danger';document.getElementById('admin-goal').className='btn btn-outline'">✗ Mis</button>
-      </div>
-    </div>`;
-  document.getElementById('modal-footer').innerHTML = `
-    <button class="btn btn-outline" onclick="closeModal()">Annuleren</button>
-    <button class="btn btn-primary" onclick="penAdminSave('${spelerNaam}',${dagIdx},${shotIdx})">✓ Opslaan</button>`;
-  openModal();
-}
-
-function penAdminSave(spelerNaam, dagIdx, shotIdx) {
-  const keeper = document.getElementById('admin-keeper')?.value?.trim() || '';
-  const goalBtn = document.getElementById('admin-goal');
-  const isGoal = goalBtn.className.includes('btn-green') ? true : false;
-  const existing = penData[dagIdx].pogingen.filter(p => p.spelerNaam === spelerNaam);
-  if(existing[shotIdx]) {
-    existing[shotIdx].keeperNaam = keeper;
-    existing[shotIdx].goal = isGoal;
-  }
-  closeModal();
-  showToast('✓ Penalty aangepast!');
-  logActie('Penalty aangepast', `${spelerNaam} · ${penMomentLabel(dagIdx)}`);
-  renderPenalty();
 }
 
 function penSetDag(idx) { penHuidigeDag = idx; penDagHandmatig = true; renderPenInvoer(); }
@@ -1195,8 +1163,8 @@ function penSpelersHtml() {
     html += `<div class="lb-row rank-${rang<=3?rang:99}">
       <div class="rank-num">${rang}</div><div class="rank-medal">${medal}</div>
       <div class="rank-name">
-        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:6px"></span>
-        ${p.name} <span style="color:var(--muted-light);font-size:.75rem;margin-left:4px">${p.team}</span>
+        <span class="team-dot" style="background:${p.color};margin-right:6px"></span>
+        ${escapeHtml(p.name)} <span style="color:var(--muted-light);font-size:.75rem;margin-left:4px">${escapeHtml(p.team)}</span>
         ${vdag!=null?`<span style="font-size:.65rem;padding:1px 5px;border-radius:20px;background:#FDF4FF;color:#A21CAF;margin-left:4px">2× ${penMomentLabel(vdag).slice(0,2)}</span>`:''}
       </div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(p.pts/max*100)}%"></div></div>
@@ -1270,7 +1238,7 @@ function renderPenHistorie() {
         const pts=penDagTotaalSpeler(naam,dagIdx);
         const verdToday=penVerdubbelaar[naam]===dagIdx;
         html+=`<div class="activity-row" style="margin-bottom:3px">
-          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${player?.color||'#ccc'};flex-shrink:0"></span>
+          <span class="team-dot" style="background:${player?.color||'#ccc'};flex-shrink:0"></span>
           <div style="font-weight:600;font-size:.85rem;flex:1">${naam} <span style="color:var(--muted-light);font-size:.75rem">${player?.team||''}</span></div>
           ${pogingen.map(p=>`<span style="font-size:.78rem;padding:2px 8px;border-radius:20px;background:${p.goal?'var(--green-bg)':'var(--red-bg)'};color:${p.goal?'var(--green)':'var(--red)'};font-weight:600">${p.goal?'⚽':'✗'} ${p.keeperNaam||'?'}</span>`).join('')}
           ${verdToday?`<span style="font-size:.7rem;padding:2px 6px;border-radius:20px;background:#FDF4FF;color:#A21CAF">2×</span>`:''}
@@ -1312,7 +1280,7 @@ function renderPenFinale() {
       const inF=penFinale.handmatigDeelnemers?.includes(p.name);
       html+=`<label style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer">
         <input type="checkbox" ${inF?'checked':''} onchange="penToggleFinaleDeelnemer('${p.name}',this.checked)" style="width:16px;height:16px;accent-color:var(--accent)">
-        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color}"></span>
+        <span class="team-dot" style="background:${p.color}"></span>
         <span style="font-weight:600;font-size:.85rem;flex:1">${p.name} <span style="color:var(--muted-light);font-size:.75rem">${p.team}</span></span>
         <span style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent)">${pts}pt</span>
       </label>`;
@@ -1409,7 +1377,7 @@ function renderPenFinale() {
                   background:${isBeurt?'var(--accent-bg)':gedaanV?'var(--bg2)':'var(--bg)'};
                   ${isBeurt?'box-shadow:0 0 0 3px rgba(37,99,235,.12)':''}">
                   ${isBeurt?`<span style="font-size:1rem">👉</span>`:`<span style="width:20px;text-align:center;font-size:.9rem">${doorgegaan===true?'✅':doorgegaan===false?'❌':si+1+(pi*ronde.deelnemers.length)+1>gedaan?'○':'·'}</span>`}
-                  <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${player?.color||'#ccc'};flex-shrink:0"></span>
+                  <span class="team-dot" style="background:${player?.color||'#ccc'};flex-shrink:0"></span>
                   <span style="font-weight:${isBeurt?'800':'600'};font-size:.88rem;flex:1;${isBeurt?'color:var(--accent)':''}">${naam}</span>
                   ${isBeurt&&!afgerond?`
                     <button onclick="penFinaleSchiet(${ri},${vIdx},true)" style="padding:8px 14px;border-radius:6px;border:2px solid var(--green);background:var(--green-bg);color:var(--green);font-weight:800;font-size:.9rem;cursor:pointer">⚽</button>
@@ -1711,7 +1679,7 @@ function renderPreSchema(){
     const ek=Math.max(1,8-i);
     html+=`<tr style="border-top:1px solid var(--border);font-size:.83rem">
       <td style="padding:6px;color:var(--muted);font-family:'DM Mono',monospace">${i+1}</td>
-      <td style="padding:6px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.color};margin-right:5px"></span><strong>${t.name}</strong></td>
+      <td style="padding:6px"><span class="team-dot" style="background:${t.color};margin-right:5px"></span><strong>${t.name}</strong></td>
       <td style="padding:6px;text-align:center;color:var(--green);font-weight:700">${t.wdl.w}</td>
       <td style="padding:6px;text-align:center;color:var(--muted)">${t.wdl.d}</td>
       <td style="padding:6px;text-align:center;color:var(--red)">${t.wdl.l}</td>
@@ -2175,16 +2143,16 @@ function renderDashboard(){
   const indTop=[...PLAYERS_ALL].filter(p=>isActief(p.name)).map(p=>({...p,pts:indPuntenSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
   document.getElementById('dash-team-top3').innerHTML=totals.slice(0,3).map((t,i)=>`
     <div class="lb-row rank-${i+1}"><div class="rank-num">${i+1}</div><div class="rank-medal">${medals[i]}</div>
-    <div class="rank-name"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.color};margin-right:6px"></span>${t.name}</div>
+    <div class="rank-name"><span class="team-dot" style="background:${t.color};margin-right:6px"></span>${escapeHtml(t.name)}</div>
     <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(t.pts/max*100)}%;background:${t.color}"></div></div>
     <div class="rank-pts">${t.pts}pt</div></div>`).join('');
   document.getElementById('dash-pen-top3').innerHTML=penTop.slice(0,3).map((p,i)=>`
     <div class="lb-row rank-${i+1}"><div class="rank-num">${i+1}</div><div class="rank-medal">${medals[i]}</div>
-    <div class="rank-name">${p.name} <span style="color:var(--muted-light);font-size:.75rem">${p.team}</span></div>
+    <div class="rank-name">${escapeHtml(p.name)} <span style="color:var(--muted-light);font-size:.75rem">${escapeHtml(p.team)}</span></div>
     <div class="rank-pts">${p.pts}pt</div></div>`).join('');
   document.getElementById('dash-ind-top3').innerHTML=indTop.slice(0,3).map((p,i)=>`
     <div class="lb-row rank-${i+1}"><div class="rank-num">${i+1}</div><div class="rank-medal">${medals[i]}</div>
-    <div class="rank-name">${p.name} <span style="color:var(--muted-light);font-size:.75rem">${p.team}</span></div>
+    <div class="rank-name">${escapeHtml(p.name)} <span style="color:var(--muted-light);font-size:.75rem">${escapeHtml(p.team)}</span></div>
     <div class="rank-pts">${p.pts}pt</div></div>`).join('');
   renderDashboardVandaag();
   renderDashboardControle();
@@ -2307,8 +2275,8 @@ function renderTeamKlassement(){
   document.getElementById('tk-stand').innerHTML=totals.map((t,i)=>`
     <div class="lb-row rank-${i<3?i+1:99}">
       <div class="rank-num">${i+1}</div><div class="rank-medal">${i<3?medals[i]:''}</div>
-      <div class="rank-name"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${t.color};margin-right:7px"></span>${t.name}
-        <span style="color:var(--muted-light);font-size:.75rem;font-weight:400;margin-left:4px">${t.leader}</span></div>
+      <div class="rank-name"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${t.color};margin-right:7px"></span>${escapeHtml(t.name)}
+        <span style="color:var(--muted-light);font-size:.75rem;font-weight:400;margin-left:4px">${escapeHtml(t.leader)}</span></div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(t.pts/max*100)}%;background:${t.color}"></div></div>
       <div class="rank-pts">${t.pts}pt</div></div>`).join('');
 }
@@ -2490,8 +2458,6 @@ function vkAfsluitenRonde(rondeId) {
   renderVierkamp();
 }
 
-// renderPenalty() is defined above — second definition removed (bugfix)
-
 // ── INACTIEF SPELERS ─────────────────────────────────────────
 const inactiefSpelers = new Set();
 function isActief(naam) { return !inactiefSpelers.has(naam); }
@@ -2602,6 +2568,31 @@ function indPuntenSpeler(naam) {
   return pts;
 }
 
+// Camppunten voor één spel, in één keer voor alle spelers (lineair i.p.v. per speler een
+// volledige ranking opbouwen). Retourneert een Map van spelernaam → camppunten.
+function indCampPtsVoorSpel(spel) {
+  const type = spel.scoreType === 'tijd' ? 'low' : 'high';
+  const players = PLAYERS_ALL
+    .filter(p => isActief(p.name) && spel.scores[p.name] != null)
+    .map(p => ({ id: p.name, score: spel.scores[p.name] }));
+  const result = assignCampPoints(players, type);
+  const map = new Map();
+  result.forEach(r => map.set(r.id, r.campPoints));
+  return map;
+}
+
+// Totale individuele punten voor alle spelers in één keer — vervangt het per-speler
+// aanroepen van indPuntenSpeler() in de standweergaven (kwadratisch → lineair).
+function indPuntenAlle() {
+  const totals = new Map();
+  indSpellen.forEach(dag => dag.spellen.forEach(spel => {
+    if(!spel.opgeslagen) return;
+    const cp = indCampPtsVoorSpel(spel);
+    cp.forEach((pts, naam) => { if(pts != null) totals.set(naam, (totals.get(naam) || 0) + pts); });
+  }));
+  return totals;
+}
+
 // ── INDIVIDUEEL ──────────────────────────────────────────────
 function renderInd() {
   renderIndStand(); renderIndLeeftijd(); renderIndInvoer(); renderIndGroepen(); renderIndSpellen();
@@ -2610,7 +2601,8 @@ function renderInd() {
 // De stand-HTML staat los van het doel-element zodat dezelfde stand ook onder
 // Klassement → Individueel getoond kan worden.
 function indStandHtml() {
-  const sorted = PLAYERS_ALL.filter(p=>isActief(p.name)).map(p=>({...p, pts:indPuntenSpeler(p.name)})).sort((a,b)=>b.pts-a.pts);
+  const totals = indPuntenAlle();
+  const sorted = PLAYERS_ALL.filter(p=>isActief(p.name)).map(p=>({...p, pts:totals.get(p.name) || 0})).sort((a,b)=>b.pts-a.pts);
   const max = sorted[0]?.pts || 1;
   let html = '';
   sorted.forEach(p => {
@@ -2618,7 +2610,7 @@ function indStandHtml() {
     const medal = rang===1?medals[0]:rang===2?medals[1]:rang===3?medals[2]:'';
     html += `<div class="lb-row rank-${rang<=3?rang:99}">
       <div class="rank-num">${rang}</div><div class="rank-medal">${medal}</div>
-      <div class="rank-name"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:6px"></span>${p.name} <span style="color:var(--muted-light);font-size:.75rem">${p.team}</span></div>
+      <div class="rank-name"><span class="team-dot" style="background:${p.color};margin-right:6px"></span>${escapeHtml(p.name)} <span style="color:var(--muted-light);font-size:.75rem">${escapeHtml(p.team)}</span></div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(p.pts/max*100)}%"></div></div>
       <div class="rank-pts">${p.pts}pt</div></div>`;
   });
@@ -2635,6 +2627,7 @@ function renderIndLeeftijd() {
   const el = document.getElementById('ind-leeftijd');
   if(!el) return;
   const admin = isAdmin();
+  const totals = indPuntenAlle();
   const inCat = IND_LEEFTIJDEN.flatMap(c => c.spelers);
   const vrij = PLAYERS_ALL.filter(p => isActief(p.name) && !inCat.includes(p.name));
 
@@ -2645,7 +2638,7 @@ function renderIndLeeftijd() {
     const spelers = cat.spelers.filter(n => isActief(n));
     if(!admin && spelers.length === 0) return;
     const ranked = spelers
-      .map(naam => ({ naam, pts: indPuntenSpeler(naam) }))
+      .map(naam => ({ naam, pts: totals.get(naam) || 0 }))
       .sort((a,b) => b.pts - a.pts);
     const max = ranked[0]?.pts || 1;
 
@@ -2662,8 +2655,8 @@ function renderIndLeeftijd() {
           <div class="rank-num">${rang}</div>
           <div class="rank-medal">${medal}</div>
           <div class="rank-name">
-            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${pl?.color||'#999'};margin-right:5px"></span>
-            ${p.naam} <span style="color:var(--muted-light);font-size:.73rem">${pl?.team||''}</span>
+            <span class="team-dot" style="background:${pl?.color||'#999'};margin-right:5px"></span>
+            ${escapeHtml(p.naam)} <span style="color:var(--muted-light);font-size:.73rem">${escapeHtml(pl?.team||'')}</span>
           </div>
           <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(p.pts/max*100)}%"></div></div>
           <div class="rank-pts">${p.pts}pt</div>
@@ -2676,12 +2669,12 @@ function renderIndLeeftijd() {
       html += `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">`;
       cat.spelers.forEach(naam => {
         html += `<span style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;background:var(--bg3);color:var(--text);font-size:.78rem;font-weight:600">
-          ${naam}<button onclick="indVerwijderUitLeeftijd(${ci},'${naam}')" style="background:none;border:none;color:var(--muted);cursor:pointer;line-height:1;padding:0 0 0 2px">&#10005;</button></span>`;
+          ${escapeHtml(naam)}<button onclick="indVerwijderUitLeeftijd(${ci},'${jsStr(naam)}')" style="background:none;border:none;color:var(--muted);cursor:pointer;line-height:1;padding:0 0 0 2px">&#10005;</button></span>`;
       });
       if(vrij.length > 0) {
         html += `<select style="font-size:.78rem;padding:3px 6px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:5px;color:var(--text)" onchange="indVoegToeAanLeeftijd(${ci},this.value);this.value=''">
           <option value="">+ speler toevoegen</option>
-          ${vrij.map(p=>`<option value="${p.name}">${p.name} (${p.team})</option>`).join('')}
+          ${vrij.map(p=>`<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)} (${escapeHtml(p.team)})</option>`).join('')}
         </select>`;
       }
       html += `</div>`;
@@ -2697,11 +2690,11 @@ function renderIndLeeftijd() {
     vrij.forEach(p => {
       html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:.82rem">
         <div style="font-weight:600;margin-bottom:5px">
-          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.name}
-          <span style="color:var(--muted-light);font-size:.7rem">${p.team}</span>
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${p.color};margin-right:4px"></span>${escapeHtml(p.name)}
+          <span style="color:var(--muted-light);font-size:.7rem">${escapeHtml(p.team)}</span>
         </div>
         <div style="display:flex;gap:4px;flex-wrap:wrap">
-          ${IND_LEEFTIJDEN.map((c,ci)=>`<button class="btn btn-outline" style="font-size:.68rem;padding:2px 8px" onclick="indVoegToeAanLeeftijd(${ci},'${p.name}')">+${c.cat}</button>`).join('')}
+          ${IND_LEEFTIJDEN.map((c,ci)=>`<button class="btn btn-outline" style="font-size:.68rem;padding:2px 8px" onclick="indVoegToeAanLeeftijd(${ci},'${jsStr(p.name)}')">+${escapeHtml(c.cat)}</button>`).join('')}
         </div>
       </div>`;
     });
@@ -2742,7 +2735,7 @@ function renderIndInvoer() {
       const safeId = p.name.replace(/[^a-z0-9]/gi,'_');
       const val = spel.scores[p.name] ?? null;
       const wrapId = `tid-${indHuidigeDag}-${si}-${safeId}`;
-      const safeName = p.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const safeName = jsStr(p.name);
       let inputHtml;
       if(!spel.opgeslagen) {
         if(isTijd) {
@@ -2768,7 +2761,7 @@ function renderIndInvoer() {
       }
       return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
         <span style="font-size:.83rem;flex:1">
-          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${p.color};margin-right:5px"></span>${p.name}
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${p.color};margin-right:5px"></span>${escapeHtml(p.name)}
         </span>
         ${inputHtml}
       </div>`;
@@ -2869,10 +2862,10 @@ function indZoekInGroep(gi, tekst) {
   const inGroep = IND_GROEPEN.flatMap(g => g.spelers);
   const matches = PLAYERS_ALL.filter(p => !inGroep.includes(p.name) && p.name.toLowerCase().includes(q)).slice(0, 8);
   if(matches.length === 0) { resultEl.innerHTML = '<div style="font-size:.75rem;color:var(--muted-light);padding:4px 2px">Geen (niet-ingedeelde) spelers gevonden.</div>'; return; }
-  resultEl.innerHTML = matches.map(p => `<div onclick="indVoegToeAanGroep(${gi},'${p.name.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:.82rem" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+  resultEl.innerHTML = matches.map(p => `<div onclick="indVoegToeAanGroep(${gi},'${jsStr(p.name)}')" style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:.82rem" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
     <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${p.color}"></span>
-    <span style="font-weight:600;flex:1">${p.name}</span>
-    <span style="color:var(--muted-light);font-size:.72rem">${p.team}</span>
+    <span style="font-weight:600;flex:1">${escapeHtml(p.name)}</span>
+    <span style="color:var(--muted-light);font-size:.72rem">${escapeHtml(p.team)}</span>
   </div>`).join('');
 }
 
@@ -2916,13 +2909,13 @@ function indFilterUitvoeren() {
     const ingedeeld = inGroep.includes(p.name);
     const huidigeGroep = ingedeeld ? IND_GROEPEN.find(g => g.spelers.includes(p.name))?.naam : null;
     return `<div style="display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--border)">
-      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color}"></span>
+      <span class="team-dot" style="background:${p.color}"></span>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:.85rem">${p.name}</div>
-        <div style="font-size:.72rem;color:var(--muted-light)">${p.team}${p.leeftijd?` · ${p.leeftijd}j`:''}${p.huidigTeam?` · ${p.huidigTeam}`:''}${ingedeeld?` · in ${huidigeGroep}`:''}</div>
+        <div style="font-weight:600;font-size:.85rem">${escapeHtml(p.name)}</div>
+        <div style="font-size:.72rem;color:var(--muted-light)">${escapeHtml(p.team)}${p.leeftijd?` · ${p.leeftijd}j`:''}${p.huidigTeam?` · ${escapeHtml(p.huidigTeam)}`:''}${ingedeeld?` · in ${escapeHtml(huidigeGroep)}`:''}</div>
       </div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;max-width:220px">
-        ${IND_GROEPEN.map((g,gi) => `<button class="btn btn-outline" style="font-size:.66rem;padding:2px 7px" onclick="indVoegToeAanGroep(${gi},'${p.name.replace(/'/g,"\\'")}');indFilterUitvoeren()">+${g.naam}</button>`).join('')}
+        ${IND_GROEPEN.map((g,gi) => `<button class="btn btn-outline" style="font-size:.66rem;padding:2px 7px" onclick="indVoegToeAanGroep(${gi},'${jsStr(p.name)}');indFilterUitvoeren()">+${escapeHtml(g.naam)}</button>`).join('')}
       </div>
     </div>`;
   }).join('');
@@ -2969,14 +2962,15 @@ function renderTeams(){
 function renderTeamsOverzicht(){
   const el = document.getElementById('tk-teams');
   if(!el) return;
+  const totals = getTeamTotals();
   el.innerHTML = `<div class="grid-2">${TEAMS.map(t=>{
-    const tot=getTeamTotals().find(x=>x.id===t.id);
+    const tot=totals.find(x=>x.id===t.id);
     const nInact=t.players.filter(p=>!isActief(p.name)).length;
     return `<div class="team-card" onclick="showTeamModal(${t.id})">
-      <div class="t-name" style="color:${t.color}">${t.name}</div>
-      <div class="t-leader">&#128100; ${t.leader || '<span style="color:var(--muted-light)">geen leider</span>'}</div>
+      <div class="t-name" style="color:${t.color}">${escapeHtml(t.name)}</div>
+      <div class="t-leader">&#128100; ${t.leader ? escapeHtml(t.leader) : '<span style="color:var(--muted-light)">geen leider</span>'}</div>
       <div class="t-pts">${tot.pts}<span style="font-size:.9rem;color:var(--muted)"> pts</span></div>
-      <ul class="player-list">${t.players.map(p=>{const inact=!isActief(p.name);return `<li style="${inact?'opacity:.4;text-decoration:line-through':''}"><span class="p-num">${p.num}</span>${p.name}</li>`;}).join('')}</ul>
+      <ul class="player-list">${t.players.map(p=>{const inact=!isActief(p.name);return `<li style="${inact?'opacity:.4;text-decoration:line-through':''}"><span class="p-num">${p.num}</span>${escapeHtml(p.name)}</li>`;}).join('')}</ul>
       ${nInact?`<div style="font-size:.72rem;color:var(--red);margin-top:4px">&#128564; ${nInact} inactief</div>`:''}
     </div>`;
   }).join('')}</div>`;
@@ -3000,9 +2994,9 @@ function renderTeamsStaf(){
     const t = TEAMS[i];
     const inactief = !stafNaamActief(l);
     html += `<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.83rem;${inactief?'opacity:.5':''}">
-      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.color}"></span>
-      <span style="font-weight:600;${inactief?'text-decoration:line-through':''}">${l}</span>
-      <span style="color:var(--muted-light);font-size:.75rem">${t.name}</span>
+      <span class="team-dot" style="background:${t.color}"></span>
+      <span style="font-weight:600;${inactief?'text-decoration:line-through':''}">${escapeHtml(l)}</span>
+      <span style="color:var(--muted-light);font-size:.75rem">${escapeHtml(t.name)}</span>
       ${inactief?'<span style="font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--red-bg);color:var(--red)">inactief</span>':''}
     </div>`;
   });
@@ -3016,8 +3010,8 @@ function renderTeamsStaf(){
   EXTRA_STAF.forEach((naam, i) => {
     const inactief = INACTIEVE_STAF.has(naam);
     html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);${inactief?'opacity:.55':''}">
-      <span style="flex:1;font-weight:600;font-size:.88rem;${inactief?'text-decoration:line-through':''}">&#128100; ${naam}</span>
-      <button onclick="stafZetInactief('${naam.replace(/'/g,"\\'")}',${inactief?'false':'true'})" style="padding:3px 10px;border-radius:20px;border:1px solid ${inactief?'#FECACA':'#A7F3D0'};background:${inactief?'var(--red-bg)':'var(--green-bg)'};color:${inactief?'var(--red)':'var(--green)'};font-size:.72rem;font-weight:700;cursor:pointer">${inactief?'Inactief':'Actief'}</button>
+      <span style="flex:1;font-weight:600;font-size:.88rem;${inactief?'text-decoration:line-through':''}">&#128100; ${escapeHtml(naam)}</span>
+      <button onclick="stafZetInactief('${jsStr(naam)}',${inactief?'false':'true'})" style="padding:3px 10px;border-radius:20px;border:1px solid ${inactief?'#FECACA':'#A7F3D0'};background:${inactief?'var(--red-bg)':'var(--green-bg)'};color:${inactief?'var(--red)':'var(--green)'};font-size:.72rem;font-weight:700;cursor:pointer">${inactief?'Inactief':'Actief'}</button>
       <button onclick="stafVerwijder(${i})" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border-dark);background:transparent;font-size:.75rem;color:var(--red);cursor:pointer">Verwijder</button>
     </div>`;
   });
@@ -3071,9 +3065,9 @@ function showTeamModal(id){
   document.getElementById('modal-body').innerHTML=`<div style="font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:8px">SPELERS — klik om inactief te zetten</div>
     ${t.players.map(p=>{const inact=!isActief(p.name);return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
       <span class="p-num">${p.num}</span>
-      <span style="flex:1;font-weight:600;font-size:.88rem;${inact?'opacity:.4;text-decoration:line-through':''}">${p.name}</span>
+      <span style="flex:1;font-weight:600;font-size:.88rem;${inact?'opacity:.4;text-decoration:line-through':''}">${escapeHtml(p.name)}</span>
       <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.78rem">
-        <input type="checkbox" ${inact?'checked':''} onchange="setInactief('${p.name}',this.checked)" style="accent-color:#EF4444;width:15px;height:15px">
+        <input type="checkbox" ${inact?'checked':''} onchange="setInactief('${jsStr(p.name)}',this.checked)" style="accent-color:#EF4444;width:15px;height:15px">
         <span style="color:${inact?'var(--red)':'var(--muted)'}">Inactief</span>
       </label>
     </div>`; }).join('')}`;
@@ -3093,11 +3087,11 @@ function renderInstTeams() {
   TEAMS.forEach((t,i) => {
     html += `<div class="card" style="margin-bottom:8px">
       <div class="grid-2" style="grid-template-columns:auto 1fr 1fr;align-items:end;gap:10px">
-        <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">KLEUR</label>
+        <div><label class="field-label">KLEUR</label>
           <input type="color" value="${t.color}" onchange="teamSetVeld(${i},'color',this.value)" style="width:40px;height:36px;border:1px solid var(--border-dark);border-radius:6px;padding:0;cursor:pointer"></div>
-        <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TEAMNAAM</label>
+        <div><label class="field-label">TEAMNAAM</label>
           <input value="${t.name}" onchange="teamSetVeld(${i},'name',this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)"></div>
-        <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">GROEPSLEIDER</label>
+        <div><label class="field-label">GROEPSLEIDER</label>
           <input value="${t.leader}" onchange="teamSetVeld(${i},'leader',this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)"></div>
       </div>
     </div>`;
@@ -3106,7 +3100,7 @@ function renderInstTeams() {
     <div class="card-title">&#128229; Teams/leiders importeren (Excel)</div>
     <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
       <strong>Formaat</strong> — één rij per team, in dezelfde volgorde als hierboven:<br>
-      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Naam,Leider,Kleur</code>
+      <code class="mono" style="font-size:.76rem;display:block;margin:4px 0">Naam,Leider,Kleur</code>
       <span style="color:var(--muted-light);font-size:.76rem">Kleur is optioneel (bv. #DC2626) — laat leeg om de huidige kleur te behouden.</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
@@ -3116,7 +3110,7 @@ function renderInstTeams() {
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
     <textarea id="teams-csv-tekst" placeholder="Naam,Leider,Kleur&#10;Rood Vuur,Thomas,#DC2626"
-      style="width:100%;min-height:80px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
+      class="mono" style="width:100%;min-height:80px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
     <div style="margin-top:8px">
       <button class="btn btn-primary" style="font-size:.8rem" onclick="teamsCsvToepassen()">&#10003; Importeren &amp; toepassen</button>
     </div>
@@ -3392,9 +3386,13 @@ function renderPlanning(){
       } else if(!a.vervallen && is8kamp) {
         click = `onclick="openAkVanuitPlanning(${di},${ai})"`;
       } else if(!a.vervallen && isInd) {
-        click = `onclick="openIndVanuitPlanning('${day.day}')"`;
+        click = `onclick="openIndVanuitPlanning('${jsStr(day.day)}')"`;
+      } else if(!a.vervallen && kl === 'Vierkamp') {
+        click = `onclick="openVierkampVanuitPlanning()"`;
+      } else if(!a.vervallen && kl === 'Pre-Ontbijt') {
+        click = `onclick="openPreontbijtVanuitPlanning()"`;
       } else if(!a.vervallen && kl) {
-        click = `onclick="openScoreModal('${a.name.replace(/'/g,"\\'")}','${a.time}','${kl}')"`;
+        click = `onclick="openScoreModal('${jsStr(a.name)}','${jsStr(a.time)}','${jsStr(kl)}')"`;
       }
 
       const clickable = !admin && !!kl && !a.vervallen;
@@ -3404,7 +3402,7 @@ function renderPlanning(){
       return `<div class="activity-row type-${a.type}${clickable?' clickable':''}${admin?' admin-editable':''}${a.vervallen?' act-vervallen':''}${isHuidig?' act-huidig':''}${isVoorbij?' act-voorbij':''}" ${click}>
         <div class="activity-row-main">
           <div class="activity-time" style="${a.vervallen?'text-decoration:line-through;':''}">${a.time}</div>
-          <div class="activity-name" style="${a.vervallen?'text-decoration:line-through;color:var(--muted);':''}">${a.name}</div>
+          <div class="activity-name" style="${a.vervallen?'text-decoration:line-through;color:var(--muted);':''}">${escapeHtml(a.name)}</div>
           ${activiteitTagHtml(a)}
           ${statusTag}
           ${admin ? `<span style="font-size:.8rem;opacity:.3;margin-left:auto;flex-shrink:0">&#9998;</span>` : ''}
@@ -3435,30 +3433,30 @@ function planningEdit(di, ai) {
   document.getElementById('modal-body').innerHTML = `
     <div style="display:grid;gap:12px">
       <div>
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">NAAM</label>
+        <label class="field-label">NAAM</label>
         <input id="pe-naam" value="${a.name.replace(/"/g,'&quot;')}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TIJDSTIP</label>
+          <label class="field-label">TIJDSTIP</label>
           <input id="pe-time" type="time" value="${a.time}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
         </div>
         <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TYPE</label>
+          <label class="field-label">TYPE</label>
           <select id="pe-type" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)" onchange="planningTypeChange('pe')">
             ${PLANNING_TYPES.map(t=>`<option value="${t.val}" ${typeVal===t.val?'selected':''}>${t.label}</option>`).join('')}
           </select>
         </div>
       </div>
       <div id="pe-kl-row" style="display:${typeVal==='spel'?'block':'none'}">
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LABEL</label>
+        <label class="field-label">LABEL</label>
         <select id="pe-kl" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
           <option value="">Geen (los spel)</option>
           ${LABELS.map(l=>`<option value="${l.naam}" ${a.klassement===l.naam?'selected':''}>${l.naam}</option>`).join('')}
         </select>
       </div>
       <div>
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LEIDERS <span style="font-weight:400;opacity:.7">(optioneel, meerdere mogelijk)</span></label>
+        <label class="field-label">LEIDERS <span style="font-weight:400;opacity:.7">(optioneel, meerdere mogelijk)</span></label>
         <div id="pe-leiders" style="display:flex;flex-wrap:wrap;gap:6px;max-height:110px;overflow-y:auto;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px">
           ${KAMPSTAF.map(l=>`<label style="display:flex;align-items:center;gap:5px;font-size:.8rem;padding:3px 8px;border-radius:14px;background:var(--bg2);cursor:pointer">
             <input type="checkbox" value="${l}" ${(a.leiders||[]).includes(l)?'checked':''} style="width:14px;height:14px;accent-color:var(--accent)"> ${l}
@@ -3467,16 +3465,16 @@ function planningEdit(di, ai) {
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">DUUR (MIN)</label>
+          <label class="field-label">DUUR (MIN)</label>
           <input id="pe-duur" type="number" min="0" step="5" value="${a.duur||''}" placeholder="bijv. 45" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
         </div>
         <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
+          <label class="field-label">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
           <input id="pe-label" value="${a.customLabel||''}" placeholder="Overschrijft standaard label..." style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
         </div>
       </div>
       <div>
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">OPMERKING <span style="font-weight:400;opacity:.7">(optioneel, zichtbaar onder de activiteit)</span></label>
+        <label class="field-label">OPMERKING <span style="font-weight:400;opacity:.7">(optioneel, zichtbaar onder de activiteit)</span></label>
         <input id="pe-opmerking" value="${(a.opmerking||'').replace(/"/g,'&quot;')}" placeholder="bijv. Neem regenjas mee" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
       </div>
       <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--red-bg);border-radius:8px;border:1px solid #FECACA;cursor:pointer">
@@ -3542,30 +3540,30 @@ function planningAdd(di) {
   document.getElementById('modal-body').innerHTML = `
     <div style="display:grid;gap:12px">
       <div>
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">NAAM</label>
+        <label class="field-label">NAAM</label>
         <input id="pa-naam" placeholder="bijv. Groot avondspel" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TIJDSTIP</label>
+          <label class="field-label">TIJDSTIP</label>
           <input id="pa-time" type="time" value="10:00" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
         </div>
         <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TYPE</label>
+          <label class="field-label">TYPE</label>
           <select id="pa-type" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)" onchange="planningTypeChange('pa')">
             ${PLANNING_TYPES.map(t=>`<option value="${t.val}">${t.label}</option>`).join('')}
           </select>
         </div>
       </div>
       <div id="pa-kl-row">
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LABEL</label>
+        <label class="field-label">LABEL</label>
         <select id="pa-kl" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
           <option value="">Geen (los spel)</option>
           ${LABELS.map(l=>`<option value="${l.naam}">${l.naam}</option>`).join('')}
         </select>
       </div>
       <div>
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">LEIDERS <span style="font-weight:400;opacity:.7">(optioneel, meerdere mogelijk)</span></label>
+        <label class="field-label">LEIDERS <span style="font-weight:400;opacity:.7">(optioneel, meerdere mogelijk)</span></label>
         <div id="pa-leiders" style="display:flex;flex-wrap:wrap;gap:6px;max-height:110px;overflow-y:auto;padding:8px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px">
           ${KAMPSTAF.map(l=>`<label style="display:flex;align-items:center;gap:5px;font-size:.8rem;padding:3px 8px;border-radius:14px;background:var(--bg2);cursor:pointer">
             <input type="checkbox" value="${l}" style="width:14px;height:14px;accent-color:var(--accent)"> ${l}
@@ -3574,16 +3572,16 @@ function planningAdd(di) {
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">DUUR (MIN)</label>
+          <label class="field-label">DUUR (MIN)</label>
           <input id="pa-duur" type="number" min="0" step="5" placeholder="bijv. 45" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
         </div>
         <div>
-          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
+          <label class="field-label">AANGEPAST LABEL <span style="font-weight:400;opacity:.7">(optioneel)</span></label>
           <input id="pa-label" placeholder="Overschrijft standaard label..." style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
         </div>
       </div>
       <div>
-        <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">OPMERKING <span style="font-weight:400;opacity:.7">(optioneel, zichtbaar onder de activiteit)</span></label>
+        <label class="field-label">OPMERKING <span style="font-weight:400;opacity:.7">(optioneel, zichtbaar onder de activiteit)</span></label>
         <input id="pa-opmerking" placeholder="bijv. Neem regenjas mee" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.88rem;color:var(--text)">
       </div>
     </div>`;
@@ -3626,7 +3624,7 @@ function renderInstPlanningImport() {
     <div class="card-title">&#128229; Planning / spellen importeren</div>
     <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
       <strong>Formaat</strong> — komma of puntkomma als scheider, één spel per rij, dag moet een bestaande kampdag zijn:<br>
-      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Tijd,Type,Spelnaam,Leider,Duur</code>
+      <code class="mono" style="font-size:.76rem;display:block;margin:4px 0">Dag,Tijd,Type,Spelnaam,Leider,Duur</code>
       <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: Maandag,10:00,8-Kamp,Ochtendspel,Thomas,60</span><br>
       <span style="color:var(--muted-light);font-size:.76rem">"Type" mag een echt activiteitstype zijn (Spel, Maaltijd, Vrij, Info, Pauze, Vierkamp, Penalty Bokaal, Individuele Spellen) — of een label (bestaand of nieuw, bv. "8-Kamp", "Teamklassement" of een eigen label). Een onbekend label wordt automatisch aangemaakt met een automatisch gekozen kleur; bij "8-Kamp" wordt ook automatisch een 8-Kamp aangemaakt.</span><br>
       <span style="color:var(--muted-light);font-size:.76rem">"Leider" mag de voornaam van meerdere kampstafleden bevatten, gescheiden door "&amp;", een komma of een puntkomma (bijv. "Thomas &amp; Sven") — elke naam wordt herkend aan de bestaande kampstaf en automatisch gekoppeld. Een niet-herkende naam wordt na het importeren duidelijk gemeld.</span><br>
@@ -3639,7 +3637,7 @@ function renderInstPlanningImport() {
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
     <textarea id="plan-csv-tekst" placeholder="Dag,Tijd,Type,Spelnaam,Leider,Duur&#10;Maandag,10:00,8-Kamp,Ochtendspel,Thomas,60"
-      style="width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"
+      class="mono" style="width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"
       oninput="planningPreviewCsv()"></textarea>
     <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="planningPreviewCsv()">&#128270; Preview</button>
@@ -3844,15 +3842,17 @@ function renderSpellen() {
     let click = '';
     if(admin) click = `onclick="planningEdit(${r.di},${r.ai})"`;
     else if(!a.vervallen && a.klassement === '8-Kamp') click = `onclick="openAkVanuitPlanning(${r.di},${r.ai})"`;
-    else if(!a.vervallen && a.klassement === 'Individueel') click = `onclick="openIndVanuitPlanning('${r.dagNaam}')"`;
-    else if(!a.vervallen && a.klassement) click = `onclick="openScoreModal('${a.name.replace(/'/g,"\\'")}','${a.time}','${a.klassement}')"`;
+    else if(!a.vervallen && a.klassement === 'Individueel') click = `onclick="openIndVanuitPlanning('${jsStr(r.dagNaam)}')"`;
+    else if(!a.vervallen && a.klassement === 'Vierkamp') click = `onclick="openVierkampVanuitPlanning()"`;
+    else if(!a.vervallen && a.klassement === 'Pre-Ontbijt') click = `onclick="openPreontbijtVanuitPlanning()"`;
+    else if(!a.vervallen && a.klassement) click = `onclick="openScoreModal('${jsStr(a.name)}','${jsStr(a.time)}','${jsStr(a.klassement)}')"`;
     html += `<tr style="cursor:${click?'pointer':'default'}" ${click}>
       <td>${activiteitTagHtml(a)}</td>
-      <td><strong>${a.name}</strong>${a.vervallen?' <span style="color:var(--red);font-size:.72rem">(vervallen)</span>':''}</td>
-      <td>${(a.leiders&&a.leiders.length) ? a.leiders.join(' & ') : '<span style="color:var(--muted-light)">—</span>'}</td>
+      <td><strong>${escapeHtml(a.name)}</strong>${a.vervallen?' <span style="color:var(--red);font-size:.72rem">(vervallen)</span>':''}</td>
+      <td>${(a.leiders&&a.leiders.length) ? a.leiders.map(escapeHtml).join(' & ') : '<span style="color:var(--muted-light)">—</span>'}</td>
       <td style="color:var(--muted)">${a.duur ? a.duur+' min' : '—'}</td>
-      <td style="color:var(--muted)">${r.dagNaam}</td>
-      <td style="font-family:'DM Mono',monospace;color:var(--muted);font-size:.8rem">${a.time}</td>
+      <td style="color:var(--muted)">${escapeHtml(r.dagNaam)}</td>
+      <td class="mono" style="color:var(--muted);font-size:.8rem">${a.time}</td>
     </tr>`;
   });
   html += `</tbody></table></div>`;
@@ -3904,7 +3904,7 @@ function updateScorePreview() {
     const medal = r.rang===1?'🥇':r.rang===2?'🥈':r.rang===3?'🥉':'';
     html += `<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--border);font-size:.85rem">
       <span style="width:22px;text-align:center;font-size:.9rem">${medal||r.rang}</span>
-      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.color};flex-shrink:0"></span>
+      <span class="team-dot" style="background:${r.color};flex-shrink:0"></span>
       <span style="flex:1;font-weight:600">${r.name}</span>
       <span style="color:var(--muted);font-size:.8rem;font-family:'DM Mono',monospace">${r.raw} punten</span>
       <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--accent);min-width:36px;text-align:right">${r.kPts}pt</span>
@@ -3926,18 +3926,18 @@ function openScoreModal(spelNaam,tijd,klassement){
     TEAMS.forEach(t=>{
       body+=`<div class="score-input-row">
         <div class="sir-dot" style="background:${t.color}"></div>
-        <div class="sir-name">${t.name}</div>
+        <div class="sir-name">${escapeHtml(t.name)}</div>
         <input class="sir-input" type="number" min="0" step="0.5" placeholder="bijv. 15" id="sir-${t.id}" oninput="updateScorePreview()">
       </div>`;
     });
     body+=`<div id="score-preview"></div>`;
     document.getElementById('modal-body').innerHTML=body;
-    document.getElementById('modal-footer').innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Annuleren</button><button class="btn btn-primary" onclick="saveScoreModal('${(spelNaam||'').replace(/'/g,"\\'")}','${tijd||''}','Teamklassement')">✓ Opslaan</button>`;
+    document.getElementById('modal-footer').innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Annuleren</button><button class="btn btn-primary" onclick="saveScoreModal('${jsStr(spelNaam||'')}','${jsStr(tijd||'')}','Teamklassement')">✓ Opslaan</button>`;
   }else if(klassement==='Penalty'){
     document.getElementById('modal-body').innerHTML=`<p style="color:var(--muted);font-size:.88rem">Ga naar het <strong>Penalty Bokaal</strong> tabblad om scores in te voeren per speler.</p>`;
     document.getElementById('modal-footer').innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Sluiten</button><button class="btn btn-primary" onclick="closeModal();showSpellenSub('penalty')">Naar Penalty Bokaal →</button>`;
   }else{
-    document.getElementById('modal-body').innerHTML=`<p style="color:var(--muted);font-size:.88rem">Score invoer voor <strong>${klassement}</strong> — gebruik het bijbehorende klassementscherm.</p>`;
+    document.getElementById('modal-body').innerHTML=`<p style="color:var(--muted);font-size:.88rem">Score invoer voor <strong>${escapeHtml(klassement)}</strong> — gebruik het bijbehorende klassementscherm.</p>`;
     document.getElementById('modal-footer').innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Sluiten</button>`;
   }
   openModal();
@@ -4105,7 +4105,7 @@ function renderAkInvoer() {
     html += `<div class="lb-row rank-${rang<=3?rang:99}">
       <div class="rank-num">${rang}</div>
       <div class="rank-medal">${medal}</div>
-      <div class="rank-name"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.color};margin-right:6px"></span>${t.name}</div>
+      <div class="rank-name"><span class="team-dot" style="background:${t.color};margin-right:6px"></span>${t.name}</div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(t.tot/maxTot*100)}%;background:${t.color}"></div></div>
       <div class="rank-pts">${t.tot}kp</div>
     </div>`;
@@ -4234,23 +4234,41 @@ function openAkVanuitPlanning(di, ai){
   // Zorg dat invoer tab actief is
   const akSection = document.getElementById('section-achtkamp');
   akSection.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  akSection.querySelectorAll('.tab')[0].classList.add('active');
+  akSection.querySelector('.tab[data-tab="invoer"]')?.classList.add('active');
   ['ak-stand','ak-detail'].forEach(sid=>{const el=document.getElementById(sid);if(el)el.style.display='none';});
   document.getElementById('ak-invoer').style.display='block';
 }
 
 // Vanuit planning naar individueel sectie springen
 function openIndVanuitPlanning(dagNaam) {
-  const btn = document.querySelector('.nav-btn[onclick*="spellen"]');
-  showSection('individueel', btn);
-  spellenSubActiefZetten('individueel');
+  showSpellenSub('individueel');
   const section = document.getElementById('section-individueel');
   section.querySelectorAll('.tab:not(.spellen-sub-btn)').forEach(t => t.classList.remove('active'));
-  section.querySelectorAll('.tab:not(.spellen-sub-btn)')[1].classList.add('active');
-  ['ind-stand','ind-groepen','ind-spellen'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  section.querySelector('.tab[data-tab="invoer"]')?.classList.add('active');
+  ['ind-stand','ind-leeftijd','ind-groepen','ind-spellen'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
   document.getElementById('ind-invoer').style.display = 'block';
   const dagIdx = IND_DAGEN.indexOf(dagNaam);
   if(dagIdx >= 0) indSetDag(dagIdx);
+}
+
+// Vanuit planning naar Vierkamp springen (Duels-tab, waar de scores per duel worden bijgehouden)
+function openVierkampVanuitPlanning() {
+  showSpellenSub('vierkamp');
+  const section = document.getElementById('section-vierkamp');
+  section.querySelectorAll('.tab:not(.spellen-sub-btn)').forEach(t => t.classList.remove('active'));
+  section.querySelector('.tab[data-tab="duels"]')?.classList.add('active');
+  ['vk-stand'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  const duels = document.getElementById('vk-duels'); if(duels) duels.style.display = 'block';
+}
+
+// Vanuit planning naar Pre-Ontbijt springen (Invoer-tab)
+function openPreontbijtVanuitPlanning() {
+  showSpellenSub('preontbijt');
+  const section = document.getElementById('section-preontbijt');
+  section.querySelectorAll('.tab:not(.spellen-sub-btn)').forEach(t => t.classList.remove('active'));
+  section.querySelector('.tab[data-tab="invoer"]')?.classList.add('active');
+  ['pre-schema','pre-spellen'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  const invoer = document.getElementById('pre-invoer'); if(invoer) invoer.style.display = 'block';
 }
 
 // ── EXPORT ────────────────────────────────────────────────────
@@ -4300,7 +4318,7 @@ function renderInstSpelers() {
       <div class="card-title">&#128229; Excel importeren</div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
         <strong>Formaat</strong> — komma of puntkomma als scheider, één speler per rij:<br>
-        <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Naam,Leeftijd,HuidigTeam,Kampteam</code>
+        <code class="mono" style="font-size:.76rem;display:block;margin:4px 0">Naam,Leeftijd,HuidigTeam,Kampteam</code>
         <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: Liam Vermeer,9,FC Utrecht,Rood Vuur</span><br>
         <span style="color:var(--muted-light);font-size:.76rem">Een kopregel (Naam, Name, Speler) wordt automatisch overgeslagen.</span>
       </div>
@@ -4311,7 +4329,7 @@ function renderInstSpelers() {
         <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
       </div>
       <textarea id="inst-csv-tekst" placeholder="Naam,Leeftijd,HuidigTeam,Kampteam&#10;Liam Vermeer,9,FC Utrecht,Rood Vuur&#10;Noah Dekker,10,Ajax,Blauw Water"
-        style="width:100%;min-height:120px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"
+        class="mono" style="width:100%;min-height:120px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"
         oninput="instPreviewCsv()"></textarea>
       <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-outline" style="font-size:.8rem" onclick="instPreviewCsv()">&#128270; Preview</button>
@@ -4503,7 +4521,6 @@ function instToepassen() {
       team: s.kampTeam,
       teamId,
       color: kleurMap[s.kampTeam],
-      indPts: 0,
     };
   });
 
@@ -4573,7 +4590,7 @@ function koppelSpelersAanTeams() {
 
 function instHuidigeSpelersHtml() {
   if(PLAYERS_ALL.length === 0) return '<div style="font-size:.82rem;color:var(--muted-light);font-style:italic">Nog geen spelers geladen.</div>';
-  const heeftExtra = !!PLAYERS_ALL[0]?.leeftijd;
+  const heeftExtra = PLAYERS_ALL.some(p => p.leeftijd != null);
   let html = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.79rem">
     <thead><tr style="background:var(--bg2)">
       <th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--muted)">#</th>
@@ -4584,10 +4601,10 @@ function instHuidigeSpelersHtml() {
   PLAYERS_ALL.forEach((p,i) => {
     html += `<tr style="border-bottom:1px solid var(--border)${i%2===0?';background:var(--bg2)':''}">
       <td style="padding:5px 8px;color:var(--muted-light)">${i+1}</td>
-      <td style="padding:5px 8px;font-weight:600">${p.name}</td>
-      ${heeftExtra ? `<td style="padding:5px 8px;text-align:center">${p.leeftijd}</td><td style="padding:5px 8px;color:var(--muted)">${p.huidigTeam||'—'}</td>` : ''}
+      <td style="padding:5px 8px;font-weight:600">${escapeHtml(p.name)}</td>
+      ${heeftExtra ? `<td style="padding:5px 8px;text-align:center">${p.leeftijd}</td><td style="padding:5px 8px;color:var(--muted)">${escapeHtml(p.huidigTeam||'—')}</td>` : ''}
       <td style="padding:5px 8px"><span style="display:inline-flex;align-items:center;gap:4px;font-size:.75rem">
-        <span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span>${p.team}
+        <span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span>${escapeHtml(p.team)}
       </span></td>
     </tr>`;
   });
@@ -4738,21 +4755,21 @@ function leiderNieuw() {
   document.getElementById('modal-sub').textContent = 'Login wordt automatisch voornaam+achternaam';
   document.getElementById('modal-body').innerHTML = `<div style="display:grid;gap:12px">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">VOORNAAM</label>
+      <div><label class="field-label">VOORNAAM</label>
         <input id="ln-voornaam" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">ACHTERNAAM</label>
+      <div><label class="field-label">ACHTERNAAM</label>
         <input id="ln-achternaam" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
     </div>
-    <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">WACHTWOORD</label>
+    <div><label class="field-label">WACHTWOORD</label>
       <input id="ln-wachtwoord" type="text" placeholder="Kies een wachtwoord" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">ROL</label>
+      <div><label class="field-label">ROL</label>
         <select id="ln-rol" onchange="document.getElementById('ln-team-row').style.display=this.value==='groepsleider'?'block':'none'" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
           <option value="groepsleider">Groepsleider</option>
           <option value="kampstaf">Kampstaf</option>
           <option value="admin">Admin</option>
         </select></div>
-      <div id="ln-team-row"><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TEAM</label>
+      <div id="ln-team-row"><label class="field-label">TEAM</label>
         <select id="ln-team" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
           ${TEAMS.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}
         </select></div>
@@ -4787,21 +4804,21 @@ function leiderBewerken(i) {
   document.getElementById('modal-sub').textContent = `Login: ${l.login}`;
   document.getElementById('modal-body').innerHTML = `<div style="display:grid;gap:12px">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">VOORNAAM</label>
+      <div><label class="field-label">VOORNAAM</label>
         <input id="ln-voornaam" value="${l.voornaam}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">ACHTERNAAM</label>
+      <div><label class="field-label">ACHTERNAAM</label>
         <input id="ln-achternaam" value="${l.achternaam||''}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
     </div>
-    <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">NIEUW WACHTWOORD <span style="font-weight:400;opacity:.7">(leeg laten = ongewijzigd)</span></label>
+    <div><label class="field-label">NIEUW WACHTWOORD <span style="font-weight:400;opacity:.7">(leeg laten = ongewijzigd)</span></label>
       <input id="ln-wachtwoord" type="text" placeholder="••••••••" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">ROL</label>
+      <div><label class="field-label">ROL</label>
         <select id="ln-rol" onchange="document.getElementById('ln-team-row').style.display=this.value==='groepsleider'?'block':'none'" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
           <option value="groepsleider" ${l.rol==='groepsleider'?'selected':''}>Groepsleider</option>
           <option value="kampstaf" ${l.rol==='kampstaf'?'selected':''}>Kampstaf</option>
           <option value="admin" ${l.rol==='admin'?'selected':''}>Admin</option>
         </select></div>
-      <div id="ln-team-row" style="display:${l.rol==='groepsleider'?'block':'none'}"><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">TEAM</label>
+      <div id="ln-team-row" style="display:${l.rol==='groepsleider'?'block':'none'}"><label class="field-label">TEAM</label>
         <select id="ln-team" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.85rem;color:var(--text)">
           ${TEAMS.map(t=>`<option value="${t.id}" ${l.teamId===t.id?'selected':''}>${t.name}</option>`).join('')}
         </select></div>
@@ -4851,12 +4868,12 @@ function renderInstKamp() {
   let html = `<div class="card" style="margin-bottom:12px">
     <div class="card-title">Huidig kamp</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">NAAM</label>
+      <div><label class="field-label">NAAM</label>
         <input id="km-naam" value="${KAMP_META.naam}" onchange="KAMP_META.naam=this.value" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">JAAR</label>
+      <div><label class="field-label">JAAR</label>
         <input id="km-jaar" type="number" value="${KAMP_META.jaar}" onchange="KAMP_META.jaar=parseInt(this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
     </div>
-    <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">THEMA <span style="font-weight:400;opacity:.7">(bepaald per kamp, zichtbaar op dashboard)</span></label>
+    <label class="field-label">THEMA <span style="font-weight:400;opacity:.7">(bepaald per kamp, zichtbaar op dashboard)</span></label>
     <input id="km-thema" value="${KAMP_META.thema||''}" placeholder="bijv. Piraten" onchange="kampSetThema(this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)">
   </div>
 
@@ -4876,7 +4893,6 @@ function renderInstKamp() {
     html += `<div style="font-size:.83rem;color:var(--muted-light);font-style:italic">Nog geen gearchiveerde kampen.</div>`;
   } else {
     [...ARCHIEF].reverse().forEach(a => {
-      const top3 = (a.data?.game_history||[]).length ? null : null;
       html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
         <div style="flex:1">
           <div style="font-weight:700;font-size:.9rem">${a.kampNaam} ${a.jaar?`(${a.jaar})`:''}</div>
@@ -5081,7 +5097,7 @@ function renderInstKampstaf() {
     <div class="card-title">&#128229; Kampstaf importeren (Excel)</div>
     <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
       <strong>Formaat</strong> — één naam per rij:<br>
-      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Naam</code>
+      <code class="mono" style="font-size:.76rem;display:block;margin:4px 0">Naam</code>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <button class="btn btn-outline" style="font-size:.8rem" onclick="downloadTemplateKampstaf()">&#8681; Download voorbeeld-Excel</button>
@@ -5090,7 +5106,7 @@ function renderInstKampstaf() {
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
     <textarea id="kampstaf-csv-tekst" placeholder="Naam&#10;Kok Piet&#10;EHBO Anna"
-      style="width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
+      class="mono" style="width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
     <div style="margin-top:8px">
       <button class="btn btn-primary" style="font-size:.8rem" onclick="kampstafCsvToepassen()">&#10003; Importeren &amp; toevoegen</button>
     </div>
@@ -5129,7 +5145,7 @@ function renderInstAtletiekImport() {
     <div class="card-title">&#128229; Atletiek-/individueel-spellen importeren</div>
     <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
       <strong>Formaat</strong> — komma of puntkomma als scheider, één spel per rij:<br>
-      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Slot,Spelnaam,Leider1,Leider2,ScoreType</code>
+      <code class="mono" style="font-size:.76rem;display:block;margin:4px 0">Dag,Slot,Spelnaam,Leider1,Leider2,ScoreType</code>
       <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: ${IND_DAGEN[1]||'Maandag'},1,Kogelstoten,Thomas,Sven,aantal</span><br>
       <span style="color:var(--muted-light);font-size:.76rem">Slot is 1 t/m 4 (het spel-nummer die dag). ScoreType is "aantal" of "tijd".</span>
     </div>
@@ -5140,7 +5156,7 @@ function renderInstAtletiekImport() {
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
     <textarea id="atletiek-csv-tekst" placeholder="Dag,Slot,Spelnaam,Leider1,Leider2,ScoreType"
-      style="width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
+      class="mono" style="width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
     <div style="margin-top:8px">
       <button class="btn btn-primary" style="font-size:.8rem" onclick="atletiekCsvToepassen()">&#10003; Importeren &amp; toepassen</button>
     </div>
@@ -5184,7 +5200,7 @@ function renderInstPreImport() {
     <div class="card-title">&#128229; Pre-Ontbijtspellen importeren</div>
     <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;background:var(--bg2);padding:8px 10px;border-radius:6px;border-left:3px solid var(--accent)">
       <strong>Formaat</strong> — één rij per ronde/veld (2 spellen per kampdag, 2 rondes per veld):<br>
-      <code style="font-family:'DM Mono',monospace;font-size:.76rem;display:block;margin:4px 0">Dag,Ronde,Spelnaam,Veld,Leider1,Leider2,Team1,Team2,Team3,Team4</code>
+      <code class="mono" style="font-size:.76rem;display:block;margin:4px 0">Dag,Ronde,Spelnaam,Veld,Leider1,Leider2,Team1,Team2,Team3,Team4</code>
       <span style="color:var(--muted-light);font-size:.76rem">Voorbeeld: ${KAMPdagen[1]||'Maandag'},1,Zaklopen,1,Thomas,Sven,Rood Vuur,Blauw Staal</span><br>
       <span style="color:var(--muted-light);font-size:.76rem">Ronde is 1 of 2. De spelnaam bepaalt bij welk spel de rij hoort (max. 2 verschillende spellen per dag). Team3/Team4 blijven normaal leeg — vul ze alleen bij een 4-teams-spel (dat spel gebruikt dan 1 veld en wordt automatisch als 4-teams ingesteld).</span>
     </div>
@@ -5195,7 +5211,7 @@ function renderInstPreImport() {
       <span style="font-size:.75rem;color:var(--muted-light)">of plak hieronder</span>
     </div>
     <textarea id="pre-csv-tekst" placeholder="Dag,Ronde,Spelnaam,Veld,Leider1,Leider2,Team1,Team2,Team3,Team4"
-      style="width:100%;min-height:100px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
+      class="mono" style="width:100%;min-height:100px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;padding:8px;font-size:.78rem;color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
     <div style="margin-top:8px">
       <button class="btn btn-primary" style="font-size:.8rem" onclick="preCsvToepassen()">&#10003; Importeren &amp; toepassen</button>
     </div>
@@ -5270,9 +5286,9 @@ function renderInstDatums() {
       (dus ook een zaterdag als die erin valt).
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">STARTDATUM</label>
+      <div><label class="field-label">STARTDATUM</label>
         <input id="km-startdatum" type="date" value="${KAMP_META.startDatum}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
-      <div><label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">EINDDATUM</label>
+      <div><label class="field-label">EINDDATUM</label>
         <input id="km-einddatum" type="date" value="${KAMP_META.eindDatum}" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border-dark);border-radius:6px;font-size:.9rem;color:var(--text)"></div>
     </div>
     <button class="btn btn-primary" onclick="pasKampDagenToeConfirm()">&#128198; Dagen genereren</button>
@@ -5658,6 +5674,23 @@ async function syncHydrate() {
     })
     .subscribe();
 }
+
+// ── LIVE KLOK (datum + tijd, Europe/Amsterdam) ────────────────
+// Toont de actuele datum en tijd in de header. Vaste tijdzone Europe/Amsterdam zodat de
+// weergave overeenkomt met de kampdag-logica (vandaagIso) — ook op apparaten met een
+// afwijkende tijdzone-instelling.
+function updateKlok() {
+  const el = document.getElementById('app-klok');
+  if (!el) return;
+  const nu = new Date();
+  const tijd = new Intl.DateTimeFormat('nl-NL', { timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit' }).format(nu);
+  const datum = new Intl.DateTimeFormat('nl-NL', { timeZone: 'Europe/Amsterdam', weekday: 'short', day: 'numeric', month: 'short' }).format(nu);
+  const tijdEl = el.querySelector('.klok-tijd'), datumEl = el.querySelector('.klok-datum');
+  if (tijdEl) tijdEl.textContent = tijd;
+  if (datumEl) datumEl.textContent = datum;
+}
+updateKlok();
+setInterval(updateKlok, 1000);
 
 syncHydrate();
 </script>
