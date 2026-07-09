@@ -270,10 +270,9 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
     <div id="login-err" style="display:none;margin-bottom:12px;padding:9px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;font-size:.83rem;color:#DC2626;font-weight:600">⚠️ Ongeldige gebruikersnaam of wachtwoord</div>
     <button onclick="doLogin()" style="width:100%;padding:13px;background:#2563EB;color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 12px rgba(37,99,235,.35)">Inloggen →</button>
     <div style="margin-top:20px;padding:14px;background:#EFF6FF;border-radius:10px;font-size:.75rem;color:#1D4ED8;line-height:2">
-      <strong>Demo accounts:</strong><br>
+      <strong>Beheerder:</strong><br>
       admin / admin2026 · <span style="background:#2563EB;color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">Admin</span><br>
-      thomas / rood2026 · <span style="background:#059669;color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">Groepsleider</span><br>
-      kampstaf / kamp2026 · <span style="background:#7C3AED;color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">Kampstaf</span>
+      Groepsleiders en kampstaf worden toegevoegd via Kampbeheer → Leiders.
     </div>
   </div>
 </div>
@@ -567,19 +566,12 @@ main{max-width:960px;margin:0 auto;padding:20px 20px 80px;}
 // tekst in de data — alleen als SHA-256 hash (zie hashWachtwoord()). Dit is geen
 // productiesterke beveiliging (de Supabase anon-key ligt sowieso open in dit bestand),
 // maar voorkomt dat wachtwoorden zomaar leesbaar in de database staan.
+// Alleen het admin-account staat vast. Groepsleiders en extra kampstaf worden per kamp
+// toegevoegd via Kampbeheer → Leiders (admin-only).
 let LEIDERS = [
   {id:1, voornaam:'Admin',    achternaam:'', login:'admin',    wachtwoordHash:'6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6', rol:'admin',        teamId:null},
-  {id:2, voornaam:'Thomas',   achternaam:'', login:'thomas',   wachtwoordHash:'678e8bbba37ae3b33d516853cfd5a459475763c5a583f242c28bf9ac52c4038d', rol:'groepsleider', teamId:1},
-  {id:3, voornaam:'Sven',     achternaam:'', login:'sven',     wachtwoordHash:'da8e3dc76ae9ca8aaa95cacd05a0f3c1c24d5539398d56c8e2f009934aebb276', rol:'groepsleider', teamId:2},
-  {id:4, voornaam:'Rick',     achternaam:'', login:'rick',     wachtwoordHash:'0b672eb5cd7f11eda14b6e436219fb06f875715f5e6a24ce9dd398f7e6ad1ba0', rol:'groepsleider', teamId:3},
-  {id:5, voornaam:'Pieter',   achternaam:'', login:'pieter',   wachtwoordHash:'285304ff4af48e62ade0d748b8f45f5c39d4bc3e1f36eb7a0ead0197e15ffde1', rol:'groepsleider', teamId:4},
-  {id:6, voornaam:'Kevin',    achternaam:'', login:'kevin',    wachtwoordHash:'d1162c9fbf909e6cb99c8f20f6734d92fa714684b625de19df804077ca2cfef7', rol:'groepsleider', teamId:5},
-  {id:7, voornaam:'Dirk',     achternaam:'', login:'dirk',     wachtwoordHash:'479d707c57e10ae1a1d9731c57f71cb0165190141f50f765a823ce76b608b107', rol:'groepsleider', teamId:6},
-  {id:8, voornaam:'Michiel',  achternaam:'', login:'michiel',  wachtwoordHash:'3c842947e934b91099019faf2099585fbdd3c624692f48dbf13cbfa7601b4a43', rol:'groepsleider', teamId:7},
-  {id:9, voornaam:'Jeroen',   achternaam:'', login:'jeroen',   wachtwoordHash:'a376134fdb00ea90e88bc41cd29533d4a482036d678509e9e3f5b1c406b74fb6', rol:'groepsleider', teamId:8},
-  {id:10,voornaam:'Kampstaf', achternaam:'', login:'kampstaf', wachtwoordHash:'16550d5b68eaa64b917188cf0ce4e5405294d989e6c1698bbc9e8129bb11cf5b', rol:'kampstaf',     teamId:null},
 ];
-let LEIDERS_NEXT_ID = 11;
+let LEIDERS_NEXT_ID = 2;
 
 function leiderNaam(l) { return [l.voornaam, l.achternaam].filter(Boolean).join(' '); }
 function leiderLogin(voornaam, achternaam) { return ((voornaam||'')+(achternaam||'')).toLowerCase().replace(/[^a-z0-9]/g,''); }
@@ -608,6 +600,7 @@ async function doLogin() {
     return;
   }
   huidigeGebruiker = user;
+  sessieBewaren(user);
   document.getElementById('login-overlay').style.display = 'none';
   document.getElementById('login-err').style.display = 'none';
   updateGebruikerDisplay();
@@ -617,11 +610,40 @@ async function doLogin() {
 
 function doLogout() {
   huidigeGebruiker = null;
+  sessieWissen();
   document.getElementById('login-email').value = '';
   document.getElementById('login-pass').value = '';
   document.getElementById('login-overlay').style.display = 'flex';
   document.getElementById('gebruiker-info').innerHTML = '';
   document.title = 'Pupillenkamp';
+}
+
+// ── SESSIE ONTHOUDEN (blijf ingelogd na F5/herladen) ──────────
+// We bewaren alleen de login-naam in localStorage, nooit het wachtwoord of de hash. Bij het
+// herladen zoeken we die login weer op in LEIDERS en loggen we automatisch in. Dit is bewust
+// licht beveiligd (net als de rest van de app): iedereen met toegang tot dit apparaat blijft
+// ingelogd. Op een gedeeld/openbaar apparaat kun je beter op "Uitloggen" klikken.
+const SESSIE_SLEUTEL = 'pk_sessie';
+function sessieBewaren(user) {
+  try { localStorage.setItem(SESSIE_SLEUTEL, JSON.stringify({ login: user.login })); } catch(e) {}
+}
+function sessieWissen() {
+  try { localStorage.removeItem(SESSIE_SLEUTEL); } catch(e) {}
+}
+// Probeert een bewaarde sessie te herstellen tegen de huidige LEIDERS-lijst. Een inactief of
+// verwijderd account wordt genegeerd (en de bewaarde sessie opgeruimd). Geeft true bij succes.
+function herstelSessie() {
+  let data;
+  try { data = JSON.parse(localStorage.getItem(SESSIE_SLEUTEL) || 'null'); } catch(e) { data = null; }
+  if(!data || !data.login) return false;
+  const user = LEIDERS.find(u => u.login === data.login);
+  if(!user || user.actief === false) { sessieWissen(); return false; }
+  huidigeGebruiker = user;
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('login-err').style.display = 'none';
+  updateGebruikerDisplay();
+  renderDashboard();
+  return true;
 }
 
 function updateGebruikerDisplay() {
@@ -661,24 +683,22 @@ function kanInvoeren(teamId) {
 }
 
 // ── DATA ────────────────────────────────────────────────────
+// Teams zijn de doorlopende structuur (naam + kleur). Leiders en spelers worden per kamp
+// beheerd via Kampbeheer → Teams / Leiders / Spelers (of via CSV-import) en starten leeg.
 const TEAMS = [
-  {id:1,name:'Rood Vuur',   leader:'Thomas', color:'#DC2626',players:[{num:1,name:'Liam V.'},{num:2,name:'Noah D.'},{num:3,name:'Lucas B.'},{num:4,name:'Finn H.'},{num:5,name:'Jesse K.'},{num:6,name:'Bram T.'},{num:7,name:'Stan M.'}]},
-  {id:2,name:'Blauw Staal', leader:'Sven',   color:'#2563EB',players:[{num:1,name:'Max R.'},{num:2,name:'Tom W.'},{num:3,name:'Daan P.'},{num:4,name:'Milan J.'},{num:5,name:'Ruben A.'},{num:6,name:'Lars F.'},{num:7,name:'Jens S.'}]},
-  {id:3,name:'Groen Woud',  leader:'Rick',   color:'#059669',players:[{num:1,name:'Cas N.'},{num:2,name:'Timo B.'},{num:3,name:'Stef L.'},{num:4,name:'Joris C.'},{num:5,name:'Niels G.'},{num:6,name:'Pim R.'},{num:7,name:'Koen V.'}]},
-  {id:4,name:'Geel Zand',   leader:'Pieter', color:'#D97706',players:[{num:1,name:'Boris H.'},{num:2,name:'Sander M.'},{num:3,name:'Thijs O.'},{num:4,name:'Rens D.'},{num:5,name:'Luuk P.'},{num:6,name:'Sem K.'},{num:7,name:'Arno W.'}]},
-  {id:5,name:'Oranje Zon',  leader:'Kevin',  color:'#EA580C',players:[{num:1,name:'Dylan T.'},{num:2,name:'Jasper B.'},{num:3,name:'Floris A.'},{num:4,name:'Chris N.'},{num:5,name:'Wouter S.'},{num:6,name:'Hugo M.'},{num:7,name:'Bas L.'}]},
-  {id:6,name:'Paars Veld',  leader:'Dirk',   color:'#7C3AED',players:[{num:1,name:'Rik H.'},{num:2,name:'Stijn C.'},{num:3,name:'Job B.'},{num:4,name:'Gijs F.'},{num:5,name:'Niek R.'},{num:6,name:'Derk V.'},{num:7,name:'Youri T.'}]},
-  {id:7,name:'Zwart Rots',  leader:'Michiel',color:'#475569',players:[{num:1,name:'Siem W.'},{num:2,name:'Jort P.'},{num:3,name:'Ferre G.'},{num:4,name:'Axel L.'},{num:5,name:'Tijs B.'},{num:6,name:'Ewout N.'},{num:7,name:'Pier M.'}]},
-  {id:8,name:'Wit Licht',   leader:'Jeroen', color:'#0891B2',players:[{num:1,name:'Elias K.'},{num:2,name:'Mats D.'},{num:3,name:'Luca V.'},{num:4,name:'Tobias S.'},{num:5,name:'Sam H.'},{num:6,name:'Felix R.'},{num:7,name:'Arne B.'}]},
+  {id:1,name:'Rood Vuur',   leader:'', color:'#DC2626',players:[]},
+  {id:2,name:'Blauw Staal', leader:'', color:'#2563EB',players:[]},
+  {id:3,name:'Groen Woud',  leader:'', color:'#059669',players:[]},
+  {id:4,name:'Geel Zand',   leader:'', color:'#D97706',players:[]},
+  {id:5,name:'Oranje Zon',  leader:'', color:'#EA580C',players:[]},
+  {id:6,name:'Paars Veld',  leader:'', color:'#7C3AED',players:[]},
+  {id:7,name:'Zwart Rots',  leader:'', color:'#475569',players:[]},
+  {id:8,name:'Wit Licht',   leader:'', color:'#0891B2',players:[]},
 ];
 
-// game_history: scores[] = points per team in TEAMS order
-const GAME_HISTORY = [
-  {name:'Veldspel',        klassement:'Teamklassement',type:'raw',date:'Zondag',  time:'16:00',scores:[8,7,5,6,4,3,2,1],rawScores:[18,15,10,12,8,6,5,4]},
-  {name:'Avondspel',       klassement:'Teamklassement',type:'raw',date:'Zondag',  time:'20:00',scores:[6,5,8,7,3,4,1,2],rawScores:[12,10,18,15,6,8,2,4]},
-  {name:'Pre-ontbijtspel', klassement:'Teamklassement',type:'raw',date:'Maandag', time:'07:30',scores:[7,8,6,5,4,3,2,1],rawScores:[16,18,14,10,8,6,4,2]},
-  {name:'Voetbal Dag 2',   klassement:'Teamklassement',type:'raw',date:'Maandag', time:'17:00',scores:[8,6,7,5,3,4,2,1],rawScores:[20,14,18,10,6,8,4,2]},
-];
+// game_history: scores[] = points per team in TEAMS order. Start leeg; wordt gevuld
+// zodra spellen worden opgeslagen.
+const GAME_HISTORY = [];
 
 // Vierkamp: 4 vaste spellen, elke ronde = 1 duel (2 teams spelen alle 4 spellen)
 const VK_SPELLEN = ['Koekhappen', 'Flessentrekker', 'Zaklopen', 'Touwtrekken'];
@@ -702,7 +722,7 @@ const VK_RONDES = [
   {id:16,dag:'Donderdag',team1Id:4,team2Id:7,spellen:[null,null,null,null],afgesloten:false},
 ];
 
-const PLAYERS_ALL = TEAMS.flatMap(t=>t.players.map(p=>({...p,team:t.name,teamId:t.id,color:t.color,indPts:Math.floor(Math.random()*20)})));
+const PLAYERS_ALL = TEAMS.flatMap(t=>t.players.map(p=>({...p,team:t.name,teamId:t.id,color:t.color,indPts:0})));
 
 // ── KAMP & ARCHIEF ────────────────────────────────────────────
 // Eén actief kamp tegelijk. "Kamp afsluiten" (Kampbeheer → Kamp & Archief) maakt een
@@ -851,10 +871,6 @@ function penDagTotaalSpeler(naam, dagIdx) {
     pts += p.verdubbelaar ? g * 2 : g;
   });
   return pts;
-}
-
-function penDagGoalsSpeler(naam, dagIdx) {
-  return penData[dagIdx].pogingen.filter(p => p.spelerNaam === naam && p.goal === true).length;
 }
 
 function penDagTegengoalsKeeper(keeperNaam, dagIdx) {
@@ -1091,18 +1107,6 @@ function penShotRow(spelerNaam, shotIdx, bestaand, opgeslagen, defaultKeeper) {
       <button class="pen-btn" style="flex:1;padding:7px 0;${goalVal===false?'background:var(--red-bg);border-color:#FECACA;color:var(--red)':''}" onclick="penToggleGoal('${spelerNaam}',${shotIdx},false)">✗</button>
     </div>
   </div>`;
-}
-
-function penUpdateShot(spelerNaam, shotIdx) {
-  const dagData = penData[penHuidigeDag];
-  const safeId = spelerNaam.replace(/[^a-z0-9]/gi,'');
-  const keeper = document.getElementById(`pen-${safeId}-${shotIdx}-keeper`)?.value || '';
-  const existing = dagData.pogingen.filter(p => p.spelerNaam === spelerNaam);
-  if(!existing[shotIdx]) {
-    dagData.pogingen.push({spelerNaam, keeperNaam:keeper, goal:null, verdubbelaar: penVerdubbelaar[spelerNaam]===penHuidigeDag});
-  } else {
-    existing[shotIdx].keeperNaam = keeper;
-  }
 }
 
 function penToggleGoal(spelerNaam, shotIdx, isGoal) {
@@ -2498,8 +2502,8 @@ function setInactief(naam, val) {
 
 // ── KAMPSTAF ─────────────────────────────────────────────────
 // Groepsleiders + extra kampstaf. Vul hier de extra stafleden in:
-const EXTRA_STAF = ['Kampleiding']; // ← pas aan naar echte namen, of beheer via Teams → Kampstaf
-const KAMPSTAF = [...LEADERS, ...EXTRA_STAF]; // wordt dynamisch bijgehouden
+const EXTRA_STAF = []; // ← beheer via Kampbeheer → Teams / Kampstaf
+const KAMPSTAF = [...LEADERS, ...EXTRA_STAF].filter(Boolean); // wordt dynamisch bijgehouden
 
 // Inactieve kampstaf-namen: blijven in EXTRA_STAF/LEADERS staan (historische koppelingen aan
 // spellen/planning blijven intact) maar verschijnen niet meer in keuzelijsten. Leider-accounts
@@ -2970,7 +2974,7 @@ function renderTeamsOverzicht(){
     const nInact=t.players.filter(p=>!isActief(p.name)).length;
     return `<div class="team-card" onclick="showTeamModal(${t.id})">
       <div class="t-name" style="color:${t.color}">${t.name}</div>
-      <div class="t-leader">&#128100; ${t.leader}</div>
+      <div class="t-leader">&#128100; ${t.leader || '<span style="color:var(--muted-light)">geen leider</span>'}</div>
       <div class="t-pts">${tot.pts}<span style="font-size:.9rem;color:var(--muted)"> pts</span></div>
       <ul class="player-list">${t.players.map(p=>{const inact=!isActief(p.name);return `<li style="${inact?'opacity:.4;text-decoration:line-through':''}"><span class="p-num">${p.num}</span>${p.name}</li>`;}).join('')}</ul>
       ${nInact?`<div style="font-size:.72rem;color:var(--red);margin-top:4px">&#128564; ${nInact} inactief</div>`:''}
@@ -2989,7 +2993,10 @@ function renderTeamsStaf(){
   <div class="card" style="margin-bottom:12px">
     <div class="card-title">Groepsleiders (automatisch)</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">`;
+  let heeftGroepsleider = false;
   LEADERS.forEach((l,i) => {
+    if(!l) return; // team zonder ingestelde leider — nog niets om te tonen
+    heeftGroepsleider = true;
     const t = TEAMS[i];
     const inactief = !stafNaamActief(l);
     html += `<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.83rem;${inactief?'opacity:.5':''}">
@@ -2999,6 +3006,7 @@ function renderTeamsStaf(){
       ${inactief?'<span style="font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--red-bg);color:var(--red)">inactief</span>':''}
     </div>`;
   });
+  if(!heeftGroepsleider) html += `<div style="font-size:.83rem;color:var(--muted);font-style:italic">Nog geen groepsleiders ingesteld — koppel per team een leider via het tabblad Teams.</div>`;
   html += `</div></div>
 
   <div class="card">
@@ -5422,6 +5430,9 @@ preHuidigeDag = standaardKampDagIndex();
 indHuidigeDag = standaardKampDagIndex();
 // Keuzelijsten meteen filteren op actieve leiders/kampstaf.
 herbouwKampstaf();
+// Bewaarde sessie herstellen zodat je na F5/herladen ingelogd blijft (tegen de vaste
+// LEIDERS-lijst; na het laden uit Supabase wordt dit nog eens tegen de DB gecontroleerd).
+herstelSessie();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -5553,8 +5564,16 @@ function scheduleSync() {
   clearTimeout(syncTimer);
   syncTimer = setTimeout(syncDiffSave, 800);
 }
-// Vangnet: elke 5 sec. diff-check (voor invoer die niet via een renderfunctie loopt)
-setInterval(syncDiffSave, 5000);
+// Vangnet voor invoer die niet via een renderfunctie loopt (bv. typen in een tekstveld):
+// alleen een diff-check draaien wanneer er sinds de vorige check echt iets is ingevoerd.
+// Zo blijft de app bij inactiviteit rustig i.p.v. elke 5 sec. alle data te serialiseren.
+let syncInvoerPending = false;
+document.addEventListener('input', () => { syncInvoerPending = true; }, true);
+setInterval(() => {
+  if (!syncInvoerPending) return;
+  syncInvoerPending = false;
+  syncDiffSave();
+}, 5000);
 
 // ── Renderfuncties wrappen: na elke render → opslaan plannen ─
 [
@@ -5613,6 +5632,14 @@ async function syncHydrate() {
   toonSyncStatus('ok');
   // Modules die nog niet in de DB stonden: eerste snapshot wegschrijven
   syncDiffSave();
+  // Bewaarde sessie herbevestigen tegen de zojuist geladen LEIDERS-lijst uit de DB: het
+  // account kan intussen op afstand gewijzigd (rol/team) of op inactief gezet zijn.
+  if (huidigeGebruiker) {
+    const vers = LEIDERS.find(u => u.login === huidigeGebruiker.login);
+    if (!vers || vers.actief === false) { doLogout(); return; }
+    huidigeGebruiker = vers;
+    updateGebruikerDisplay();
+  }
   // UI verversen met de geladen data
   if (huidigeGebruiker) herRenderActieveSectie();
 
